@@ -102,6 +102,7 @@ def datosPaciente(tabla):
             if k2:
                 datos[k2] = v2
 
+    datos["Referencias mastocitomas"] = False
     return datos
 
 def getImagenes(doc, el):
@@ -160,7 +161,6 @@ def cargarDescMicro(descripciones_micro, bloque_actual):
         "Descripcion": "",
         "Diagnostico": {
             "Descripcion": "",
-            "Tablas": [],
             "Imagenes": []
         },
         "Tabla de Grado": []
@@ -203,7 +203,6 @@ def procesar_docx(ruta):
         "Descripcion": "",
         "Diagnostico": {    # cada descripcion microscopica tiene su diagnostico asociado
             "Descripcion": "",
-            "Tablas": [],
             "Imagenes": []
         },
         "Tabla de Grado": []
@@ -230,6 +229,8 @@ def procesar_docx(ruta):
                     # si nos encontramos con una liena que solo diga Referencias cortamos el procesado del parrafo actual
                     if patron_referencias.search(linea):
                         en_referencias = True
+                        if re.compile(r"referencia graduaci[oó]n mastocitomas", re.I).search(linea):
+                            datos_paciente["Referencias mastocitomas"] = True
                         break
 
                     matchea_categoria, seccion_actual, nueva_desc_micro, nombre_tabla_actual = matcheaCategoria(linea, seccion_actual, nueva_desc_micro, nombre_tabla_actual)
@@ -263,30 +264,29 @@ def procesar_docx(ruta):
                     cabecera_procesada = True
                 # solo procesamos tablas NO RALAS (por ejemplo dejamos afuera la de diagnostico porque dice lo mismo que la descripcion del diagnostico)
                 else:
-                    contenido_primera_celda = tabla.rows[0].cells[0].text
+                    # contenido_primera_celda = tabla.rows[0].cells[0].text
                     es_tabla_grado = (patronTablaGrado.match(tabla.rows[0].cells[1].text.strip()) if len(tabla.rows[0].cells) > 1 else False)
-                    tabla_procesable = (not contenido_primera_celda) or es_tabla_grado
-                    if tabla_procesable:
-                        if es_tabla_grado:
-                            bloque_actual['Tabla de Grado'] = procesarTablaGrado(tabla)
-                        else:
-                            texto_tabla = procesarTabla(tabla, os.path.basename(ruta))
-
-                            # si estamos en una seccion de descripcion micro o de diagnostico, agregamos la tabla al diagnostico asociado
-                            if seccion_actual in [DESCRIPCION_MICROSCOPICA, DIAGNOSTICO_HISTOPATOLOGICO]:
-                                bloque_actual["Diagnostico"]["Tablas"].append({
-                                    "Nombre": nombre_tabla_actual,
-                                    "Contenido": texto_tabla
-                                })
-                                nombre_tabla_actual = ""  # limpiamos para la próxima tabla
-                            else:
-                                try:
-                                    secciones[seccion_actual].append(texto_tabla)
-                                except Exception as e:
-                                    print(f"ERRO : {e}")
-                                    with open("diagnosticos_mal_procesados.txt", "a", encoding="utf-8") as f:
-                                        f.write(f"{nombre_diag_actual}\n")
-                                    return ""
+                    # tabla_procesable = (not contenido_primera_celda) or es_tabla_grado
+                    if es_tabla_grado:
+                        bloque_actual['Tabla de Grado'] = procesarTablaGrado(tabla)
+                    # if tabla_procesable:
+                    #     texto_tabla = procesarTabla(tabla, os.path.basename(ruta))
+                    #
+                    #     # si estamos en una seccion de descripcion micro o de diagnostico, agregamos la tabla al diagnostico asociado
+                    #     if seccion_actual in [DESCRIPCION_MICROSCOPICA, DIAGNOSTICO_HISTOPATOLOGICO]:
+                    #         bloque_actual["Diagnostico"]["Tablas"].append({
+                    #             "Nombre": nombre_tabla_actual,
+                    #             "Contenido": texto_tabla
+                    #         })
+                    #         nombre_tabla_actual = ""  # limpiamos para la próxima tabla
+                    #     else:
+                    #         try:
+                    #             secciones[seccion_actual].append(texto_tabla)
+                    #         except Exception as e:
+                    #             print(f"ERRO : {e}")
+                    #             with open("diagnosticos_mal_procesados.txt", "a", encoding="utf-8") as f:
+                    #                 f.write(f"{nombre_diag_actual}\n")
+                    #             return ""
 
     # agregamos el ultimo contenido de descripcion microscopica del documento
     if bloque_actual["Descripcion"]:
@@ -304,7 +304,7 @@ def procesar_docx(ruta):
 #     os.remove(ruta)
 
 if __name__ == "__main__":
-    ruta = "../prueba/"
+    ruta = "../Histopatología/"
 
     if not os.path.exists("JSONS/"):
         os.makedirs("JSONS/")
