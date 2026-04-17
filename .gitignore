@@ -1,2 +1,4 @@
 JSONS/
 IMAGENES/
+sqlc/
+views/*.go
