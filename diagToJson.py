@@ -100,6 +100,8 @@ def datosPaciente(tabla):
                     datos[k1] = v1
 
             if k2:
+                if v2.startswith("-") and len(v2) == 5:
+                    v2 = f"01-01{v2}"
                 datos[k2] = v2
 
     datos["Referencias mastocitomas"] = False
