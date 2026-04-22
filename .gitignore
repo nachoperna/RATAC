@@ -2,3 +2,4 @@ JSONS/
 IMAGENES/
 sqlc/
 views/*.go
+./diagnosticos_mal_procesados.txt
