@@ -1,0 +1,36 @@
+package views
+
+import "RATAC/domain"
+
+templ ListPacientes(pacientes []domain.Paciente) {
+	for _, p := range pacientes {
+            <article class="case-card">
+                <div class="card-header">
+                    <span class="protocol-chip">{p.Protocolo}o</span>
+                    <span class="date-label">{p.Fecha}</span>
+                </div>
+                <div class="patient-info">
+                    <span class="patient-name">{p.NombrePaciente}</span>
+                    <span class="species-breed">Especie no especificada • Raza no especificada</span>
+                </div>
+                <div class="data-grid">
+                    <div class="data-item">
+                        <span class="data-label">Solicitante</span>
+                        <span class="data-value">{p.Solicitante}</span>
+                    </div>
+                    <div class="data-item">
+                        <span class="data-label">Técnica</span>
+                        <span class="data-value">{p.Tecnica}</span>
+                    </div>
+                    <div class="data-item">
+                        <span class="data-label">Edad</span>
+                        <span class="not-specified">{p.Edad}</span>
+                    </div>
+                    <div class="data-item">
+                        <span class="data-label">Familia</span>
+                        <span class="not-specified">{p.Familia}</span>
+                    </div>
+                </div>
+            </article>
+      }
+}

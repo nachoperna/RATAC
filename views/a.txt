@@ -1,1 +1,0 @@
-En esta carpeta tienen que estar los templ en caso que useamos templ

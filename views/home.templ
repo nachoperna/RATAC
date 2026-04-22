@@ -1,0 +1,217 @@
+package views
+
+templ ShowHome() {
+      <!DOCTYPE html>
+      <html lang="es">
+      <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>RATAC — Panel de Protocolos</title>
+      <!-- Fuentes -->
+      <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+      <!-- HTMX -->
+      <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+      <style>
+            *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+            :root {
+                  --navy: #1a1a6e;
+                  --navy-mid: #2d2d8f;
+                  --lavender: #e8e4f5;
+                  --lavender-mid: #c9bfea;
+                  --rose-pale: #f5eff2;
+                  --ink: #111128;
+                  --muted: #6b6b8a;
+                  --border: #ddd8ee;
+                  --white: #ffffff;
+                  --bg: #f7f6fb;
+                  --accent: #4a4a9d;
+            }
+
+            body {
+                  font-family: 'Source Serif 4', Georgia, serif;
+                  background: var(--bg);
+                  color: var(--ink);
+                  padding: 40px 20px;
+            }
+
+            .container {
+                  max-width: 1200px;
+                  margin: 0 auto;
+            }
+
+            .section-header {
+                  margin-bottom: 40px;
+                  border-bottom: 1px solid var(--border);
+                  padding-bottom: 20px;
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: flex-end;
+            }
+
+            .section-title-group h1 {
+                  font-family: 'Playfair Display', serif;
+                  font-size: 2.5rem;
+                  font-weight: 400;
+                  color: var(--navy);
+            }
+
+            .section-label {
+                  text-transform: uppercase;
+                  letter-spacing: 0.1em;
+                  font-size: 0.8rem;
+                  font-weight: 600;
+                  color: var(--navy);
+                  margin-bottom: 8px;
+                  display: block;
+            }
+
+            /* Grid de Tarjetas - Contenedor HTMX */
+            #cards-grid {
+                  display: grid;
+                  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+                  gap: 24px;
+                  min-height: 200px;
+            }
+
+            /* Estilo de la Tarjeta (Lo que el servidor enviará) */
+            .case-card {
+                  background: var(--white);
+                  border: 1px solid var(--border);
+                  border-radius: 12px;
+                  padding: 24px;
+                  transition: all 0.3s ease;
+                  display: flex;
+                  flex-direction: column;
+                  animation: fadeIn 0.5s ease forwards;
+            }
+
+            @keyframes fadeIn {
+                  from { opacity: 0; transform: translateY(10px); }
+                  to { opacity: 1; transform: translateY(0); }
+            }
+
+            .case-card:hover {
+                  transform: translateY(-4px);
+                  box-shadow: 0 12px 24px rgba(26, 26, 110, 0.06);
+                  border-color: var(--lavender-mid);
+            }
+
+            .card-header {
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: flex-start;
+                  margin-bottom: 20px;
+            }
+
+            .protocol-chip {
+                  font-family: 'DM Mono', monospace;
+                  background: var(--lavender);
+                  color: var(--navy);
+                  padding: 4px 12px;
+                  border-radius: 20px;
+                  font-size: 0.85rem;
+                  font-weight: 500;
+            }
+
+            .date-label {
+                  font-size: 0.85rem;
+                  color: var(--muted);
+                  font-style: italic;
+            }
+
+            .patient-name {
+                  font-family: 'Playfair Display', serif;
+                  font-size: 1.6rem;
+                  color: var(--ink);
+                  margin-bottom: 4px;
+                  display: block;
+            }
+
+            .species-breed {
+                  font-size: 0.95rem;
+                  color: var(--muted);
+                  margin-bottom: 12px;
+                  display: block;
+            }
+
+            .data-grid {
+                  display: grid;
+                  grid-template-columns: 1fr 1fr;
+                  gap: 16px;
+                  padding-top: 16px;
+                  border-top: 1px dashed var(--border);
+                  margin-top: auto;
+            }
+
+            .data-item { display: flex; flex-direction: column; }
+
+            .data-label {
+                  font-size: 0.7rem;
+                  text-transform: uppercase;
+                  letter-spacing: 0.05em;
+                  color: var(--muted);
+                  font-weight: 600;
+                  margin-bottom: 2px;
+            }
+
+            .data-value {
+                  font-size: 0.9rem;
+                  color: var(--navy-mid);
+                  font-weight: 500;
+            }
+
+            .not-specified {
+                  color: #b0afc5;
+                  font-style: italic;
+                  font-size: 0.85rem;
+            }
+
+            /* Indicador de carga de HTMX */
+            .htmx-indicator {
+                  display: none;
+                  color: var(--muted);
+                  font-family: 'DM Mono', monospace;
+                  font-size: 0.9rem;
+            }
+            .htmx-request .htmx-indicator {
+                  display: inline-block;
+            }
+            .htmx-request#cards-grid {
+                  opacity: 0.6;
+            }
+      </style>
+      </head>
+      <body>
+
+      <div class="container">
+      <header class="section-header">
+            <div class="section-title-group">
+                  <span class="section-label">Sistema de Gestión de Biopsias</span>
+                  <h1>Pacientes Registrados</h1>
+            </div>
+            <!-- Botón para forzar recarga manual si se desea -->
+            <button 
+                  hx-get="/pacientes" 
+                  hx-target="#cards-grid" 
+                  style="background: var(--navy); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-family: inherit; font-size: 0.8rem; font-weight: 600;">
+                  Actualizar Lista
+            </button>
+      </header>
+
+      <div 
+            id="cards-grid" 
+            hx-get="/pacientes" 
+            hx-trigger="load" 
+            hx-swap="innerHTML">
+ 
+            <div class="htmx-indicator" style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                  Consultando base de datos de protocolos...
+            </div>
+
+      </div>
+      </div>
+
+      </body>
+      </html>
+}

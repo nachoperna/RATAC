@@ -29,6 +29,8 @@ func main() {
 	pacienteServices := application.NewPacienteService(pacienteRepo)
 	pacienteHandler := ui.NewPacienteHandler(pacienteServices)
 
-	http.HandleFunc("/", pacienteHandler.ListPacientes)
+	http.HandleFunc("/", pacienteHandler.ShowHome)
+	http.HandleFunc("/pacientes", pacienteHandler.ListPacientes)
+	http.HandleFunc("/apipacientes", pacienteHandler.APIPacientes)
 	http.ListenAndServe(port, nil)
 }
