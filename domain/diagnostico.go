@@ -1,8 +1,8 @@
 package domain
 
 type Diagnostico struct {
-	Descripcion string
-	Imagenes    []string
+	Descripcion 	string	`json:"Descripcion"`
+	Imagenes    	[]string	`json:"Imagenes"`
 }
 
 type DiagnosticoRepository interface {

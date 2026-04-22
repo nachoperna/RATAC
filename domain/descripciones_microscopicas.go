@@ -1,8 +1,8 @@
 package domain
 
 type Descripcion_microscopicas struct {
-	Descripcion  string
-	Diagnositico Diagnostico
+	Descripcion  string		`json:"Descripcion"`
+	Diagnositico Diagnostico	`json:"Diagnostico"`
 }
 
 type Descripciones_microscopicasRepository interface {

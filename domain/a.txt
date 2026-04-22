@@ -1,1 +1,0 @@
-En esta carpeta debe estar el codigo de cada estructura ejemplo imagen, descripciones_micro y las interfaces con los metodos que deben tener

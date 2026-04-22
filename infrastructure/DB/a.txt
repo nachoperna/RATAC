@@ -1,1 +1,0 @@
-En esta carpeta van los metodos que se conectan directamente con la base de datos
