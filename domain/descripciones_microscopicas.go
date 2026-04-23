@@ -1,13 +1,19 @@
 package domain
 
+import "context"
+
 type Descripcion_microscopicas struct {
-	Descripcion  string		`json:"Descripcion"`
-	Diagnositico Diagnostico	`json:"Diagnostico"`
+	Descripcion  string      `json:"Descripcion"`
+	Diagnositico Diagnostico `json:"Diagnostico"`
 }
 
 type Descripciones_microscopicasRepository interface {
-	CreateDescripcionMicroscopica(descripcion_microscopica *Descripcion_microscopicas) error
-	GetDescripcionMicroscopicaByProtocolo(protocolo string) (*Descripcion_microscopicas, error)
-	// UpdateDescripcionMicroscopica(descripcion_microscopica *Descripcion_microscopicas) error
-	DeleteDescripcionMicroscopica(protocolo string) error
+	// Ahora requiere contexto y el protocolo del paciente por separado
+	CreateDescripcionMicroscopica(ctx context.Context, protocolo string, descripcion_microscopica *Descripcion_microscopicas) error
+
+	// Devuelve un slice [] porque un paciente puede tener múltiples descripciones
+	GetDescripcionMicroscopicaByProtocolo(ctx context.Context, protocolo string) ([]Descripcion_microscopicas, error)
+
+	// Requiere la descripción específica y el protocolo para identificar qué borrar
+	DeleteDescripcionMicroscopica(ctx context.Context, descripcion string, protocolo string) error
 }
