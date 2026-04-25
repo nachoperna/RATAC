@@ -3,8 +3,8 @@ package domain
 import "context"
 
 type Descripcion_microscopicas struct {
-	Descripcion  string      `json:"Descripcion"`
-	Diagnositico Diagnostico `json:"Diagnostico"`
+	Descripcion string      `json:"Descripcion"`
+	Diagnostico Diagnostico `json:"Diagnostico"`
 }
 
 type Descripciones_microscopicasRepository interface {
