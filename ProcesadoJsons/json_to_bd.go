@@ -128,9 +128,13 @@ func insertarDescMicro(desc domain.Descripcion_microscopicas, pk string, qtx *sq
 		PacientesProtocolo: pk,
 	})
 	if err != nil {
-		err = errors.New("Error al insertar descripcion microscopica")
+		return errors.New("Error al insertar descripcion microscopica")
 	}
 	err = insertarImagenes(desc.Diagnostico.Imagenes, desc.Descripcion, pk, qtx, ctx)
+	if err != nil {
+		return err
+	}
+	err = insertarTablaGrado(desc.TablaGrado, desc.Descripcion, pk, qtx, ctx)
 	return err
 }
 
@@ -143,6 +147,26 @@ func insertarImagenes(imagenes []string, pk1, pk2 string, qtx *sqlc.Queries, ctx
 		})
 		if err != nil {
 			return errors.New("Error al insertar ruta de imagen")
+		}
+	}
+	return nil
+}
+
+func insertarTablaGrado(tabla []domain.Grado_oncologico, pk1, pk2 string, qtx *sqlc.Queries, ctx context.Context) error{
+	for _, fila := range tabla {
+		puntaje, err := strconv.Atoi(fila.Puntaje)
+		if err != nil {
+			return errors.New("Error parseando puntaje de tabla de grado oncologico")
+		}
+		_, err = qtx.CreateGradoOncologico(ctx, sqlc.CreateGradoOncologicoParams{
+			Caracteristica: fila.Caracteristica,
+			MuestraAnalizada: sql.NullString{String: fila.Muestra_analizada, Valid: true},
+			Puntaje: int16(puntaje),
+			DescripcionesMicroscopicasDescripcion: pk1,
+			DescripcionesMicroscopicasPacientesProtocolo: pk2,
+		})
+		if err != nil {
+			return errors.New("Error al insertar fila de grado oncologico")
 		}
 	}
 	return nil
