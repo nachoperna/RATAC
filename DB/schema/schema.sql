@@ -13,7 +13,7 @@ CREATE TABLE Pacientes (
     Antecedentes text NULL,
     Descripcion_macroscopica text,
     Referencias_mastocitomas boolean NOT NULL,
-    CONSTRAINT Pacientes_pk PRIMARY KEY (Protocolo)
+    CONSTRAINT Pacientes_pk PRIMARY KEY (id,Protocolo)
 );
 
 -- Table: Descripciones_microscopicas
@@ -34,13 +34,13 @@ CREATE TABLE Imagenes (
 
 -- Table: Grado_oncologico
 CREATE TABLE Grado_oncologico (
+    id serial NOT NULL,
     Caracteristica varchar(100) NOT NULL,
     Muestra_analizada varchar(100) NULL,
     Puntaje smallint NOT NULL,
-    Total smallint NOT NULL,
     Descripciones_microscopicas_Descripcion text NOT NULL,
     Descripciones_microscopicas_Pacientes_Protocolo varchar(20) NOT NULL,
-    CONSTRAINT Grado_oncologico_pk PRIMARY KEY (Descripciones_microscopicas_Pacientes_Protocolo,Descripciones_microscopicas_Descripcion)
+    CONSTRAINT Grado_oncologico_pk PRIMARY KEY (id,Descripciones_microscopicas_Pacientes_Protocolo,Descripciones_microscopicas_Descripcion)
 );
 
 -- foreign keys
