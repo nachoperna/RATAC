@@ -20,7 +20,7 @@ func NewPacienteRepository(queries *sqlc.Queries) *PacienteRepository {
 	}
 }
 
-func (r *PacienteRepository) CreatePaciente(ctx context.Context, paciente domain.Paciente) error  {
+func (r *PacienteRepository) CreatePaciente(ctx context.Context, paciente domain.Paciente) error {
 	layout := "02-01-2006"
 	fecha_parseada, err := time.Parse(layout, paciente.Fecha)
 
@@ -29,7 +29,7 @@ func (r *PacienteRepository) CreatePaciente(ctx context.Context, paciente domain
 	}
 
 	var edad int64
-	if paciente.Edad != ""{
+	if paciente.Edad != "" {
 		edad, err = strconv.ParseInt(paciente.Edad, 10, 16)
 		if err != nil {
 			fmt.Printf("ERROR al parsear edad: %s", err)
@@ -53,30 +53,49 @@ func (r *PacienteRepository) CreatePaciente(ctx context.Context, paciente domain
 	return err
 }
 
-func (r *PacienteRepository) ListPacientes(ctx context.Context) ([]domain.Paciente, error)  {
+func (r *PacienteRepository) ListPacientes(ctx context.Context) ([]domain.Paciente, error) {
 	bd_pacientes, err := r.queries.ListPacientes(ctx)
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
-	
+
 	var pacientes []domain.Paciente
 	for _, p := range bd_pacientes {
 		paciente := domain.Paciente{
-			Protocolo: p.Protocolo,
-			Fecha: p.Fecha.GoString(),
-			Solicitante: p.Solicitante,
-			Tecnica: p.Tecnica,
-			Familia: p.Familia.String,
-			Especie: p.Especie.String,
-			Raza: p.Raza.String,
-			Edad: strconv.Itoa(int(p.Edad.Int16)),
-			NombrePaciente: p.Paciente,
-			Antecedentes: p.Antecedentes.String,
+			Protocolo:                   p.Protocolo,
+			Fecha:                       p.Fecha.GoString(),
+			Solicitante:                 p.Solicitante,
+			Tecnica:                     p.Tecnica,
+			Familia:                     p.Familia.String,
+			Especie:                     p.Especie.String,
+			Raza:                        p.Raza.String,
+			Edad:                        strconv.Itoa(int(p.Edad.Int16)),
+			NombrePaciente:              p.Paciente,
+			Antecedentes:                p.Antecedentes.String,
 			Descripciones_microscopicas: nil,
-			DescripcionMacroscopica: p.DescripcionMacroscopica.String,
-			ReferenciasMastocitomas: p.ReferenciasMastocitomas,
+			DescripcionMacroscopica:     p.DescripcionMacroscopica.String,
+			ReferenciasMastocitomas:     p.ReferenciasMastocitomas,
 		}
 		pacientes = append(pacientes, paciente)
+	}
+	return pacientes, nil
+}
+
+func (r *PacienteRepository) ListUltimosPacientes(ctx context.Context) ([]domain.Paciente, error) {
+	bd_pacientes, err := r.queries.ListUltimosPacientes(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var pacientes []domain.Paciente
+	for _, p := range bd_pacientes {
+		pacientes = append(pacientes, domain.Paciente{
+			Protocolo:      p.Protocolo,
+			Fecha:          p.Fecha.Format("02-01-2006"), // Formateo de fecha
+			NombrePaciente: p.Paciente,
+			Solicitante:    p.Solicitante,
+			// ... (mapear el resto de campos como en ListPacientes)
+		})
 	}
 	return pacientes, nil
 }

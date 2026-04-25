@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-type PacienteHandler struct{
+type PacienteHandler struct {
 	pacienteService *application.PacienteService
 }
 
@@ -22,8 +22,8 @@ func (h *PacienteHandler) ShowHome(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func (h *PacienteHandler) ListPacientes(w http.ResponseWriter, r *http.Request) {
-	pacientes, err := h.pacienteService.ListPacientes(r.Context())
-	if err != nil{
+	pacientes, err := h.pacienteService.ListUltimosPacientes(r.Context())
+	if err != nil {
 		// renderizar templ de error
 	}
 	views.ListPacientes(pacientes).Render(r.Context(), w)
@@ -31,7 +31,7 @@ func (h *PacienteHandler) ListPacientes(w http.ResponseWriter, r *http.Request) 
 
 func (h *PacienteHandler) APIPacientes(w http.ResponseWriter, r *http.Request) {
 	pacientes, err := h.pacienteService.ListPacientes(r.Context())
-	if err != nil{
+	if err != nil {
 		// renderizar templ de error
 	}
 	w.WriteHeader(http.StatusOK)

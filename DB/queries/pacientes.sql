@@ -16,6 +16,11 @@ WHERE Protocolo = $1 LIMIT 1;
 SELECT * FROM Pacientes
 ORDER BY Fecha DESC;
 
+-- name: ListUltimosPacientes :many
+SELECT * FROM Pacientes
+ORDER BY Fecha DESC
+LIMIT 3;
+
 -- name: UpdatePaciente :one
 UPDATE Pacientes
 SET 

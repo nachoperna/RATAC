@@ -5,11 +5,11 @@ import (
 	"context"
 )
 
-type PacienteService struct{
+type PacienteService struct {
 	pacienteRepo domain.PacienteRepository
 }
 
-func NewPacienteService(pacienteRepo domain.PacienteRepository) *PacienteService{
+func NewPacienteService(pacienteRepo domain.PacienteRepository) *PacienteService {
 	return &PacienteService{
 		pacienteRepo: pacienteRepo,
 	}
@@ -21,4 +21,8 @@ func (s *PacienteService) CreatePaciente(ctx context.Context, paciente domain.Pa
 
 func (s *PacienteService) ListPacientes(ctx context.Context) ([]domain.Paciente, error) {
 	return s.pacienteRepo.ListPacientes(ctx)
+}
+
+func (s *PacienteService) ListUltimosPacientes(ctx context.Context) ([]domain.Paciente, error) {
+	return s.pacienteRepo.ListUltimosPacientes(ctx)
 }
