@@ -6,16 +6,16 @@ type Paciente struct {
 	Protocolo                   string `json:"Protocolo"`
 	Fecha                       string `json:"fecha"`
 	Solicitante                 string `json:"Solicitante"`
-	Tecnica                     string	`json:"Tecnica"`
+	Tecnica                     string	`json:"Técnica"`
 	Familia                     string	`json:"Familia"`
 	Especie                     string	`json:"Especie"`
 	Raza                        string	`json:"Raza"`
 	Edad                        string	`json:"Edad"`
 	NombrePaciente              string	`json:"Paciente"`
-	Antecedentes                string	`json:"Antecedentes"`
-	Descripciones_microscopicas []Descripcion_microscopicas `json:"Descripciones microscopicas"`
-	DescripcionMacroscopica     string `json:"Descripcion macroscopica"`
 	ReferenciasMastocitomas     bool `json:"Referencias mastocitomas"`
+	Antecedentes                string	`json:"Material remitido - Antecedentes"`
+	DescripcionMacroscopica     string `json:"Descripción macroscópica"`
+	Descripciones_microscopicas []Descripcion_microscopicas `json:"Descripción microscópica"`
 }
 
 type PacienteRepository interface {
