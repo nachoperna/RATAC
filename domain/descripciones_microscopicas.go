@@ -5,11 +5,12 @@ import "context"
 type Descripcion_microscopicas struct {
 	Descripcion string      `json:"Descripcion"`
 	Diagnostico Diagnostico `json:"Diagnostico"`
+	TablaGrado	[]Grado_oncologico `json:"Tabla de Grado"`
 }
 
 type Descripciones_microscopicasRepository interface {
 	// Ahora requiere contexto y el protocolo del paciente por separado
-	CreateDescripcionMicroscopica(ctx context.Context, protocolo string, descripcion_microscopica *Descripcion_microscopicas) error
+	CreateDescripcionMicroscopica(ctx context.Context, protocolo string, descripcion_microscopica Descripcion_microscopicas) error
 
 	// Devuelve un slice [] porque un paciente puede tener múltiples descripciones
 	GetDescripcionMicroscopicaByProtocolo(ctx context.Context, protocolo string) ([]Descripcion_microscopicas, error)
