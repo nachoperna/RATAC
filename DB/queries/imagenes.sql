@@ -14,3 +14,6 @@ AND Descripciones_microscopicas_Pacientes_Protocolo = $2;
 -- name: DeleteImagen :exec
 DELETE FROM Imagenes
 WHERE Ruta = $1;
+
+-- name: CountImagenes :one
+SELECT count(*) FROM imagenes;

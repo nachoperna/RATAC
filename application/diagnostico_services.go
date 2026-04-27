@@ -15,7 +15,7 @@ func NewDiagnosticoService(repo domain.DiagnosticoRepository) *DiagnosticoServic
 	}
 }
 
-func (s *DiagnosticoService) CreateDiagnostico(ctx context.Context, protocolo string, descripcionMicro string, diagnostico *domain.Diagnostico) error {
+func (s *DiagnosticoService) CreateDiagnostico(ctx context.Context, protocolo string, descripcionMicro string, diagnostico domain.Diagnostico) error {
 	return s.repo.CreateDiagnostico(ctx, protocolo, descripcionMicro, diagnostico)
 }
 
@@ -25,4 +25,7 @@ func (s *DiagnosticoService) GetDiagnostico(ctx context.Context, protocolo strin
 
 func (s *DiagnosticoService) DeleteImagen(ctx context.Context, ruta string) error {
 	return s.repo.DeleteImagen(ctx, ruta)
+}
+func (s *DiagnosticoService) CountImagenes(ctx context.Context) (int64, error) {
+	return s.repo.CountImagenes(ctx)
 }

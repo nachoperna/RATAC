@@ -33,7 +33,7 @@ func (h *DiagnosticoHandler) APICreateDiagnostico(w http.ResponseWriter, r *http
 		return
 	}
 
-	err := h.service.CreateDiagnostico(r.Context(), protocolo, descripcionMicro, &diag)
+	err := h.service.CreateDiagnostico(r.Context(), protocolo, descripcionMicro, diag)
 	if err != nil {
 		http.Error(w, "Error guardando el diagnóstico en la BD", http.StatusInternalServerError)
 		return

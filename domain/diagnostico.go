@@ -16,4 +16,5 @@ type DiagnosticoRepository interface {
 
 	// Método específico para gestionar la eliminación de imágenes individuales
 	DeleteImagen(ctx context.Context, ruta string) error
+	CountImagenes(ctx context.Context) (int64, error)
 }

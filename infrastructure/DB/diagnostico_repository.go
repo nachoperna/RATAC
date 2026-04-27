@@ -18,7 +18,7 @@ func NewDiagnosticoRepository(queries *sqlc.Queries) *DiagnosticoRepository {
 }
 
 // CreateDiagnostico actualiza el texto en la descripción microscópica y guarda las imágenes asociadas
-func (r *DiagnosticoRepository) CreateDiagnostico(ctx context.Context, protocolo string, descripcionMicro string, diagnostico *domain.Diagnostico) error {
+func (r *DiagnosticoRepository) CreateDiagnostico(ctx context.Context, protocolo string, descripcionMicro string, diagnostico domain.Diagnostico) error {
 	// 1. Actualizamos el texto del diagnóstico en la tabla Descripciones_microscopicas
 	_, err := r.queries.UpdateDescripcionMicroscopica(ctx, sqlc.UpdateDescripcionMicroscopicaParams{
 		Descripcion:        descripcionMicro,
@@ -71,4 +71,8 @@ func (r *DiagnosticoRepository) GetDiagnostico(ctx context.Context, protocolo st
 // DeleteImagen borra una imagen específica por su ruta
 func (r *DiagnosticoRepository) DeleteImagen(ctx context.Context, ruta string) error {
 	return r.queries.DeleteImagen(ctx, ruta)
+}
+
+func (r *DiagnosticoRepository) CountImagenes(ctx context.Context) (int64, error) {
+	return r.queries.CountImagenes(ctx)
 }
