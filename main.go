@@ -28,8 +28,20 @@ func main() {
 	var pacienteRepo domain.PacienteRepository = dbrepo.NewPacienteRepository(queries)
 	pacienteServices := application.NewPacienteService(pacienteRepo)
 	pacienteHandler := ui.NewPacienteHandler(pacienteServices)
+	
+	var desc_microRepo domain.Descripcion_microscopicasRepository = dbrepo.NewDescripcion_microscopicasRepository(queries)
+	desc_microServices := application.NewDescripcionMicroscopicaService(desc_microRepo)
+	// desc_microHandler := ui.NewDescripcionMicroscopicaHandler(desc_microServices)
 
-	http.HandleFunc("/", pacienteHandler.ShowHome)
+	var diagnosticoRepo domain.DiagnosticoRepository = dbrepo.NewDiagnosticoRepository(queries)
+	diagnosticoServices := application.NewDiagnosticoService(diagnosticoRepo)
+	// diagnosticoHandler := ui.NewDiagnosticoHandler(diagnosticoServices)
+
+	homeHandler := ui.NewHomeHandler(pacienteServices, desc_microServices, diagnosticoServices)
+
+	fs := http.FileServer(http.Dir("./infrastructure/UI/static"))
+	http.Handle("/static/", http.StripPrefix("/static/", fs))
+	http.HandleFunc("/", homeHandler.ShowHome)
 	http.HandleFunc("/pacientes", pacienteHandler.ListPacientes)
 	http.HandleFunc("/apipacientes", pacienteHandler.APIPacientes)
 	http.ListenAndServe(port, nil)
