@@ -33,7 +33,7 @@ func (h *DescripcionMicroscopicaHandler) APICreateDescripcion(w http.ResponseWri
 		return
 	}
 
-	err := h.service.CreateDescripcionMicroscopica(r.Context(), protocolo, &desc)
+	err := h.service.CreateDescripcionMicroscopica(r.Context(), protocolo, desc)
 	if err != nil {
 		http.Error(w, "Error guardando en la BD", http.StatusInternalServerError)
 		return

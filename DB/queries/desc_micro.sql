@@ -19,3 +19,7 @@ RETURNING *;
 -- name: DeleteDescripcionMicroscopica :exec
 DELETE FROM Descripciones_microscopicas
 WHERE Descripcion = $1 AND Pacientes_Protocolo = $2;
+
+-- name: CountDiagnosticos :one
+SELECT count(*) FROM Descripciones_microscopicas
+WHERE diagnostico IS NOT NULL;

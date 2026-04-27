@@ -7,17 +7,17 @@ import (
 	"database/sql"
 )
 
-type DescripcionMicroscopicaRepository struct {
+type Descripcion_microscopicasRepository struct {
 	queries *sqlc.Queries
 }
 
-func NewDescripcionMicroscopicaRepository(queries *sqlc.Queries) *DescripcionMicroscopicaRepository {
-	return &DescripcionMicroscopicaRepository{
+func NewDescripcion_microscopicasRepository (queries *sqlc.Queries) *Descripcion_microscopicasRepository {
+	return &Descripcion_microscopicasRepository {
 		queries: queries,
 	}
 }
 
-func (r *DescripcionMicroscopicaRepository) CreateDescripcionMicroscopica(ctx context.Context, protocolo string, descripcion *domain.Descripcion_microscopicas) error {
+func (r *Descripcion_microscopicasRepository) CreateDescripcionMicroscopica(ctx context.Context, protocolo string, descripcion domain.Descripcion_microscopicas) error {
 	_, err := r.queries.CreateDescripcionMicroscopica(ctx, sqlc.CreateDescripcionMicroscopicaParams{
 		Descripcion: descripcion.Descripcion,
 		// Envolvemos el string en sql.NullString
@@ -27,7 +27,7 @@ func (r *DescripcionMicroscopicaRepository) CreateDescripcionMicroscopica(ctx co
 	return err
 }
 
-func (r *DescripcionMicroscopicaRepository) GetDescripcionMicroscopicaByProtocolo(ctx context.Context, protocolo string) ([]domain.Descripcion_microscopicas, error) {
+func (r *Descripcion_microscopicasRepository) GetDescripcionMicroscopicaByProtocolo(ctx context.Context, protocolo string) ([]domain.Descripcion_microscopicas, error) {
 	bd_descripciones, err := r.queries.GetDescripcionByPaciente(ctx, protocolo)
 	if err != nil {
 		return nil, err
@@ -48,10 +48,14 @@ func (r *DescripcionMicroscopicaRepository) GetDescripcionMicroscopicaByProtocol
 	return descripcionesDomain, nil
 }
 
-func (r *DescripcionMicroscopicaRepository) DeleteDescripcionMicroscopica(ctx context.Context, descripcion string, protocolo string) error {
+func (r *Descripcion_microscopicasRepository) DeleteDescripcionMicroscopica(ctx context.Context, descripcion string, protocolo string) error {
 	err := r.queries.DeleteDescripcionMicroscopica(ctx, sqlc.DeleteDescripcionMicroscopicaParams{
 		Descripcion:        descripcion,
 		PacientesProtocolo: protocolo,
 	})
 	return err
+}
+
+func (r *Descripcion_microscopicasRepository) CountDiagnosticos(ctx context.Context) (int64, error) {
+	return r.queries.CountDiagnosticos(ctx)
 }
