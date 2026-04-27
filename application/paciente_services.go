@@ -26,3 +26,7 @@ func (s *PacienteService) ListPacientes(ctx context.Context) ([]domain.Paciente,
 func (s *PacienteService) ListUltimosPacientes(ctx context.Context) ([]domain.Paciente, error) {
 	return s.pacienteRepo.ListUltimosPacientes(ctx)
 }
+
+func (s *PacienteService) CountPacientes(ctx context.Context) (int64, error) {
+	return s.pacienteRepo.CountPacientes(ctx)
+}

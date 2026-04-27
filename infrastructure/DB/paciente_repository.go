@@ -99,3 +99,8 @@ func (r *PacienteRepository) ListUltimosPacientes(ctx context.Context) ([]domain
 	}
 	return pacientes, nil
 }
+
+
+func (r *PacienteRepository) CountPacientes(ctx context.Context) (int64, error) {
+	return r.queries.CountPacientes(ctx)
+}

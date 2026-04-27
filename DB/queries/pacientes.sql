@@ -41,3 +41,7 @@ RETURNING *;
 -- name: DeletePaciente :exec
 DELETE FROM Pacientes
 WHERE Protocolo = $1;
+
+-- name: CountPacientes :one
+SELECT count(*) FROM pacientes;
+
