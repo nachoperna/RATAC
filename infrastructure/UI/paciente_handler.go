@@ -4,7 +4,6 @@ import (
 	"RATAC/application"
 	"RATAC/views"
 	"encoding/json"
-	"fmt"
 	"net/http"
 )
 
@@ -15,12 +14,7 @@ type PacienteHandler struct {
 func NewPacienteHandler(pacienteService *application.PacienteService) *PacienteHandler {
 	return &PacienteHandler{pacienteService: pacienteService}
 }
-func (h *PacienteHandler) ShowHome(w http.ResponseWriter, r *http.Request) {
-	err := views.ShowHome().Render(r.Context(), w)
-	if err != nil {
-		fmt.Println("ERROR: ", err)
-	}
-}
+
 func (h *PacienteHandler) ListPacientes(w http.ResponseWriter, r *http.Request) {
 	pacientes, err := h.pacienteService.ListUltimosPacientes(r.Context())
 	if err != nil {
