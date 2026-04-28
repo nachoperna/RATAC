@@ -104,3 +104,26 @@ func (r *PacienteRepository) ListUltimosPacientes(ctx context.Context) ([]domain
 func (r *PacienteRepository) CountPacientes(ctx context.Context) (int64, error) {
 	return r.queries.CountPacientes(ctx)
 }
+
+func (r *PacienteRepository) GetPacienteByNombre(ctx context.Context, nombre string) ([]domain.Paciente, error) {
+	bd_pacientes, err := r.queries.GetPacienteByNombre(ctx, nombre)
+	if err != nil {
+		return nil, err
+	}
+
+	var pacientes []domain.Paciente
+	for _, p := range bd_pacientes {
+		pacientes = append(pacientes, domain.Paciente{
+			Protocolo:      p.Protocolo,
+			Fecha:          p.Fecha.Format("02-01-2006"), // Formateo de fecha
+			NombrePaciente: p.Paciente,
+			Solicitante:    p.Solicitante,
+			Tecnica: p.Tecnica,
+			Familia: p.Familia.String,
+			Especie: p.Especie.String,
+			Raza: p.Raza.String,
+			Edad: strconv.FormatInt(int64(p.Edad.Int16),10),
+		})
+	}
+	return pacientes, nil
+}

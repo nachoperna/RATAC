@@ -411,3 +411,123 @@ nav a { display: none; }
 footer { flex-direction: column; gap: 12px; text-align: center; }
 }
 
+/* Grid de Tarjetas - Contenedor HTMX */
+#cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 24px;
+      min-height: 200px;
+}
+
+.container {
+      padding-top: 64px;
+      min-height: 100vh;
+      max-width: 1200px;
+      margin: 0 auto;
+}
+
+.case-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .case-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(26, 26, 110, 0.06);
+            border-color: var(--lavender-mid);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .protocol-chip {
+            font-family: 'DM Mono', monospace;
+            background: var(--lavender);
+            color: var(--navy);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .date-label {
+            font-size: 0.85rem;
+            color: var(--muted);
+            font-style: italic;
+        }
+
+        .patient-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            color: var(--ink);
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .species-breed {
+            font-size: 0.95rem;
+            color: var(--muted);
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            padding-top: 16px;
+            border-top: 1px dashed var(--border);
+            margin-top: auto;
+        }
+
+        .data-item { display: flex; flex-direction: column; }
+
+        .data-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--muted);
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .data-value {
+            font-size: 0.9rem;
+            color: var(--navy-mid);
+            font-weight: 500;
+        }
+
+        .not-specified {
+            color: #b0afc5;
+            font-style: italic;
+            font-size: 0.85rem;
+        }
+
+        /* Indicador de carga de HTMX */
+        .htmx-indicator {
+            display: none;
+            color: var(--muted);
+            font-family: 'DM Mono', monospace;
+            font-size: 0.9rem;
+        }
+        .htmx-request .htmx-indicator {
+            display: inline-block;
+        }
+        .htmx-request#cards-grid {
+            opacity: 0.6;
+        }

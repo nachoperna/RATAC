@@ -4,6 +4,7 @@ import (
 	"RATAC/application"
 	"RATAC/views"
 	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
@@ -21,6 +22,17 @@ func (h *PacienteHandler) ListPacientes(w http.ResponseWriter, r *http.Request) 
 		// renderizar templ de error
 	}
 	views.ListPacientes(pacientes).Render(r.Context(), w)
+}
+
+func (h *PacienteHandler) ListPacientesBy(w http.ResponseWriter, r *http.Request) {
+	paciente := r.URL.Query().Get("paciente")
+	if paciente != ""{
+		pacientes, err := h.pacienteService.GetPacienteByNombre(r.Context(), paciente)
+		if err != nil {
+			fmt.Println("ERROR: ", err)
+		}
+		views.ListPacientes(pacientes).Render(r.Context(), w)
+	}
 }
 
 func (h *PacienteHandler) APIPacientes(w http.ResponseWriter, r *http.Request) {

@@ -26,4 +26,5 @@ type PacienteRepository interface {
 	ListUltimosPacientes(ctx context.Context) ([]Paciente, error)
 	ListPacientes(ctx context.Context) ([]Paciente, error)
 	CountPacientes(ctx context.Context) (int64, error)
+	GetPacienteByNombre(ctx context.Context, nombre string) ([]Paciente, error)
 }

@@ -43,6 +43,7 @@ func main() {
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 	http.HandleFunc("/", homeHandler.ShowHome)
 	http.HandleFunc("/pacientes", pacienteHandler.ListPacientes)
+	http.HandleFunc("/pacientes/", pacienteHandler.ListPacientesBy)
 	http.HandleFunc("/apipacientes", pacienteHandler.APIPacientes)
 	http.ListenAndServe(port, nil)
 }
