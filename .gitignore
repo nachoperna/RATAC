@@ -4,3 +4,4 @@ sqlc/
 views/*.go
 ./diagnosticos_mal_procesados.txt
 /venv
+ProcesadoJsons/prueba/

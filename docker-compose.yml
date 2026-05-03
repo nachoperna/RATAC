@@ -27,7 +27,7 @@ services:
     command: >
       sh -c "templ generate && 
              sqlc generate && 
-             go build -o main . && 
+             go build -buildvcs=false -o main . &&
              ./main"
 
 volumes:

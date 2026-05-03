@@ -306,7 +306,7 @@ def procesar_docx(ruta):
 #     os.remove(ruta)
 
 if __name__ == "__main__":
-    ruta = "/home/nachoperna/Documents/Histopatología/"
+    ruta = "./ProcesadoJsons/prueba/"
 
     if not os.path.exists("JSONS/"):
         os.makedirs("JSONS/")
