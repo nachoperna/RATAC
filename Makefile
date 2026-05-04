@@ -23,6 +23,13 @@ procesarjsons:
 run:
 	go run ./main.go 
 
+wait:
+	@sleep 2
+
+dependencias:
+	sqlc generate
+	templ generate
+
 # Acceso directo a la terminal de la base de datos PostgreSQL
 sql-directo:
 	docker exec -it RATAC_db psql -U admin -d RATAC_DB 
@@ -32,9 +39,9 @@ logs:
 	docker compose logs -f app
 
 # Alias para levantar todo el entorno
-server: udocker
+server: udocker wait dependencias run
 
 emptyJSONS:
-	cd JSONS && sudo rm -rf * && cd ..
+	rm -rf JSONS/
 
 .PHONY: run udocker dvdocker ddocker procesarjsons sql-directo logs server
