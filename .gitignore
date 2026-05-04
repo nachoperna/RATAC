@@ -5,3 +5,4 @@ views/*.go
 ./diagnosticos_mal_procesados.txt
 /venv
 ProcesadoJsons/prueba/
+./main
