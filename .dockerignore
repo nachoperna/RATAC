@@ -1,0 +1,10 @@
+.git
+__pycache__
+*.pyc
+.env
+data/
+bin/
+obj/
+main
+IMAGENES/
+JSONS/
