@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:17
+    image: postgres:17-alpine
     container_name: RATAC_db
     restart: always
     environment:
@@ -14,7 +14,9 @@ services:
       - ./DB/schema:/docker-entrypoint-initdb.d:ro,Z # ro,Z agregado por problemas especificos de Fedora
 
   app:
-    build: .
+    build: 
+      context: .
+      target: builder # Durante desarrollo usamos la etapa pesada para poder recompilar
     container_name: RATAC_app
     ports:
       - "8080:8080"
@@ -23,12 +25,11 @@ services:
     environment:
       DATABASE_URL: postgres://admin:password@db:5432/RATAC_DB
     volumes:
-      - .:/app  # Esto sincroniza tus archivos locales con el contenedor
+      - .:/app # Esto sincroniza tus archivos locales con el contenedor
     command: >
       sh -c "templ generate && 
              sqlc generate && 
-             go build -buildvcs=false -o main . &&
-             ./main"
+             go run ." 
 
 volumes:
   postgres_data:

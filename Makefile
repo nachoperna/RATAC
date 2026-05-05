@@ -1,9 +1,13 @@
 # Variable para acortar los comandos de ejecución en Docker
 DOCKER_EXEC = docker compose exec app
 
-# Levanta los contenedores y fuerza el build para aplicar cambios en el Dockerfile/requirements
-udocker:
+# Fuerza el build para aplicar cambios en el Dockerfile/requirements
+bdocker:
 	docker compose up -d --build
+
+# Levanta los contenedores 
+udocker:
+	docker compose up -d
 
 # Baja los contenedores y borra los volúmenes (limpieza total de la DB)
 dvdocker:
@@ -12,6 +16,10 @@ dvdocker:
 # Baja los contenedores normalmente
 ddocker:
 	docker compose down 
+
+# Borra copia de imagenes antiguas
+clean-images:
+	docker system prune -f
 
 # PROCESAMIENTO: Ahora corre dentro del contenedor usando las dependencias de Python instaladas
 procesarjsons:
@@ -44,4 +52,4 @@ server: udocker wait dependencias run
 emptyJSONS:
 	rm -rf JSONS/
 
-.PHONY: run udocker dvdocker ddocker procesarjsons sql-directo logs server
+.PHONY: run udocker dvdocker ddocker procesarjsons sql-directo logs server bdocker wait clean-images emptyJSONS dependencias

@@ -1,26 +1,37 @@
-FROM golang:1.24-bookworm
+# ETAPA 1: Builder (Imagen pesada con todas las herramientas)
+FROM golang:1.24-bookworm AS builder
 
-# 1. Instalamos Python y pip en el contenedor
-RUN apt-get update && apt-get install -y python3 python3-pip
-
-# Instalación de herramientas de Go 
+# Instalar herramientas de generación
 RUN go install github.com/a-h/templ/cmd/templ@v0.3.833
 RUN go install github.com/sqlc-dev/sqlc/cmd/sqlc@v1.28.0
 
-ENV PATH="/go/bin:${PATH}"
 WORKDIR /app
 
-# 2. Copiamos el requirements.txt ANTES del código para aprovechar el caché
-COPY requirements.txt ./
-# Instalamos las dependencias de Python
-RUN pip3 install --break-system-packages -r requirements.txt
-
-# Solo copiamos los archivos de dependencias de Go para el caché
+# Copiar dependencias de Go para caché
 COPY go.mod go.sum ./
 RUN go mod download
 
-# Copiamos el resto del código (incluyendo tus .py)
+# Copiar el resto del código y generar/compilar
 COPY . .
+RUN templ generate && sqlc generate
+RUN go build -buildvcs=false -o main .
+
+# ETAPA 2: Final (Imagen liviana para producción)
+FROM python:3.13-slim-bookworm
+
+WORKDIR /app
+
+# Instalar solo librerías de ejecución necesarias si tu app de Go llama a scripts de Python
+COPY requirements.txt .
+RUN pip3 install --no-cache-dir --break-system-packages -r requirements.txt
+
+# COPIAR SOLO EL BINARIO generado en la etapa anterior
+COPY --from=builder /app/main .
+# Copiar scripts de python o carpetas necesarias para la ejecución (ej: templates)
+COPY --from=builder /app/ProcesadoJsons/*.py ./ 
+# Si tienes carpetas como 'static' o 'templates', añádelas aquí:
+# COPY --from=builder /app/static ./static
 
 EXPOSE 8080
-# El comando ahora lo maneja el docker-compose.yml
+
+CMD ["./main"]
