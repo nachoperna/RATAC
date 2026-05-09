@@ -2,6 +2,7 @@ package ui
 
 import (
 	"RATAC/application"
+	"RATAC/domain"
 	"RATAC/views"
 	"encoding/json"
 	"fmt"
@@ -14,6 +15,9 @@ type PacienteHandler struct {
 
 func NewPacienteHandler(pacienteService *application.PacienteService) *PacienteHandler {
 	return &PacienteHandler{pacienteService: pacienteService}
+}
+type PayloadRequest struct {
+	Filtros []domain.Filtro `json:"filtros"`
 }
 
 func (h *PacienteHandler) ListPacientes(w http.ResponseWriter, r *http.Request) {
@@ -30,9 +34,27 @@ func (h *PacienteHandler) ListPacientesBy(w http.ResponseWriter, r *http.Request
 		pacientes, err := h.pacienteService.GetPacienteByNombre(r.Context(), paciente)
 		if err != nil {
 			fmt.Println("ERROR: ", err)
+			// renderizar templ de error
 		}
 		views.ListPacientes(pacientes).Render(r.Context(), w)
 	}
+}
+
+func (h *PacienteHandler) ListPacientesByFiltro(w http.ResponseWriter, r *http.Request) {
+	// Crear el slice que almacenará los filtros ordenados
+	var req PayloadRequest
+
+	// Decodificar el JSON del body en nuestro slice
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		http.Error(w, "Error procesando el JSON", http.StatusBadRequest)
+		return
+	}
+	pacientes, err := h.pacienteService.GetPacienteByFiltro(r.Context(), req.Filtros)
+	if err != nil {
+		// renderizar templ de error
+	}
+	views.ListPacientes(pacientes).Render(r.Context(), w)
 }
 
 func (h *PacienteHandler) APIPacientes(w http.ResponseWriter, r *http.Request) {

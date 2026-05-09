@@ -34,3 +34,7 @@ func (s *PacienteService) CountPacientes(ctx context.Context) (int64, error) {
 func (s *PacienteService) GetPacienteByNombre(ctx context.Context, nombre string) ([]domain.Paciente, error) {
 	return s.pacienteRepo.GetPacienteByNombre(ctx, nombre)
 }
+
+func (s *PacienteService) GetPacienteByFiltro(ctx context.Context, filtros []domain.Filtro) ([]domain.Paciente, error) {
+	return s.pacienteRepo.GetPacienteByFiltro(ctx, filtros)
+}

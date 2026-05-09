@@ -25,7 +25,7 @@ func main() {
 
 	queries := sqlc.New(db)
 
-	var pacienteRepo domain.PacienteRepository = dbrepo.NewPacienteRepository(queries)
+	var pacienteRepo domain.PacienteRepository = dbrepo.NewPacienteRepository(queries, db)
 	pacienteServices := application.NewPacienteService(pacienteRepo)
 	pacienteHandler := ui.NewPacienteHandler(pacienteServices)
 	
@@ -43,7 +43,7 @@ func main() {
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 	http.HandleFunc("/", homeHandler.ShowHome)
 	http.HandleFunc("/pacientes", pacienteHandler.ListPacientes)
-	http.HandleFunc("/pacientes/", pacienteHandler.ListPacientesBy)
+	http.HandleFunc("/pacientes/", pacienteHandler.ListPacientesByFiltro)
 	http.HandleFunc("/apipacientes", pacienteHandler.APIPacientes)
 	http.ListenAndServe(port, nil)
 }

@@ -18,6 +18,22 @@ type Paciente struct {
 	Descripciones_microscopicas []Descripcion_microscopicas `json:"Descripción microscópica"`
 }
 
+type Filtro struct {
+	Logica   string `json:"logica"`
+	Campo    string `json:"campo"`
+	Operador string `json:"operador"`
+	Valores  []string `json:"valores"`
+	Not      bool   `json:"not"`
+	Multiple bool   `json:"multiple"`
+}
+
+// Lista blanca de columnas permitidas
+var ColumnasPermitidas = map[string]bool{
+	"Especie": true,
+	"Raza":    true,
+	"Edad":    true,
+}
+
 type PacienteRepository interface {
 	CreatePaciente(ctx context.Context, paciente Paciente) error
 	// GetPaciente(protocolo string) (Paciente, error)
@@ -27,4 +43,5 @@ type PacienteRepository interface {
 	ListPacientes(ctx context.Context) ([]Paciente, error)
 	CountPacientes(ctx context.Context) (int64, error)
 	GetPacienteByNombre(ctx context.Context, nombre string) ([]Paciente, error)
+	GetPacienteByFiltro(ctx context.Context, filtros []Filtro) ([]Paciente, error)
 }

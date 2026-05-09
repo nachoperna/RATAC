@@ -5,18 +5,24 @@ import (
 	"RATAC/domain"
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
+	"log"
 	"strconv"
 	"time"
+
+	"github.com/Masterminds/squirrel"
 )
 
 type PacienteRepository struct {
 	queries *sqlc.Queries
+	db *sql.DB
 }
 
-func NewPacienteRepository(queries *sqlc.Queries) *PacienteRepository {
+func NewPacienteRepository(queries *sqlc.Queries, db *sql.DB) *PacienteRepository {
 	return &PacienteRepository{
 		queries: queries,
+		db: db,
 	}
 }
 
@@ -100,7 +106,6 @@ func (r *PacienteRepository) ListUltimosPacientes(ctx context.Context) ([]domain
 	return pacientes, nil
 }
 
-
 func (r *PacienteRepository) CountPacientes(ctx context.Context) (int64, error) {
 	return r.queries.CountPacientes(ctx)
 }
@@ -126,4 +131,114 @@ func (r *PacienteRepository) GetPacienteByNombre(ctx context.Context, nombre str
 		})
 	}
 	return pacientes, nil
+}
+
+func (r *PacienteRepository) GetPacienteByFiltro(ctx context.Context, filtros []domain.Filtro) ([]domain.Paciente, error){
+	sqlQuery, args, _ := getQueryByFiltro(filtros)
+
+	// 5. Ejecutar la consulta en PostgreSQL
+	rows, err := r.db.Query(sqlQuery, args...)
+	if err != nil {
+		log.Printf("Error ejecutando query en Postgres: %v", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var pacientes []domain.Paciente
+	// 6. Leer los resultados (Ejemplo genérico)
+	for rows.Next() {
+		var paciente domain.Paciente
+		
+		if err := rows.Scan(&paciente.Protocolo, &paciente.Fecha, &paciente.NombrePaciente, &paciente.Solicitante, &paciente.Tecnica, &paciente.Edad, &paciente.NombrePaciente, &paciente.Raza, &paciente.Especie); err != nil {
+			log.Printf("Error leyendo fila: %v", err)
+			continue
+		}
+		pacientes = append(pacientes, paciente)
+	}
+
+	return pacientes, nil
+}
+
+func getQueryByFiltro(filtros []domain.Filtro) (string, []interface{}, error){
+	// 1. CRÍTICO PARA POSTGRESQL: Configurar el formato del dólar ($1, $2)
+	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
+	
+	// Iniciamos la consulta base
+	query_builder := psql.Select("protocolo", "fecha", "paciente", "solicitante", "tecnica", "edad", "familia", "raza", "especie").From("pacientes")
+
+	var cond squirrel.Sqlizer
+
+	// 2. Iterar sobre los filtros enviados desde el Frontend
+	for i, f := range filtros {
+		if !domain.ColumnasPermitidas[f.Campo] {
+			log.Printf("Advertencia: Columna ignorada por seguridad: %s\n", f.Campo)
+			continue
+		}
+
+		var expresiones squirrel.Sqlizer
+
+		for _, valor := range f.Valores {
+			expresion, err := getOperadorSQL(f.Operador, f.Campo, valor)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			if expresiones == nil{
+				expresiones = expresion
+			}else{
+				expresiones = squirrel.Or{expresiones, expresion}
+			}
+		}
+
+		// if f.Not {
+		// 	expresiones = squirrel.NotExpr(expresiones)
+		// }
+
+		// Acoplar la lógica AND / OR
+		if i == 0 {
+			cond = expresiones
+		} else {
+			if f.Logica == "OR" {
+				cond = squirrel.Or{cond, expresiones}
+			} else {
+				cond = squirrel.And{cond, expresiones} // AND por defecto
+			}
+		}
+	}
+
+	// 3. Aplicar las condiciones generadas
+	if cond != nil {
+		query_builder = query_builder.Where(cond)
+	}
+
+	// 4. Generar el SQL final compatible con Postgres
+	sqlQuery, args, err := query_builder.ToSql()
+	if err != nil {
+		log.Printf("Error construyendo query: %v", err)
+		return "", nil, err
+	}
+
+	fmt.Printf("\n--- QUERY PARA POSTGRESQL ---\n")
+	fmt.Printf("SQL: %s\n", sqlQuery)
+	fmt.Printf("Argumentos: %v\n-----------------------------\n", args)
+	return sqlQuery, args, nil
+}
+
+func getOperadorSQL(operador, campo, valor string) (squirrel.Sqlizer, error){
+	switch operador {
+	case "igual":
+		if campo != "Edad" {
+			return squirrel.ILike{campo: valor}, nil
+		}
+		return squirrel.Eq{campo: valor}, nil
+	case "mayor":
+		return squirrel.Gt{campo: valor}, nil
+	case "menor":
+		return squirrel.Lt{campo: valor}, nil
+	case "menorigual":
+		return squirrel.LtOrEq{campo: valor}, nil
+	case "mayorigual":
+		return squirrel.GtOrEq{campo: valor}, nil
+	}
+	return nil, errors.New("No se pudo obtener operador squirrel")
 }
