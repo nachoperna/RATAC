@@ -4,13 +4,15 @@
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>RATAC — Registro Argentino de Tumores en Animales de Compañía</title>
-      <link rel="stylesheet" type="text/css" href="../static/index.css">
+      <link rel="stylesheet" href="../static/index.css">
       <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
       <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+      <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+      <script src="../static/index.js"></script>
 </head>
 <body>
       <header>
-            <a class="logo" href="#">
+            <a class="logo" href="/">
                   <img src="../static/img/logo.png" alt="RATAC" style="height:32px; width:auto; display:block;">
             </a>
             <nav>
@@ -36,12 +38,7 @@
 
                   <div class="search-wrap">
                         <div class="search-box">
-                              <div class="search-icon">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-                                          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-                                    </svg>
-                              </div>
-                              <input class="search-input" id="search-input" type="text" name="paciente" placeholder="Buscar diagnóstico, especie, tipo tumoral…">
+                              <input class="search-input" id="search-input" type="text" name="paciente" placeholder="Busqueda rápida por nombre de paciente...">
                               <button 
                                     class="search-btn"
                                     hx-get="/pacientes/"
@@ -51,28 +48,51 @@
                                     hx-push-url="true"
                               >Buscar</button>
                         </div>
-
-                        <div class="search-tags">
-                              <span>Frecuentes:</span>
-                              <div class="tag">Linfoma canino</div>
-                              <div class="tag">Mastocitoma</div>
-                              <div class="tag">Osteosarcoma felino</div>
-                              <div class="tag">Carcinoma mamario</div>
-                        </div>
                   </div>
 
+                  <div class="filtros">
+                        <div class="filtro">
+                              <select class="filtro-selector">
+                                    <option value="Especie">Especie</option>
+                                    <option value="Raza">Raza</option>
+                                    <option value="Edad">Edad</option>
+                              </select>
+                              <select class="operador">
+                                    <option value="igual">=</option>
+                                    <option value="menor"><</option>
+                                    <option value="mayor">></option>
+                                    <option value="menorigual"><=</option>
+                                    <option value="mayorigual">>=</option>
+                              </select>
+                              <input type="text" class="filtro-valor">
+                              <input type="checkbox" class="filtro-not"> NOT
+                              <input type="checkbox" class="filtro-or" onchange="addInputOr(this)"> MULTIPLE
+                        </div>
+                  </div>
+                  <div class="acciones">
+                        <button type="button" onclick="addFiltro()">Añadir filtro</button>
+                        <button 
+                              type="button" 
+                              hx-post="/pacientes/"
+                              hx-ext="json-enc" 
+                              hx-vals='js:{filtros: obtenerFiltros()}' 
+                              hx-target="#main-section"
+                              hx-swap="outerHTML"
+                              hx-push-url="true"
+                              style="font-weight: bold;">Buscar</button>
+                  </div>
                   <div class="stats-bar">
                         <div class="stat">
-                        <span class="stat-num">{{.cant_docs}}</span>
-                        <span class="stat-label">Documentos cargados</span>
+                              <span class="stat-num">{{.cant_docs}}</span>
+                              <span class="stat-label">Documentos cargados</span>
                         </div>
                         <div class="stat">
-                        <span class="stat-num">{{.cant_diagnosticos}}</span>
-                        <span class="stat-label">Pacientes diagnosticados</span>
+                              <span class="stat-num">{{.cant_diagnosticos}}</span>
+                              <span class="stat-label">Pacientes diagnosticados</span>
                         </div>
                         <div class="stat">
-                        <span class="stat-num">{{.cant_imgs}}</span>
-                        <span class="stat-label">Imagenes</span>
+                              <span class="stat-num">{{.cant_imgs}}</span>
+                              <span class="stat-label">Imagenes</span>
                         </div>
                   </div>
             </div>

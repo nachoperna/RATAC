@@ -249,6 +249,14 @@ letter-spacing: 0.04em;
 
 .tag:hover { background: var(--lavender-mid); }
 
+/* ── FILTROS ── */
+.filtros{
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+}
+
+
 /* ── STATS BAR ── */
 .stats-bar {
 margin-top: 72px;
