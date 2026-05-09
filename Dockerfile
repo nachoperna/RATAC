@@ -4,6 +4,7 @@ FROM golang:1.24-bookworm AS builder
 # Instalar herramientas de generación
 RUN go install github.com/a-h/templ/cmd/templ@v0.3.833
 RUN go install github.com/sqlc-dev/sqlc/cmd/sqlc@v1.28.0
+RUN go install github.com/Masterminds/squirrel@v1.5.4
 
 WORKDIR /app
 
