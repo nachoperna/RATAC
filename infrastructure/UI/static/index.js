@@ -13,27 +13,36 @@ function addFiltro() {
             <option value="AND">AND</option>
             <option value="OR">OR</option>
       `
-      nuevoFiltro.insertBefore(operador_logico, nuevoFiltro.firstChild);
+      const nuevo_header = nuevoFiltro.querySelector('.filtro-header');
+      nuevo_header.insertBefore(operador_logico, nuevo_header.firstChild);
       const filtros = document.querySelector('.filtros');
-      filtros.insertBefore(nuevoFiltro, filtros.querySelector('button'));
+      filtros.insertBefore(nuevoFiltro, filtros.querySelector('.filtros-footer'));
 }
 
 function addInputOr(elemento) {
-  const filtro = elemento.closest('.filtro');
-  const inputs = filtro.querySelectorAll('input.filtro-valor');
-  const lastInput = inputs[inputs.length - 1];
-  
-  const nuevoInput = document.createElement('input');
-  nuevoInput.type = 'text';
-  nuevoInput.className = 'filtro-valor';
-  
-  const btnAgregar = document.createElement('button');
-  btnAgregar.type = 'button';
-  btnAgregar.textContent = '+';
-  btnAgregar.onclick = function() { addInputOr(this); };
-  btnAgregar.style.marginLeft = '5px';
-  
-  lastInput.after(nuevoInput, btnAgregar);
+      const esCheckbox = elemento.type === 'checkbox';
+
+      const filtro = elemento.closest('.filtro');
+      const inputs = filtro.querySelectorAll('input.filtro-valor');
+      if (esCheckbox){ // significa que el usuario quito la seleccion multiple y quitamos todos los inputs y botones extras
+            filtro.querySelector('.filtro-add-valor-container').classList.toggle('hidden')
+            if (!elemento.checked){
+                  const botones = filtro.querySelector('.filtro-add-valor');
+                  for (let i = inputs.length - 1; i > 0; i--) {
+                        inputs[i].remove();
+                  }
+                  botones.forEach(btn => btn.remove());
+                  return
+            }
+      }
+      const lastInput = inputs[inputs.length - 1];
+      
+      const nuevoInput = document.createElement('input');
+      nuevoInput.type = 'text';
+      nuevoInput.className = 'filtro-valor';
+      nuevoInput.placeholder = 'Otro valor...';
+      
+      lastInput.after(nuevoInput);
 }
 
 function obtenerFiltros() {
@@ -77,6 +86,14 @@ function obtenerFiltros() {
       return arrayFiltros;
 }
 
-function removeFilter(btn) {
-      btn.parentElement.remove();
+function removeFiltro(btn) {
+      if (document.querySelectorAll('.filtro').length == 1) {
+          toggleFiltros();  
+      }else{
+            btn.closest('.filtro').remove();
+      }
+}
+
+function toggleFiltros(){
+      document.querySelector('.filtros').classList.toggle('hidden');
 }

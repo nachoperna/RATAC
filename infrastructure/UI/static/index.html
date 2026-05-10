@@ -36,8 +36,8 @@
                         Consulte casos clínicos, estadísticas por especie, raza y tipo tumoral.
                   </p>
 
-                  <div class="search-wrap">
-                        <div class="search-box">
+                  <div class="search-section">
+                        <div class="search-group">
                               <input class="search-input" id="search-input" type="text" name="paciente" placeholder="Busqueda rápida por nombre de paciente...">
                               <button 
                                     class="search-btn"
@@ -48,39 +48,68 @@
                                     hx-push-url="true"
                               >Buscar</button>
                         </div>
-                  </div>
-
-                  <div class="filtros">
-                        <div class="filtro">
-                              <select class="filtro-selector">
-                                    <option value="Especie">Especie</option>
-                                    <option value="Raza">Raza</option>
-                                    <option value="Edad">Edad</option>
-                              </select>
-                              <select class="operador">
-                                    <option value="igual">=</option>
-                                    <option value="menor"><</option>
-                                    <option value="mayor">></option>
-                                    <option value="menorigual"><=</option>
-                                    <option value="mayorigual">>=</option>
-                              </select>
-                              <input type="text" class="filtro-valor">
-                              <input type="checkbox" class="filtro-not"> NOT
-                              <input type="checkbox" class="filtro-or" onchange="addInputOr(this)"> MULTIPLE
+                        <div
+                              type="button"
+                              class="mostrar-filtros"
+                              onclick="toggleFiltros()"
+                        >Filtros Avanzados
+                        </div>
+                        <div class="filtros hidden">
+                              <div class="filtro">
+                                    <div class="filtro-header">
+                                          <select class="filtro-selector">
+                                                <option value="Especie">Especie</option>
+                                                <option value="Raza">Raza</option>
+                                                <option value="Edad">Edad</option>
+                                          </select>
+                                          <select class="operador">
+                                                <option value="igual">=</option>
+                                                <option value="menor"><</option>
+                                                <option value="mayor">></option>
+                                                <option value="menorigual"><=</option>
+                                                <option value="mayorigual">>=</option>
+                                          </select>
+                                          <div class="checkbox-group">
+                                                <label class="checkbox-item">
+                                                      <input type="checkbox" class="filtro-not"> NOT
+                                                </label>
+                                                <label class="checkbox-item">
+                                                      <input type="checkbox" class="filtro-or" onchange="addInputOr(this)"> MULTIPLE
+                                                </label>
+                                                <button type="button" class="btn-remove" onclick="removeFiltro(this)" title="Eliminar filtro">
+                                                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                                                </button>
+                                          </div>
+                                    </div>
+                                    <div class="valores-container">
+                                          <input type="text" class="filtro-valor" placeholder="Ingrese un valor...">
+                                    </div>
+                                    <div class="filtro-add-valor-container hidden">
+                                          <button type="button" class="filtro-add-valor" onclick="addInputOr(this)">
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                                                Agregar opción
+                                          </button>
+                                    </div>
+                              </div>
+                              <div class="filtros-footer">
+                                    <button type="button" class="btn-add-filtro" onclick="addFiltro()">+ Añadir filtro</button>
+                                    <button 
+                                          type="button" 
+                                          class="btn-buscar-avanzada"
+                                          hx-post="/pacientes/"
+                                          hx-ext="json-enc" 
+                                          hx-vals='js:{filtros: obtenerFiltros()}' 
+                                          hx-target="#main-section"
+                                          hx-swap="outerHTML"
+                                          hx-push-url="true"
+                                          style="font-weight: bold;"
+                                          >Aplicar Filtros y Buscar
+                                    </button>
+                              </div>
                         </div>
                   </div>
-                  <div class="acciones">
-                        <button type="button" onclick="addFiltro()">Añadir filtro</button>
-                        <button 
-                              type="button" 
-                              hx-post="/pacientes/"
-                              hx-ext="json-enc" 
-                              hx-vals='js:{filtros: obtenerFiltros()}' 
-                              hx-target="#main-section"
-                              hx-swap="outerHTML"
-                              hx-push-url="true"
-                              style="font-weight: bold;">Buscar</button>
-                  </div>
+
+
                   <div class="stats-bar">
                         <div class="stat">
                               <span class="stat-num">{{.cant_docs}}</span>
