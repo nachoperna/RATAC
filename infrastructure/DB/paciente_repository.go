@@ -190,9 +190,15 @@ func getQueryByFiltro(filtros []domain.Filtro) (string, []interface{}, error){
 			}
 		}
 
-		// if f.Not {
-		// 	expresiones = squirrel.NotExpr(expresiones)
-		// }
+		if f.Not {
+			expresion_sql, args, err := expresiones.ToSql()
+			if err != nil {
+				log.Println("Error al intentar negar la expresión:", err)
+				continue
+			}
+			negacion_sql := fmt.Sprintf("NOT (%s)", expresion_sql)
+			expresiones = squirrel.Expr(negacion_sql, args...)
+		}
 
 		// Acoplar la lógica AND / OR
 		if i == 0 {
