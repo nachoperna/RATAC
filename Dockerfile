@@ -4,7 +4,6 @@ FROM golang:1.24-bookworm AS builder
 # Instalar herramientas de generación
 RUN go install github.com/a-h/templ/cmd/templ@v0.3.833
 RUN go install github.com/sqlc-dev/sqlc/cmd/sqlc@v1.28.0
-RUN go install github.com/Masterminds/squirrel@v1.5.4
 
 WORKDIR /app
 
@@ -29,7 +28,7 @@ RUN pip3 install --no-cache-dir --break-system-packages -r requirements.txt
 # COPIAR SOLO EL BINARIO generado en la etapa anterior
 COPY --from=builder /app/main .
 # Copiar scripts de python o carpetas necesarias para la ejecución (ej: templates)
-COPY --from=builder /app/ProcesadoJsons/*.py ./ 
+COPY --from=builder /app/ProcesadoJsons ./ProcesadoJsons
 # Si tienes carpetas como 'static' o 'templates', añádelas aquí:
 # COPY --from=builder /app/static ./static
 
