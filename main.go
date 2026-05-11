@@ -44,6 +44,7 @@ func main() {
 	http.HandleFunc("/", homeHandler.ShowHome)
 	http.HandleFunc("/pacientes", pacienteHandler.ListPacientes)
 	http.HandleFunc("/pacientes/", pacienteHandler.ListPacientesByFiltro)
+	http.HandleFunc("/pacientes/nombre", pacienteHandler.ListPacientesBy)
 	http.HandleFunc("/apipacientes", pacienteHandler.APIPacientes)
 	http.ListenAndServe(port, nil)
 }
