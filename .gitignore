@@ -1,8 +1,9 @@
+Histopatología/
 JSONS/
 IMAGENES/
 sqlc/
 views/*.go
-./diagnosticos_mal_procesados.txt
+diagnosticos_mal_procesados.txt
 /venv
 ProcesadoJsons/prueba/
 ./main
