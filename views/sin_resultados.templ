@@ -1,0 +1,20 @@
+package views
+
+templ SinResultados() {
+      <div class="container-sin-resultados">
+            <div class="sin-resultados">
+                  <div class="sin-resultados-estado">Búsqueda</div>
+
+                  <h2>No hay resultados</h2>
+                  <p>No se encontraron registros que coincidan con los filtros aplicados</p>
+
+                  <button 
+                        class="btn-volver" 
+                        hx-get="/"
+                        hx-target="body"
+                        hx-push-url="true"
+                        >Volver
+                  </button>
+            </div>
+      </div>
+}

@@ -36,7 +36,11 @@ func (h *PacienteHandler) ListPacientesBy(w http.ResponseWriter, r *http.Request
 			fmt.Println("ERROR: ", err)
 			// renderizar templ de error
 		}
-		views.ListPacientes(pacientes).Render(r.Context(), w)
+		if len(pacientes) == 0{
+			views.SinResultados().Render(r.Context(), w)
+		}else{
+			views.ListPacientes(pacientes).Render(r.Context(), w)
+		}
 	}
 }
 
@@ -54,7 +58,11 @@ func (h *PacienteHandler) ListPacientesByFiltro(w http.ResponseWriter, r *http.R
 	if err != nil {
 		// renderizar templ de error
 	}
-	views.ListPacientes(pacientes).Render(r.Context(), w)
+	if len(pacientes) == 0{
+		views.SinResultados().Render(r.Context(), w)
+	}else{
+		views.ListPacientes(pacientes).Render(r.Context(), w)
+	}
 }
 
 func (h *PacienteHandler) APIPacientes(w http.ResponseWriter, r *http.Request) {
