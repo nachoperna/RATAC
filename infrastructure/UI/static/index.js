@@ -1,4 +1,3 @@
-let filterCount = 0;
 function addFiltro() {
       const filtroPrimero = document.querySelector('.filtro');
       
@@ -97,3 +96,17 @@ function removeFiltro(btn) {
 function toggleFiltros(){
       document.querySelector('.filtros').classList.toggle('hidden');
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+      document.querySelector('.filtros').addEventListener('change', function(e) {
+      if (e.target.classList.contains('filtro-selector')) {
+            const es_edad = e.target.value === 'Edad';
+            const operador_select = e.target.closest('.filtro-header').querySelector('.operador');
+            Array.from(operador_select.options).forEach(option => {
+                  if (option.value !== 'igual') {
+                        option.classList.toggle('hidden', !es_edad);
+                  }
+            });
+      }
+      });
+});
