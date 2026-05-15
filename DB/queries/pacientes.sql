@@ -46,5 +46,5 @@ WHERE Protocolo = $1;
 SELECT count(*) FROM pacientes;
 
 -- name: GetPacienteByNombre :many
-SELECT * FROM Pacientes
+SELECT *, COUNT(*) OVER() AS total FROM Pacientes
 WHERE Paciente ilike CONCAT('%', $1::VARCHAR, '%');

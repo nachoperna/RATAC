@@ -25,13 +25,13 @@ func (h *PacienteHandler) ListPacientes(w http.ResponseWriter, r *http.Request) 
 	if err != nil {
 		// renderizar templ de error
 	}
-	views.ListPacientes(pacientes).Render(r.Context(), w)
+	views.ListPacientes(pacientes, 0).Render(r.Context(), w)
 }
 
 func (h *PacienteHandler) ListPacientesBy(w http.ResponseWriter, r *http.Request) {
 	paciente := r.URL.Query().Get("paciente")
 	if paciente != ""{
-		pacientes, err := h.pacienteService.GetPacienteByNombre(r.Context(), paciente)
+		pacientes, resultados_total, err := h.pacienteService.GetPacienteByNombre(r.Context(), paciente)
 		if err != nil {
 			fmt.Println("ERROR: ", err)
 			// renderizar templ de error
@@ -39,7 +39,7 @@ func (h *PacienteHandler) ListPacientesBy(w http.ResponseWriter, r *http.Request
 		if len(pacientes) == 0{
 			views.SinResultados().Render(r.Context(), w)
 		}else{
-			views.ListPacientes(pacientes).Render(r.Context(), w)
+			views.ListPacientes(pacientes, resultados_total).Render(r.Context(), w)
 		}
 	}
 }
@@ -54,14 +54,14 @@ func (h *PacienteHandler) ListPacientesByFiltro(w http.ResponseWriter, r *http.R
 		http.Error(w, "Error procesando el JSON", http.StatusBadRequest)
 		return
 	}
-	pacientes, err := h.pacienteService.GetPacienteByFiltro(r.Context(), req.Filtros)
+	pacientes, resultados_total, err := h.pacienteService.GetPacienteByFiltro(r.Context(), req.Filtros)
 	if err != nil {
 		// renderizar templ de error
 	}
 	if len(pacientes) == 0{
 		views.SinResultados().Render(r.Context(), w)
 	}else{
-		views.ListPacientes(pacientes).Render(r.Context(), w)
+		views.ListPacientes(pacientes, resultados_total).Render(r.Context(), w)
 	}
 }
 

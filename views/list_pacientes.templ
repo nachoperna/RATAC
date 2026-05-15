@@ -2,8 +2,13 @@ package views
 
 import "RATAC/domain"
 
-templ ListPacientes(pacientes []domain.Paciente) {
+templ ListPacientes(pacientes []domain.Paciente, resultados_total int16) {
       <div class="container">
+            <div class="results-card">
+                  <div class="results-info">
+                        <span>10</span> de <strong class="highlight">{resultados_total}</strong> resultados mostrados
+                  </div>
+            </div>
             <div id="cards-grid">
                   for _, p := range pacientes {
                         <article class="case-card">

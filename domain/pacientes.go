@@ -32,6 +32,8 @@ var ColumnasPermitidas = map[string]bool{
 	"Especie": true,
 	"Raza":    true,
 	"Edad":    true,
+	"Paciente": true,
+	"Protocolo": true,
 }
 
 type PacienteRepository interface {
@@ -42,6 +44,6 @@ type PacienteRepository interface {
 	ListUltimosPacientes(ctx context.Context) ([]Paciente, error)
 	ListPacientes(ctx context.Context) ([]Paciente, error)
 	CountPacientes(ctx context.Context) (int64, error)
-	GetPacienteByNombre(ctx context.Context, nombre string) ([]Paciente, error)
-	GetPacienteByFiltro(ctx context.Context, filtros []Filtro) ([]Paciente, error)
+	GetPacienteByNombre(ctx context.Context, nombre string) ([]Paciente, int16, error)
+	GetPacienteByFiltro(ctx context.Context, filtros []Filtro) ([]Paciente, int16, error)
 }

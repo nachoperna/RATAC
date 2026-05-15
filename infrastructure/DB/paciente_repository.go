@@ -110,13 +110,14 @@ func (r *PacienteRepository) CountPacientes(ctx context.Context) (int64, error) 
 	return r.queries.CountPacientes(ctx)
 }
 
-func (r *PacienteRepository) GetPacienteByNombre(ctx context.Context, nombre string) ([]domain.Paciente, error) {
+func (r *PacienteRepository) GetPacienteByNombre(ctx context.Context, nombre string) ([]domain.Paciente, int16, error) {
 	bd_pacientes, err := r.queries.GetPacienteByNombre(ctx, nombre)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	var pacientes []domain.Paciente
+	var resultados_total int16 = int16(bd_pacientes[0].Total)
 	for _, p := range bd_pacientes {
 		pacientes = append(pacientes, domain.Paciente{
 			Protocolo:      p.Protocolo,
@@ -130,33 +131,43 @@ func (r *PacienteRepository) GetPacienteByNombre(ctx context.Context, nombre str
 			Edad: strconv.FormatInt(int64(p.Edad.Int16),10),
 		})
 	}
-	return pacientes, nil
+	return pacientes, resultados_total, nil
 }
 
-func (r *PacienteRepository) GetPacienteByFiltro(ctx context.Context, filtros []domain.Filtro) ([]domain.Paciente, error){
+func (r *PacienteRepository) GetPacienteByFiltro(ctx context.Context, filtros []domain.Filtro) ([]domain.Paciente, int16, error){
 	sqlQuery, args, _ := getQueryByFiltro(filtros)
 
 	// 5. Ejecutar la consulta en PostgreSQL
 	rows, err := r.db.Query(sqlQuery, args...)
 	if err != nil {
 		log.Printf("Error ejecutando query en Postgres: %v", err)
-		return nil, err
+		return nil, 0, err
 	}
 	defer rows.Close()
 
 	var pacientes []domain.Paciente
+	var resultados_total int16 
+	set_resultado := false
+
 	// 6. Leer los resultados (Ejemplo genérico)
 	for rows.Next() {
 		var paciente domain.Paciente
-		
-		if err := rows.Scan(&paciente.Protocolo, &paciente.Fecha, &paciente.NombrePaciente, &paciente.Solicitante, &paciente.Tecnica, &paciente.Edad, &paciente.NombrePaciente, &paciente.Raza, &paciente.Especie); err != nil {
+		var err error
+		dummy := 0
+		if !set_resultado{
+			err = rows.Scan(&paciente.Protocolo, &paciente.Fecha, &paciente.NombrePaciente, &paciente.Solicitante, &paciente.Tecnica, &paciente.Edad, &paciente.Familia, &paciente.Raza, &paciente.Especie, &resultados_total);
+			set_resultado = true
+		}else{
+			err = rows.Scan(&paciente.Protocolo, &paciente.Fecha, &paciente.NombrePaciente, &paciente.Solicitante, &paciente.Tecnica, &paciente.Edad, &paciente.Familia, &paciente.Raza, &paciente.Especie, &dummy);
+		}
+		if  err != nil {
 			log.Printf("Error leyendo fila: %v", err)
 			continue
 		}
 		pacientes = append(pacientes, paciente)
 	}
 
-	return pacientes, nil
+	return pacientes, resultados_total, nil
 }
 
 func getQueryByFiltro(filtros []domain.Filtro) (string, []interface{}, error){
@@ -164,7 +175,7 @@ func getQueryByFiltro(filtros []domain.Filtro) (string, []interface{}, error){
 	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 	
 	// Iniciamos la consulta base
-	query_builder := psql.Select("protocolo", "fecha", "paciente", "solicitante", "tecnica", "edad", "familia", "raza", "especie").From("pacientes")
+	query_builder := psql.Select("protocolo", "fecha", "paciente", "solicitante", "tecnica", "edad", "familia", "raza", "especie", "COUNT(*) OVER() as total").From("pacientes")
 
 	var cond squirrel.Sqlizer
 

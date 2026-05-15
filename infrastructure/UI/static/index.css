@@ -523,6 +523,26 @@ footer { flex-direction: column; gap: 12px; text-align: center; }
       margin: 0 auto;
 }
 
+.results-card {
+      margin-bottom: 1.5rem;
+      margin-top: 1.5rem;
+}
+
+.results-info {
+      display: inline-block;
+      background-color: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      padding: 0.4rem 1rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      /* color: var(--text-muted); */
+}
+
+.results-info strong.highlight {
+      /* color: var(--accent-indigo); */
+      font-weight: 700;
+}
+
 .case-card {
       background: var(--white);
       border: 1px solid var(--border);
