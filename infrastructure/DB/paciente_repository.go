@@ -110,14 +110,20 @@ func (r *PacienteRepository) CountPacientes(ctx context.Context) (int64, error) 
 	return r.queries.CountPacientes(ctx)
 }
 
-func (r *PacienteRepository) GetPacienteByNombre(ctx context.Context, nombre string) ([]domain.Paciente, int16, error) {
-	bd_pacientes, err := r.queries.GetPacienteByNombre(ctx, nombre)
+func (r *PacienteRepository) GetPacienteByNombre(ctx context.Context, nombre string, offset int8) ([]domain.Paciente, int16, error) {
+	bd_pacientes, err := r.queries.GetPacienteByNombre(ctx, sqlc.GetPacienteByNombreParams{
+		Column1: nombre,
+		Offset: int32(offset),
+	})
 	if err != nil {
 		return nil, 0, err
 	}
 
 	var pacientes []domain.Paciente
-	var resultados_total int16 = int16(bd_pacientes[0].Total)
+	var resultados_total int16
+	if len(bd_pacientes) > 0{
+		resultados_total = int16(bd_pacientes[0].Total)
+	}
 	for _, p := range bd_pacientes {
 		pacientes = append(pacientes, domain.Paciente{
 			Protocolo:      p.Protocolo,
@@ -134,8 +140,8 @@ func (r *PacienteRepository) GetPacienteByNombre(ctx context.Context, nombre str
 	return pacientes, resultados_total, nil
 }
 
-func (r *PacienteRepository) GetPacienteByFiltro(ctx context.Context, filtros []domain.Filtro) ([]domain.Paciente, int16, error){
-	sqlQuery, args, _ := getQueryByFiltro(filtros)
+func (r *PacienteRepository) GetPacienteByFiltro(ctx context.Context, filtros []domain.Filtro, offset int8) ([]domain.Paciente, int16, error){
+	sqlQuery, args, _ := getQueryByFiltro(filtros, offset)
 
 	// 5. Ejecutar la consulta en PostgreSQL
 	rows, err := r.db.Query(sqlQuery, args...)
@@ -170,7 +176,7 @@ func (r *PacienteRepository) GetPacienteByFiltro(ctx context.Context, filtros []
 	return pacientes, resultados_total, nil
 }
 
-func getQueryByFiltro(filtros []domain.Filtro) (string, []interface{}, error){
+func getQueryByFiltro(filtros []domain.Filtro, offset int8) (string, []any, error){
 	// 1. CRÍTICO PARA POSTGRESQL: Configurar el formato del dólar ($1, $2)
 	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 	
@@ -225,7 +231,7 @@ func getQueryByFiltro(filtros []domain.Filtro) (string, []interface{}, error){
 
 	// 3. Aplicar las condiciones generadas
 	if cond != nil {
-		query_builder = query_builder.Where(cond)
+		query_builder = query_builder.Where(cond).Limit(domain.LIMIT_RESULTADOS_PACIENTE).Offset(uint64(offset))
 	}
 
 	// 4. Generar el SQL final compatible con Postgres

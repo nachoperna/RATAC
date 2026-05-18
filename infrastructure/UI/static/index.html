@@ -97,11 +97,11 @@
                               <div class="filtros-footer">
                                     <button type="button" class="btn-add-filtro" onclick="addFiltro()">+ Añadir filtro</button>
                                     <button 
-                                          type="button" 
+                                          type="submit" 
                                           class="btn-buscar-avanzada"
                                           hx-post="/pacientes/"
                                           hx-ext="json-enc" 
-                                          hx-vals='js:{filtros: obtenerFiltros()}' 
+                                          hx-vals='js:{filtros: setFiltros(), offset: getOffset()}' 
                                           hx-target="#main-section"
                                           hx-swap="outerHTML"
                                           hx-push-url="true"

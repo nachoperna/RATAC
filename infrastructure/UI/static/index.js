@@ -1,3 +1,6 @@
+const arrayFiltros = [];
+let offset = -1;
+
 function addFiltro() {
       const filtroPrimero = document.querySelector('.filtro');
       
@@ -44,9 +47,8 @@ function addInputOr(elemento) {
       lastInput.after(nuevoInput);
 }
 
-function obtenerFiltros() {
+function setFiltros() {
       const filas = document.querySelectorAll('.filtro');
-      const arrayFiltros = [];
       const arrayValores = [];
 
       filas.forEach((fila, index) => {
@@ -72,17 +74,17 @@ function obtenerFiltros() {
                   multiple: isMultiple
             });
       });
-      arrayFiltros.forEach(filtro => {
-      console.log("Lógica:", filtro.logica);
-      console.log("Campo:", filtro.campo);
-      console.log("Operador:", filtro.operador);
-      console.log("Valores:", filtro.valores);
-      console.log("Not:", filtro.not);
-      console.log("Multiple:", filtro.multiple);
-      console.log("---");
-      });
       console.log("Enviando payload:", arrayFiltros);
       return arrayFiltros;
+}
+
+function getOffset(){
+      if (offset == -1){
+            offset = 0;
+      }else{
+            offset += 10;
+      }
+      return offset;
 }
 
 function removeFiltro(btn) {
@@ -95,6 +97,10 @@ function removeFiltro(btn) {
 
 function toggleFiltros(){
       document.querySelector('.filtros').classList.toggle('hidden');
+}
+
+function obtenerFiltros(){
+      return arrayFiltros;
 }
 
 document.addEventListener('DOMContentLoaded', function() {

@@ -36,6 +36,8 @@ var ColumnasPermitidas = map[string]bool{
 	"Protocolo": true,
 }
 
+const LIMIT_RESULTADOS_PACIENTE = 10
+
 type PacienteRepository interface {
 	CreatePaciente(ctx context.Context, paciente Paciente) error
 	// GetPaciente(protocolo string) (Paciente, error)
@@ -44,6 +46,6 @@ type PacienteRepository interface {
 	ListUltimosPacientes(ctx context.Context) ([]Paciente, error)
 	ListPacientes(ctx context.Context) ([]Paciente, error)
 	CountPacientes(ctx context.Context) (int64, error)
-	GetPacienteByNombre(ctx context.Context, nombre string) ([]Paciente, int16, error)
-	GetPacienteByFiltro(ctx context.Context, filtros []Filtro) ([]Paciente, int16, error)
+	GetPacienteByNombre(ctx context.Context, nombre string, offset int8) ([]Paciente, int16, error)
+	GetPacienteByFiltro(ctx context.Context, filtros []Filtro, offset int8) ([]Paciente, int16, error)
 }

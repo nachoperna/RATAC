@@ -1,45 +1,93 @@
 package views
 
 import "RATAC/domain"
+import "fmt"
 
-templ ListPacientes(pacientes []domain.Paciente, resultados_total int16) {
+templ ShowResultados(pacientes []domain.Paciente, resultados_total int16, offset int8, filtros_avanzados bool) {
       <div class="container">
             <div class="results-card">
-                  <div class="results-info">
-                        <span>10</span> de <strong class="highlight">{resultados_total}</strong> resultados mostrados
+                  <div class="results-info" id="results-info">
+                        <span>{len(pacientes)}</span> de <strong class="highlight">{resultados_total}</strong> RESULTADOS MOSTRADOS
                   </div>
             </div>
             <div id="cards-grid">
-                  for _, p := range pacientes {
-                        <article class="case-card">
-                              <div class="card-header">
-                                    <span class="protocol-chip">{p.Protocolo}</span>
-                                    <span class="date-label">{p.Fecha}</span>
-                              </div>
-                              <div class="patient-info">
-                                    <span class="patient-name">{p.NombrePaciente}</span>
-                                    <span class="species-breed">{p.Especie} • {p.Raza}</span>
-                              </div>
-                              <div class="data-grid">
-                                    <div class="data-item">
-                                          <span class="data-label">Solicitante</span>
-                                          <span class="data-value">{p.Solicitante}</span>
-                                    </div>
-                                    <div class="data-item">
-                                          <span class="data-label">Técnica</span>
-                                          <span class="data-value">{p.Tecnica}</span>
-                                    </div>
-                                    <div class="data-item">
-                                          <span class="data-label">Edad</span>
-                                          <span class="not-specified">{p.Edad}</span>
-                                    </div>
-                                    <div class="data-item">
-                                          <span class="data-label">Familia</span>
-                                          <span class="not-specified">{p.Familia}</span>
-                                    </div>
-                              </div>
-                        </article>
-                  }
+                  @ListPacientes(pacientes, resultados_total, offset, filtros_avanzados)
+            </div>
+ 
+            <div class="container-mostrar-mas" id="container-mostrar-mas">
+                  @botonMostrarMas(resultados_total, offset, filtros_avanzados)
             </div>
       </div>
+}
+
+templ ListPacientes(pacientes []domain.Paciente, resultados_total int16, offset int8, filtros_avanzados bool) {
+      @resultadosMostrados(len(pacientes), resultados_total, offset)
+      for _, p := range pacientes {
+            <article class="case-card">
+                  <div class="card-header">
+                        <span class="protocol-chip">{p.Protocolo}</span>
+                        <span class="date-label">{p.Fecha}</span>
+                  </div>
+                  <div class="patient-info">
+                        <span class="patient-name">{p.NombrePaciente}</span>
+                        <span class="species-breed">{p.Especie} • {p.Raza}</span>
+                  </div>
+                  <div class="data-grid">
+                        <div class="data-item">
+                              <span class="data-label">Solicitante</span>
+                              <span class="data-value">{p.Solicitante}</span>
+                        </div>
+                        <div class="data-item">
+                              <span class="data-label">Técnica</span>
+                              <span class="data-value">{p.Tecnica}</span>
+                        </div>
+                        <div class="data-item">
+                              <span class="data-label">Edad</span>
+                              <span class="not-specified">{p.Edad}</span>
+                        </div>
+                        <div class="data-item">
+                              <span class="data-label">Familia</span>
+                              <span class="not-specified">{p.Familia}</span>
+                        </div>
+                  </div>
+            </article>
+      }
+
+      <div class="container-mostrar-mas" id="container-mostrar-mas" hx-swap-oob="true">
+            @botonMostrarMas(resultados_total, offset, filtros_avanzados)
+      </div>
+
+}
+
+templ botonMostrarMas(resultados_total int16, offset int8, filtros_avanzados bool) {
+      if (resultados_total - int16(offset) > domain.LIMIT_RESULTADOS_PACIENTE){
+            if (filtros_avanzados){
+                  <button 
+                        class="btn-mostrar-mas"
+                        hx-post="."
+                        hx-on::config-request="event.detail.path = window.location.pathname + window.location.search"
+                        hx-ext="json-enc" 
+                        hx-vals='js:{filtros: setFiltros(), offset: getOffset()}' 
+                        hx-target="#cards-grid"
+                        hx-swap="beforeend"
+                        >Mostrar más resultados
+                  </button>
+            }else{
+                  <button 
+                        class="btn-mostrar-mas"
+                        hx-get="."
+                        hx-on::config-request="event.detail.path = window.location.pathname + window.location.search"
+                        hx-vals={fmt.Sprintf("js:{offset: %d}", offset + domain.LIMIT_RESULTADOS_PACIENTE)}
+                        hx-target="#cards-grid"
+                        hx-swap="beforeend"
+                        >Mostrar más resultados
+                  </button>
+            }
+      }
+}
+
+templ resultadosMostrados(cant_pacientes int, resultados_total int16, offset int8) {
+      <div class="results-info" id="results-info" hx-swap-oob="true">
+            <span>{offset + int8(cant_pacientes)}</span> de <strong class="highlight">{resultados_total}</strong> RESULTADOS MOSTRADOS
+      </div>     
 }

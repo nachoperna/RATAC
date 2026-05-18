@@ -47,4 +47,5 @@ SELECT count(*) FROM pacientes;
 
 -- name: GetPacienteByNombre :many
 SELECT *, COUNT(*) OVER() AS total FROM Pacientes
-WHERE Paciente ilike CONCAT('%', $1::VARCHAR, '%');
+WHERE Paciente ilike CONCAT('%', $1::VARCHAR, '%')
+LIMIT 10 OFFSET $2;

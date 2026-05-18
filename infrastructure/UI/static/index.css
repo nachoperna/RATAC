@@ -554,6 +554,44 @@ footer { flex-direction: column; gap: 12px; text-align: center; }
       animation: fadeIn 0.5s ease forwards;
 }
 
+.container-mostrar-mas {
+      margin-top: 40px; /* Separación de la última fila de tarjetas */
+      margin-bottom: 60px;
+      text-align: center;
+      width: 100%;
+}
+
+/* Estilo del botón */
+.btn-mostrar-mas {
+      background-color: transparent;
+      color: #14143a; /* Azul marino oscuro extraído de la UI */
+      border: 1.5px solid #14143a;
+      border-radius: 6px; /* Redondeo sutil acorde a las tarjetas */
+      padding: 14px 40px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1.5px; /* Espaciado elegante de letras */
+      text-transform: uppercase;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.3s ease; /* Animación suave */
+      font-family: inherit;
+}
+
+/* Efecto al pasar el cursor (Hover) */
+.btn-mostrar-mas:hover {
+      background-color: #14143a;
+      color: #ffffff;
+      box-shadow: 0 6px 16px rgba(20, 20, 58, 0.15); /* Sombra suave para dar profundidad */
+      transform: translateY(-2px); /* Ligero movimiento hacia arriba */
+}
+
+/* Efecto al hacer clic (Active) */
+.btn-mostrar-mas:active {
+      transform: translateY(1px); /* Efecto de hundimiento */
+      box-shadow: 0 2px 8px rgba(20, 20, 58, 0.1);
+}
+
 .container-sin-resultados{
       padding-top: 64px;
       min-height: 100vh;
