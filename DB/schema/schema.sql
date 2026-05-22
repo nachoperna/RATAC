@@ -43,15 +43,15 @@ CREATE TABLE Grado_oncologico (
     CONSTRAINT Grado_oncologico_pk PRIMARY KEY (id,Descripciones_microscopicas_Pacientes_Protocolo,Descripciones_microscopicas_Descripcion)
 );
 
-CREATE TABLE historial_acciones (
-    id serial PRIMARY KEY,
-    usuario varchar(50) NOT NULL DEFAULT 'sistema',
-    accion varchar(255) NOT NULL,
-    tabla_afectada varchar(50) NOT NULL,
-    fecha timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    datos_anteriores text,
-    datos_nuevos text
-);
+-- CREATE TABLE historial_acciones (
+--     id serial PRIMARY KEY,
+--     usuario varchar(50) NOT NULL DEFAULT 'sistema',
+--     accion varchar(255) NOT NULL,
+--     tabla_afectada varchar(50) NOT NULL,
+--     fecha timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+--    datos_anteriores text,
+--    datos_nuevos text
+--);
 
 
 -- Funciones y triggers para registrar el historial de acciones
