@@ -1,0 +1,244 @@
+:root {
+      /* Colores Base */
+      --bg-body: #f4f5f8;
+      --bg-card: #ffffff;
+      
+      /* Textos */
+      --text-main: #14143a; /* Azul marino profundo (Corporativo RATAC) */
+      --text-body: #3b3b4f;
+      --text-muted: #73738c;
+      
+      /* Acentos Coloridos */
+      --accent-primary: #3f3f8c; /* Azul/Violeta para detalles */
+      --accent-light: #edf0fa; /* Fondo azul clarito */
+      --bg-patient: #ebf0fb; /* Celeste sólido para la tarjeta principal */
+      
+      /* Bordes */
+      --border-color: #e2e4ec;
+      
+      /* Diagnóstico */
+      --diag-bg: #f2f4fc;
+      --diag-border: #4a4ade;
+      --diag-text: #2a2a6b;
+}
+
+.container-paciente {
+      max-width: 1050px;
+      margin: 40px auto;
+      padding: 0 20px;
+}
+
+.card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 35px;
+      margin-bottom: 30px;
+      box-shadow: 0 8px 24px rgba(20, 20, 58, 0.03);
+}
+
+.section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 40px 0 20px 0;
+}
+
+.section-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background-color: var(--accent-light);
+      color: var(--accent-primary);
+      border-radius: 8px;
+}
+
+.section-title {
+      font-size: 15px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--accent-primary);
+      font-weight: 700;
+      margin: 0;
+}
+
+.patient-card {
+      background-color: var(--bg-patient); /* Color sólido en lugar de gradiente */
+      border-top: 5px solid var(--accent-primary);
+}
+
+.header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+}
+
+.badges {
+      display: flex;
+      gap: 10px;
+}
+
+.badge {
+      background-color: rgba(63, 63, 140, 0.1);
+      color: var(--accent-primary);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1px;
+}
+
+.badge.date {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+}
+
+.patient-name {
+      font-size: 36px;
+      margin: 0 0 25px 0; /* Mayor margen inferior porque ya no hay subtítulo */
+      font-weight: 800;
+      color: var(--text-main);
+}
+
+.info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 25px;
+      background-color: var(--bg-card);
+      padding: 25px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+}
+
+.info-item {
+      display: flex;
+      flex-direction: column;
+}
+
+.info-item .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      font-weight: 700;
+}
+
+.info-item .value {
+      font-size: 16px;
+      color: var(--text-main);
+      font-weight: 600;
+}
+
+.text-block {
+      font-size: 16px;
+      color: var(--text-body);
+      line-height: 1.8;
+}
+        
+.text-block p {
+      margin-top: 0;
+      margin-bottom: 12px;
+}
+
+.text-block p:last-child {
+      margin-bottom: 0;
+}
+
+.micro-card {
+      display: grid;
+      grid-template-columns: 1fr 450px;
+      gap: 0;
+      padding: 0;
+      overflow: hidden;
+}
+
+.micro-content {
+      padding: 35px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+}
+
+.micro-organ {
+      font-size: 20px;
+      color: var(--text-main);
+      margin: 0 0 15px 0;
+      font-weight: 700;
+      display: inline-block;
+      border-bottom: 2px solid var(--accent-light);
+      padding-bottom: 5px;
+}
+
+.micro-desc {
+      font-size: 15px;
+      color: var(--text-body);
+      margin-bottom: 25px;
+      line-height: 1.7;
+}
+
+        /* Caja de Diagnóstico Resaltada */
+.diagnosis-box {
+      background-color: var(--diag-bg);
+      border-left: 5px solid var(--diag-border);
+      padding: 20px;
+      border-radius: 0 6px 6px 0;
+}
+
+.diagnosis-box .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--diag-border);
+      font-weight: 800;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+}
+
+.diagnosis-box p {
+      margin: 0;
+      font-weight: 600;
+      color: var(--diag-text);
+      font-size: 15px;
+      line-height: 1.5;
+}
+
+.micro-image {
+      width: 100%;
+      height: 100%;
+      min-height: 350px;
+      background-color: #e0e0e0;
+      position: relative;
+}
+
+.micro-image img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+}
+
+.micro-image:hover img {
+      transform: scale(1.03);
+}
+
+@media (max-width: 900px) {
+      .micro-card {
+            grid-template-columns: 1fr;
+      }
+      .micro-image {
+            min-height: 300px;
+      }
+      .micro-image img {
+            position: relative;
+      }
+}

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">
+  <rect width="1920" height="1080" fill="#f4f5f8" />
+  
+  <defs>
+    <g id="nodo-red">
+      <line x1="0" y1="-80" x2="0" y2="-220" stroke="#e1e2ec" stroke-width="3" />
+      <line x1="0" y1="80" x2="0" y2="220" stroke="#e1e2ec" stroke-width="3" />
+      <line x1="-80" y1="0" x2="-220" y2="0" stroke="#e1e2ec" stroke-width="3" />
+      <line x1="80" y1="0" x2="220" y2="0" stroke="#e1e2ec" stroke-width="3" />
+      
+      <line x1="-56.5" y1="-56.5" x2="-155.5" y2="-155.5" stroke="#e1e2ec" stroke-width="3" />
+      <line x1="56.5" y1="56.5" x2="155.5" y2="155.5" stroke="#e1e2ec" stroke-width="3" />
+      <line x1="-56.5" y1="56.5" x2="-155.5" y2="155.5" stroke="#e1e2ec" stroke-width="3" />
+      <line x1="56.5" y1="-56.5" x2="155.5" y2="-155.5" stroke="#e1e2ec" stroke-width="3" />
+      
+      <circle cx="0" cy="0" r="80" fill="none" stroke="#e1e2ec" stroke-width="3" />
+      <circle cx="0" cy="0" r="30" fill="#eaebf2" />
+    </g>
+  </defs>
+
+  <use href="#nodo-red" x="350" y="280" />
+  <use href="#nodo-red" x="960" y="200" />
+  <use href="#nodo-red" x="1600" y="350" />
+  
+  <use href="#nodo-red" x="250" y="850" />
+  <use href="#nodo-red" x="1020" y="880" />
+  <use href="#nodo-red" x="1500" y="800" />
+</svg>
