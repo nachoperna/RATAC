@@ -23,7 +23,7 @@ templ ShowResultados(pacientes []domain.Paciente, resultados_total int16, offset
 templ ListPacientes(pacientes []domain.Paciente, resultados_total int16, offset int8, filtros_avanzados bool) {
       @resultadosMostrados(len(pacientes), resultados_total, offset)
       for _, p := range pacientes {
-            <article class="case-card">
+            <article class="case-card" hx-get={fmt.Sprintf("/paciente/protocolo/%s", p.Protocolo)} hx-target=".container" hx-swap="innerHTML" hx-push-url="true">
                   <div class="card-header">
                         <span class="protocol-chip">{p.Protocolo}</span>
                         <span class="date-label">{p.Fecha}</span>

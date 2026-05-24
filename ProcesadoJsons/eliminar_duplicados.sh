@@ -1,5 +1,5 @@
 # Este script elimina los pdf que tienen su copia en docx y todos los archivos que tienen 2+ versiones quedandose con la ultima
-carpeta="./prueba/"
+carpeta="$HOME/Documents/RATAC/"
 docs=$(find "$carpeta" -name "*.docx")
 cant_pdfs=$(find "$carpeta" -name "*.pdf" | wc -l)
 cant_copias=0

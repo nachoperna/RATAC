@@ -1,0 +1,112 @@
+package views
+
+import "RATAC/domain"
+import "fmt"
+import "path/filepath"
+
+templ ShowPaciente(paciente domain.Paciente) {
+      <div class="container-paciente">
+            <div class="card patient-card">
+                  <div class="header-top">
+                        <div class="badges">
+                              <span class="badge">PROT: {paciente.Protocolo}</span>
+                              <span class="badge date">{paciente.Fecha}</span>
+                        </div>
+                  </div>
+ 
+                  <h1 class="patient-name">{paciente.NombrePaciente}</h1>
+
+                  <!-- Grid Organizado de Categorías -->
+                  <div class="info-grid">
+                  <div class="info-item">
+                        <span class="label">Especie</span>
+                        <span class="value">{paciente.Especie}</span>
+                  </div>
+                  <div class="info-item">
+                        <span class="label">Raza</span>
+                        <span class="value">{paciente.Raza}</span>
+                  </div>
+                  <div class="info-item">
+                        <span class="label">Edad</span>
+                        <span class="value">{paciente.Edad}</span>
+                  </div>
+                  <div class="info-item">
+                        <span class="label">Solicitante</span>
+                        <span class="value">{paciente.Solicitante}</span>
+                  </div>
+                  <div class="info-item">
+                        <span class="label">Familia</span>
+                        <span class="value">{paciente.Familia}</span>
+                  </div>
+                  <div class="info-item">
+                        <span class="label">Técnica</span>
+                        <span class="value">{paciente.Tecnica}</span>
+                  </div>
+                  </div>
+            </div>
+
+            <!-- =========================================
+                  2. ANTECEDENTES
+                  ========================================= -->
+            <div class="section-header">
+                  <div class="section-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                  </div>
+                  <h2 class="section-title">Material remitido - Antecedentes</h2>
+            </div>
+            
+            <div class="card text-block">
+                  {paciente.Antecedentes}
+            </div>
+
+            <!-- =========================================
+                  3. DESCRIPCIÓN MACROSCÓPICA
+                  ========================================= -->
+            <div class="section-header">
+                  <div class="section-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+                  </div>
+                  <h2 class="section-title">Descripción Macroscópica</h2>
+            </div>
+            
+            <div class="card text-block">
+                  {paciente.DescripcionMacroscopica}
+            </div>
+
+            <!-- =========================================
+                  4. DESCRIPCIÓN MICROSCÓPICA (Array)
+                  ========================================= -->
+            <div class="section-header">
+                  <div class="section-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h4l2-9 5 18 3-9h6"></path></svg>
+                  </div>
+                  <h2 class="section-title">Análisis Microscópico y Diagnósticos</h2>
+            </div>
+
+            for index, desc_micro := range paciente.Descripciones_microscopicas {
+                  <div class="card micro-card">
+                        <div class="micro-content">
+                              <h3 class="micro-organ">Descripción {index + 1}</h3>
+                              <div class="micro-desc">
+                                    {desc_micro.Descripcion}
+                              </div>
+                              if desc_micro.Diagnostico.Descripcion != "" {
+                                    <div class="diagnosis-box">
+                                          <span class="label">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                                Diagnóstico
+                                          </span>
+                                          <p>{desc_micro.Diagnostico.Descripcion}</p>
+                                    </div>
+ 
+                              }
+                        </div>
+                        for _, imagen := range desc_micro.Diagnostico.Imagenes {
+                              <div class="micro-image">
+                                    <img src={fmt.Sprintf("/imagenes/%s", filepath.Base(imagen))} alt={fmt.Sprintf("Imagen Diagnostico %d", index + 1)}>
+                                    </div>
+                        }
+                  </div>
+            }
+      </div>
+}

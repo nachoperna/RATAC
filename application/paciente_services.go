@@ -38,3 +38,7 @@ func (s *PacienteService) GetPacienteByNombre(ctx context.Context, nombre string
 func (s *PacienteService) GetPacienteByFiltro(ctx context.Context, filtros []domain.Filtro, offset int8) ([]domain.Paciente, int16, error) {
 	return s.pacienteRepo.GetPacienteByFiltro(ctx, filtros, offset)
 }
+
+func (s *PacienteService) GetAllFromPaciente(ctx context.Context, protocolo string) (*domain.Paciente, error) {
+	return s.pacienteRepo.GetAllFromPaciente(ctx, protocolo)
+}

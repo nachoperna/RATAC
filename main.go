@@ -39,12 +39,15 @@ func main() {
 
 	homeHandler := ui.NewHomeHandler(pacienteServices, desc_microServices, diagnosticoServices)
 
-	fs := http.FileServer(http.Dir("./infrastructure/UI/static"))
-	http.Handle("/static/", http.StripPrefix("/static/", fs))
+	fs_static := http.FileServer(http.Dir("./infrastructure/UI/static"))
+	fs_imagenes := http.FileServer(http.Dir("./IMAGENES/"))
+	http.Handle("/static/", http.StripPrefix("/static/", fs_static))
+	http.Handle("/imagenes/", http.StripPrefix("/imagenes/", fs_imagenes))
 	http.HandleFunc("/", homeHandler.ShowHome)
 	http.HandleFunc("/pacientes", pacienteHandler.ListPacientes)
 	http.HandleFunc("/pacientes/", pacienteHandler.ListPacientesByFiltro)
 	http.HandleFunc("/pacientes/nombre", pacienteHandler.ListPacientesBy)
+	http.HandleFunc("/paciente/protocolo/{protocolo}", pacienteHandler.ShowFullPaciente)
 	http.HandleFunc("/apipacientes", pacienteHandler.APIPacientes)
 	http.ListenAndServe(port, nil)
 }

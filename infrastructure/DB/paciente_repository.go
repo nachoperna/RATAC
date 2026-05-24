@@ -265,3 +265,63 @@ func getOperadorSQL(operador, campo, valor string) (squirrel.Sqlizer, error){
 	}
 	return nil, errors.New("No se pudo obtener operador squirrel")
 }
+
+func (r *PacienteRepository) GetAllFromPaciente(ctx context.Context, protocolo string) (*domain.Paciente, error) {
+	datos_paciente, err := r.queries.GetPaciente(ctx, protocolo)
+	if err != nil{
+		return nil, err
+		// Generar error
+	}
+
+	paciente_repo := setDatosBasePaciente(datos_paciente)
+	
+	descripciones_micro, err := r.queries.GetDescripcionByPaciente(ctx, protocolo)
+	if err != nil{
+		return nil, err
+		// Generar error
+	}
+	var descripciones_micro_repo []domain.Descripcion_microscopicas
+	for _, desc := range descripciones_micro {
+		imagenes, err := r.queries.GetImagenesByDescripcion(ctx, sqlc.GetImagenesByDescripcionParams{
+			DescripcionesMicroscopicasPacientesProtocolo: protocolo,
+			DescripcionesMicroscopicasDescripcion: desc.Descripcion,
+		})
+		if err != nil { // Aca se deberia retornar simplemente el repositorio sin las imagenes cargadas
+			return nil, nil
+		}
+		var img_rutas []string
+		for _, imagen := range imagenes {
+			img_rutas = append(img_rutas, imagen.Ruta)
+		}
+		diagnostico := domain.Diagnostico{
+			Descripcion: desc.Diagnostico.String,
+			Imagenes: img_rutas,
+		}
+		descripcion_micro := domain.Descripcion_microscopicas{
+			Descripcion: desc.Descripcion,
+			Diagnostico: diagnostico,
+			TablaGrado: nil,
+		}
+		descripciones_micro_repo = append(descripciones_micro_repo, descripcion_micro)
+	}
+	paciente_repo.Descripciones_microscopicas = descripciones_micro_repo
+	return &paciente_repo, nil
+}
+
+func setDatosBasePaciente(datos sqlc.Paciente) domain.Paciente {
+	return domain.Paciente{
+		Protocolo: datos.Protocolo,
+		Fecha: datos.Fecha.Format("02-01-2006"),
+		Solicitante: datos.Solicitante,
+		Tecnica: datos.Tecnica,
+		Familia: datos.Familia.String,
+		Especie: datos.Especie.String,
+		Raza: datos.Raza.String,
+		Edad: strconv.FormatInt(int64(datos.Edad.Int16), 10),
+		NombrePaciente: datos.Paciente,
+		ReferenciasMastocitomas: datos.ReferenciasMastocitomas,
+		Antecedentes: datos.Antecedentes.String,
+		DescripcionMacroscopica: datos.DescripcionMacroscopica.String,
+		Descripciones_microscopicas: nil,
+	}
+}

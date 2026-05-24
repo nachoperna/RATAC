@@ -87,6 +87,16 @@ func (h *PacienteHandler) APIPacientes(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(pacientes[:5])
 }
 
+func (h *PacienteHandler) ShowFullPaciente(w http.ResponseWriter, r *http.Request) {
+	protocolo := r.PathValue("protocolo")
+	paciente, err := h.pacienteService.GetAllFromPaciente(r.Context(), protocolo)
+	if err != nil || paciente == nil{
+		// renderizar templ de error
+		fmt.Println("Algo salio mal")
+	}
+	views.ShowPaciente(*paciente).Render(r.Context(), w)
+}
+
 func getOffset(offset string) (int8, error){
 	var ioffset int
 	
