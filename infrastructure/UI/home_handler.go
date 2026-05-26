@@ -47,7 +47,7 @@ func (h *HomeHandler) ShowHome(w http.ResponseWriter, r *http.Request) {
 		"cant_imgs": cant_imgs,
 		"cant_diagnosticos": cant_diagnosticos,
 	}
-	tmp, err := template.ParseFiles("/home/nachoperna/Documents/RATAC/infrastructure/UI/static/index.html")
+	tmp, err := template.ParseFiles("./infrastructure/UI/static/index.html")
 	if err != nil {
 		fmt.Printf("Error al parsear el template: %v", err) // Esto saldrá en tu consola
 		http.Error(w, "No se pudo cargar la página", http.StatusInternalServerError)

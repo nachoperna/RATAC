@@ -9,7 +9,6 @@ MATERIAL_REMITIDO_ANTECEDENTES = "Material remitido - Antecedentes"
 DESCRIPCION_MACROSCOPICA = "Descripción macroscópica"
 DESCRIPCION_MICROSCOPICA = "Descripción microscópica"
 DIAGNOSTICO_HISTOPATOLOGICO = "Diagnóstico histopatológico"
-RUTA_RATAC = os.path.expanduser("~/Documents/RATAC")
 nombre_diag_actual = ""
 
 # regexs que nos indican los cambios de seccion o elementos a evitar
@@ -131,7 +130,7 @@ def getImagenes(doc, el):
                         continue
                     # todas las imagenes de los diagnosticos ya estan en formato png
                     ruta = f"IMG_{rId}_{nombre_diag_actual}.png"
-                    ruta = os.path.join(RUTA_RATAC, "IMAGENES", ruta)
+                    ruta = os.path.join("IMAGENES", ruta)
                     with open(ruta, "wb") as img:   # wb = write binary
                         img.write(binario)
                     rutas.append(ruta)
@@ -307,7 +306,7 @@ def procesar_docx(ruta):
 #     os.remove(ruta)
 
 if __name__ == "__main__":
-    ruta = os.path.join(RUTA_RATAC, "Histopatología")
+    ruta = "./Histopatología/"
 
     if not os.path.exists("JSONS/"):
         os.makedirs("JSONS/")

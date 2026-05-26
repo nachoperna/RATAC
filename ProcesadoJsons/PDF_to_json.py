@@ -9,7 +9,6 @@ MATERIAL_REMITIDO_ANTECEDENTES = "Material remitido - Antecedentes"
 DESCRIPCION_MACROSCOPICA = "Descripción macroscópica"
 DESCRIPCION_MICROSCOPICA = "Descripción microscópica"
 DIAGNOSTICO_HISTOPATOLOGICO = "Diagnóstico histopatológico"
-RUTA_RATAC = os.path.expanduser("~/Documents/RATAC")
 nombre_diag_actual = ""
  
 # Patrones regex
@@ -174,7 +173,7 @@ def getImagenesPDF(reader, page_num):
             binario = image_obj.data
             if len(binario) < 685_000: continue
             nombre_img = f"IMG_p{page_num}_{idx}_{nombre_diag_actual}.png"
-            ruta = os.path.join(RUTA_RATAC, "IMAGENES", nombre_img)
+            ruta = os.path.join("IMAGENES", nombre_img)
             with open(ruta, "wb") as img:
                 img.write(binario)
             rutas.append(ruta)
@@ -397,7 +396,7 @@ def procesar_pdf(ruta):
     return resultados(datos_paciente, secciones)
  
 if __name__ == "__main__":
-    ruta = os.path.join(RUTA_RATAC, "Histopatología")
+    ruta = "./Histopatología/"
     os.makedirs("JSONS/", exist_ok=True)
     os.makedirs("IMAGENES/", exist_ok=True)
  
