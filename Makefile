@@ -5,6 +5,9 @@ MIGRATE_DOCKER = docker run --rm -v "$(PWD)/$(MIGRATIONS_DIR):/migrations:z" --n
 
 DOCKER_EXEC = docker compose exec app
 MIGRATIONS_DIR=./DB/migrations
+# Variables para herramientas de generación efímeras (con permisos corregidos)
+SQLC_DOCKER = docker run --rm -u $(shell id -u):$(shell id -g) -v "$(PWD):/src:z" -w /src sqlc/sqlc:1.28.0
+TEMPL_DOCKER = docker run --rm -u $(shell id -u):$(shell id -g) -v "$(PWD):/app:z" -w /app ghcr.io/a-h/templ:v0.3.833
 
 # Fuerza el build para aplicar cambios en el Dockerfile/requirements
 bdocker:
@@ -12,7 +15,7 @@ bdocker:
 
 # Levanta los contenedores 
 udocker:
-	docker compose up -d
+	docker compose up -d db
 
 # Baja los contenedores y borra los volúmenes (limpieza total de la DB)
 dvdocker:
@@ -42,7 +45,8 @@ clean-images:
 	docker system prune -f
 
 # PROCESAMIENTO: Ahora corre dentro del contenedor usando las dependencias de Python instaladas
-procesarjsons:
+procesarjsons: udocker
+	$(DOCKER_EXEC) ./ProcesadoJsons/eliminar_duplicados.sh
 	$(DOCKER_EXEC) python3 ./ProcesadoJsons/diag_to_json.py
 	$(DOCKER_EXEC) python3 ./ProcesadoJsons/PDF_to_json.py  
 	$(DOCKER_EXEC) go run ./ProcesadoJsons/json_to_bd.go 
@@ -55,8 +59,8 @@ wait:
 	@sleep 2
 
 dependencias:
-	sqlc generate
-	templ generate
+	$(SQLC_DOCKER) generate
+	$(TEMPL_DOCKER) generate
 
 # Acceso directo a la terminal de la base de datos PostgreSQL
 sql-directo:
