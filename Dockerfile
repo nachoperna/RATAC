@@ -5,6 +5,12 @@ FROM golang:1.24-bookworm AS builder
 RUN go install github.com/a-h/templ/cmd/templ@v0.3.833
 RUN go install github.com/sqlc-dev/sqlc/cmd/sqlc@v1.28.0
 
+# Instalar solo librerías de ejecución necesarias si tu app de Go llama a scripts de Python
+# 1. Instalar pip3 a nivel de sistema operativo
+RUN apt-get update && apt-get install -y python3-pip
+COPY requirements.txt .
+RUN pip3 install --no-cache-dir --break-system-packages -r requirements.txt
+
 WORKDIR /app
 
 # Copiar dependencias de Go para caché
@@ -21,16 +27,11 @@ FROM python:3.13-slim-bookworm
 
 WORKDIR /app
 
-# Instalar solo librerías de ejecución necesarias si tu app de Go llama a scripts de Python
-COPY requirements.txt .
-RUN pip3 install --no-cache-dir --break-system-packages -r requirements.txt
-
 # COPIAR SOLO EL BINARIO generado en la etapa anterior
 COPY --from=builder /app/main .
 # Copiar scripts de python o carpetas necesarias para la ejecución (ej: templates)
 COPY --from=builder /app/ProcesadoJsons ./ProcesadoJsons
-# Si tienes carpetas como 'static' o 'templates', añádelas aquí:
-# COPY --from=builder /app/static ./static
+COPY --from=builder /app/infrastructure/UI/static ./static
 
 EXPOSE 8080
 
