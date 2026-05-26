@@ -41,7 +41,7 @@
 
                   <div class="search-section">
                         <div class="search-group">
-                              <input class="search-input" id="search-input" type="text" name="paciente" placeholder="Busqueda rápida por nombre de paciente...">
+                              <input class="search-input" id="search-input" type="text" name="paciente" placeholder="Busqueda rápida por nombre de paciente..." onkeydown="if(event.key==='Enter') this.nextElementSibling.click()">
                               <button 
                                     class="search-btn"
                                     hx-get="/pacientes/nombre"
