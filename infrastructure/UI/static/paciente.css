@@ -20,6 +20,9 @@
       --diag-bg: #f2f4fc;
       --diag-border: #4a4ade;
       --diag-text: #2a2a6b;
+      --diag-pending-bg: #fffbf0;
+      --diag-pending-border: #dcb324;
+      --diag-pending-text: #8c7314;
 }
 
 .container-paciente {
@@ -150,14 +153,14 @@
 }
 
 .micro-card {
-      display: grid;
-      grid-template-columns: 1fr 450px;
+      display: flex;
       gap: 0;
       padding: 0;
       overflow: hidden;
 }
 
 .micro-content {
+      flex: 1;
       padding: 35px;
       display: flex;
       flex-direction: column;
@@ -209,10 +212,24 @@
       line-height: 1.5;
 }
 
+.diagnosis-box.pending {
+      background-color: var(--diag-pending-bg);
+      border-left-color: var(--diag-pending-border);
+}
+
+.diagnosis-box.pending .label {
+      color: var(--diag-pending-border);
+}
+
+.diagnosis-box.pending p {
+      color: var(--diag-pending-text);
+      font-style: italic;
+      font-weight: 500;
+}
+
 .micro-image {
-      width: 100%;
-      height: 100%;
-      min-height: 350px;
+      width: 450px;
+      flex-shrink: 0;
       background-color: #e0e0e0;
       position: relative;
 }

@@ -99,12 +99,20 @@ templ ShowPaciente(paciente domain.Paciente) {
                                           <p>{desc_micro.Diagnostico.Descripcion}</p>
                                     </div>
  
+                              }else {
+                                    <div class="diagnosis-box pending">
+                                          <span class="label">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                                Pendiente
+                                          </span>
+                                          <p>Sin diagnóstico aún.</p>
+                                    </div>
                               }
                         </div>
                         for _, imagen := range desc_micro.Diagnostico.Imagenes {
                               <div class="micro-image">
                                     <img src={fmt.Sprintf("/imagenes/%s", filepath.Base(imagen))} alt={fmt.Sprintf("Imagen Diagnostico %d", index + 1)}>
-                                    </div>
+                              </div>
                         }
                   </div>
             }
