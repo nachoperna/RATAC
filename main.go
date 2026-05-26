@@ -49,5 +49,8 @@ func main() {
 	http.HandleFunc("/pacientes/nombre", pacienteHandler.ListPacientesBy)
 	http.HandleFunc("/paciente/protocolo/{protocolo}", pacienteHandler.ShowFullPaciente)
 	http.HandleFunc("/apipacientes", pacienteHandler.APIPacientes)
-	http.ListenAndServe(port, nil)
+	err = http.ListenAndServe(port, nil)
+	if err != nil{
+		log.Fatalf("Error al exponer puerto 8080: %v", err)
+	}
 }
