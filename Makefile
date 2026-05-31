@@ -17,6 +17,12 @@ bdocker:
 udocker:
 	docker compose up -d db
 
+up-appdocker:
+	docker compose up -d app
+
+down-appdocker:
+	docker compose down app
+
 # Baja los contenedores y borra los volúmenes (limpieza total de la DB)
 dvdocker:
 	docker compose down -v 
@@ -45,11 +51,12 @@ clean-images:
 	docker system prune -f
 
 # PROCESAMIENTO: Ahora corre dentro del contenedor usando las dependencias de Python instaladas
-procesarjsons: udocker wait
+procesarjsons: udocker wait up-appdocker wait
 	$(DOCKER_EXEC) ./ProcesadoJsons/eliminar_duplicados.sh
 	$(DOCKER_EXEC) python3 ./ProcesadoJsons/diag_to_json.py
 	$(DOCKER_EXEC) python3 ./ProcesadoJsons/PDF_to_json.py  
 	$(DOCKER_EXEC) go run ./ProcesadoJsons/json_to_bd.go 
+	$(MAKE) down-appdocker
 
 # Ejecución local (por si querés probar algo fuera de Docker, requiere dependencias locales)
 run:
