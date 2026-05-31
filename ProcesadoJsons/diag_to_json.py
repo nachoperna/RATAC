@@ -97,11 +97,15 @@ def datosPaciente(tabla):
                 datos["Edad"] = edad
             else:
                 if k1:
+                    if "Familia" in k1 and v1 == "":
+                        v1 = None
                     datos[k1] = v1
 
             if k2:
                 if v2.startswith("-") and len(v2) == 5:
                     v2 = f"01-01{v2}"
+                if "Especie" in k2 and v2 == "":
+                    v2 = None
                 datos[k2] = v2
 
     datos["Referencias mastocitomas"] = False
@@ -220,7 +224,7 @@ def procesar_docx(ruta):
 
             if el.tag.endswith("p"):    # estamos ante un parrafo
                 p = map_parrafos.get(el)    # obtenemos el parrafo pre procesado
-                
+ 
                 for r in p.runs:    # iteramos por cada linea del parrafo
                     linea = r.text
 
@@ -271,24 +275,6 @@ def procesar_docx(ruta):
                     # tabla_procesable = (not contenido_primera_celda) or es_tabla_grado
                     if es_tabla_grado:
                         bloque_actual['Tabla de Grado'] = procesarTablaGrado(tabla)
-                    # if tabla_procesable:
-                    #     texto_tabla = procesarTabla(tabla, os.path.basename(ruta))
-                    #
-                    #     # si estamos en una seccion de descripcion micro o de diagnostico, agregamos la tabla al diagnostico asociado
-                    #     if seccion_actual in [DESCRIPCION_MICROSCOPICA, DIAGNOSTICO_HISTOPATOLOGICO]:
-                    #         bloque_actual["Diagnostico"]["Tablas"].append({
-                    #             "Nombre": nombre_tabla_actual,
-                    #             "Contenido": texto_tabla
-                    #         })
-                    #         nombre_tabla_actual = ""  # limpiamos para la próxima tabla
-                    #     else:
-                    #         try:
-                    #             secciones[seccion_actual].append(texto_tabla)
-                    #         except Exception as e:
-                    #             print(f"ERRO : {e}")
-                    #             with open("diagnosticos_mal_procesados.txt", "a", encoding="utf-8") as f:
-                    #                 f.write(f"{nombre_diag_actual}\n")
-                    #             return ""
 
     # agregamos el ultimo contenido de descripcion microscopica del documento
     if bloque_actual["Descripcion"]:
@@ -297,13 +283,6 @@ def procesar_docx(ruta):
     secciones[DESCRIPCION_MICROSCOPICA] = descripciones_micro
 
     return resultados(datos_paciente, secciones)
-
-
-# def convertDocx(ruta):
-#     cv = Converter(ruta)
-#     cv.convert(ruta + ".docx")
-#     cv.close()
-#     os.remove(ruta)
 
 if __name__ == "__main__":
     ruta = "./Histopatología/"

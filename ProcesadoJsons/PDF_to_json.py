@@ -148,10 +148,15 @@ def datosPaciente(tabla_filas):
         if raza_val:
             datos = procesar_raza_edad(raza_val, datos)
 
-        if k1 and not ("Raza" in k1 or "Edad" in k1): datos[k1] = v1
+        if k1 and not ("Raza" in k1 or "Edad" in k1):
+            if "Familia" in k1 and v1 == "":
+                v1 = None
+            datos[k1] = v1
         if k2:
             if v2.startswith("-") and len(v2) == 5:
                 v2 = f"01-01{v2}"
+            if "Especie" in k2 and v2 == "":
+                v2 = None
             datos[k2] = v2
 
     if not datos.get("Raza") or datos.get("Raza") == "-":
