@@ -204,6 +204,8 @@ def matcheaCategoria(linea, seccion_actual, nueva_desc_micro, nombre_tabla_actua
 def cargarDescMicro(descripciones_micro, bloque_actual):
     bloque_actual["Descripcion"] = re.sub(r'\s+', ' ', bloque_actual["Descripcion"]).strip()
     bloque_actual["Diagnostico"]["Descripcion"] = limpiar_diagnostico(bloque_actual["Diagnostico"]["Descripcion"])
+    if bloque_actual['Diagnostico']['Descripcion'] in ("", "."):
+        bloque_actual['Diagnostico']['Descripcion'] = None
     descripciones_micro.append(bloque_actual.copy())
     return {
         "Descripcion": "",

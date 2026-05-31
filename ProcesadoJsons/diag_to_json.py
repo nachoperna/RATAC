@@ -162,6 +162,8 @@ def matcheaCategoria(linea, seccion_actual, nueva_desc_micro, nombre_tabla_actua
 
 def cargarDescMicro(descripciones_micro, bloque_actual):
     # no se puede hacer un simple append(bloque_actual) porque las variables son mutables entonces tener que hacer un copy de cada estructura
+    if bloque_actual['Diagnostico']['Descripcion'] in ("", "."):
+        bloque_actual['Diagnostico']['Descripcion'] = None
     descripciones_micro.append(bloque_actual.copy())
     return {   # reiniciamos la estructura
         "Descripcion": "",
