@@ -45,7 +45,7 @@ clean-images:
 	docker system prune -f
 
 # PROCESAMIENTO: Ahora corre dentro del contenedor usando las dependencias de Python instaladas
-procesarjsons: udocker
+procesarjsons: udocker wait
 	$(DOCKER_EXEC) ./ProcesadoJsons/eliminar_duplicados.sh
 	$(DOCKER_EXEC) python3 ./ProcesadoJsons/diag_to_json.py
 	$(DOCKER_EXEC) python3 ./ProcesadoJsons/PDF_to_json.py  
