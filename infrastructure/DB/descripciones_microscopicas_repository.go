@@ -21,7 +21,7 @@ func (r *Descripcion_microscopicasRepository) CreateDescripcionMicroscopica(ctx 
 	_, err := r.queries.CreateDescripcionMicroscopica(ctx, sqlc.CreateDescripcionMicroscopicaParams{
 		Descripcion: descripcion.Descripcion,
 		// Envolvemos el string en sql.NullString
-		Diagnostico:        sql.NullString{String: descripcion.Diagnostico.Descripcion, Valid: true},
+		Diagnostico:        sql.NullString{String: *descripcion.Diagnostico.Descripcion, Valid: true},
 		PacientesProtocolo: protocolo,
 	})
 	return err
@@ -39,7 +39,7 @@ func (r *Descripcion_microscopicasRepository) GetDescripcionMicroscopicaByProtoc
 			Descripcion: bd_desc.Descripcion,
 			Diagnostico: domain.Diagnostico{
 				// Extraemos el string del sql.NullString usando .String
-				Descripcion: bd_desc.Diagnostico.String,
+				Descripcion: &bd_desc.Diagnostico.String,
 				Imagenes:    nil,
 			},
 		})

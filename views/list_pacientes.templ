@@ -30,7 +30,7 @@ templ ListPacientes(pacientes []domain.Paciente, resultados_total int16, offset 
                   </div>
                   <div class="patient-info">
                         <span class="patient-name">{p.NombrePaciente}</span>
-                        <span class="species-breed">{p.Especie} • {p.Raza}</span>
+                        <span class="species-breed">{GetValue(p.Especie)} • {GetValue(p.Raza)}</span>
                   </div>
                   <div class="data-grid">
                         <div class="data-item">
@@ -43,11 +43,11 @@ templ ListPacientes(pacientes []domain.Paciente, resultados_total int16, offset 
                         </div>
                         <div class="data-item">
                               <span class="data-label">Edad</span>
-                              <span class="not-specified">{p.Edad}</span>
+                              <span class="not-specified">{GetValue(p.Edad)}</span>
                         </div>
                         <div class="data-item">
                               <span class="data-label">Familia</span>
-                              <span class="not-specified">{p.Familia}</span>
+                              <span class="not-specified">{GetValue(p.Familia)}</span>
                         </div>
                   </div>
             </article>

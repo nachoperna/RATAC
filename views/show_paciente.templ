@@ -4,6 +4,11 @@ import "RATAC/domain"
 import "fmt"
 import "path/filepath"
 
+func GetValue(campo *string) string{
+      if campo != nil { return *campo}
+      return "-"
+}
+
 templ ShowPaciente(paciente domain.Paciente) {
       <div class="container-paciente">
             <div class="card patient-card">
@@ -20,15 +25,15 @@ templ ShowPaciente(paciente domain.Paciente) {
                   <div class="info-grid">
                   <div class="info-item">
                         <span class="label">Especie</span>
-                        <span class="value">{paciente.Especie}</span>
+                        <span class="value">{GetValue(paciente.Especie)}</span>
                   </div>
                   <div class="info-item">
                         <span class="label">Raza</span>
-                        <span class="value">{paciente.Raza}</span>
+                        <span class="value">{GetValue(paciente.Raza)}</span>
                   </div>
                   <div class="info-item">
                         <span class="label">Edad</span>
-                        <span class="value">{paciente.Edad}</span>
+                        <span class="value">{GetValue(paciente.Edad)}</span>
                   </div>
                   <div class="info-item">
                         <span class="label">Solicitante</span>
@@ -36,7 +41,7 @@ templ ShowPaciente(paciente domain.Paciente) {
                   </div>
                   <div class="info-item">
                         <span class="label">Familia</span>
-                        <span class="value">{paciente.Familia}</span>
+                        <span class="value">{GetValue(paciente.Familia)}</span>
                   </div>
                   <div class="info-item">
                         <span class="label">Técnica</span>
@@ -56,7 +61,7 @@ templ ShowPaciente(paciente domain.Paciente) {
             </div>
             
             <div class="card text-block">
-                  {paciente.Antecedentes}
+                  {GetValue(paciente.Antecedentes)}
             </div>
 
             <!-- =========================================
@@ -70,7 +75,7 @@ templ ShowPaciente(paciente domain.Paciente) {
             </div>
             
             <div class="card text-block">
-                  {paciente.DescripcionMacroscopica}
+                  {GetValue(paciente.DescripcionMacroscopica)}
             </div>
 
             <!-- =========================================
@@ -90,13 +95,13 @@ templ ShowPaciente(paciente domain.Paciente) {
                               <div class="micro-desc">
                                     {desc_micro.Descripcion}
                               </div>
-                              if desc_micro.Diagnostico.Descripcion != "" {
+                              if desc_micro.Diagnostico.Descripcion != nil {
                                     <div class="diagnosis-box">
                                           <span class="label">
                                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                                                 Diagnóstico
                                           </span>
-                                          <p>{desc_micro.Diagnostico.Descripcion}</p>
+                                          <p>{*desc_micro.Diagnostico.Descripcion}</p>
                                     </div>
  
                               }else {

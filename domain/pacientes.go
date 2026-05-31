@@ -7,14 +7,14 @@ type Paciente struct {
 	Fecha                       string                      `json:"fecha"`
 	Solicitante                 string                      `json:"Solicitante"`
 	Tecnica                     string                      `json:"Técnica"`
-	Familia                     string                      `json:"Familia"`
-	Especie                     string                      `json:"Especie"`
-	Raza                        string                      `json:"Raza"`
-	Edad                        string                      `json:"Edad"`
+	Familia                     *string                      `json:"Familia"`
+	Especie                     *string                      `json:"Especie"`
+	Raza                        *string                      `json:"Raza"`
+	Edad                        *string                      `json:"Edad"`
 	NombrePaciente              string                      `json:"Paciente"`
 	ReferenciasMastocitomas     bool                        `json:"Referencias mastocitomas"`
-	Antecedentes                string                      `json:"Material remitido - Antecedentes"`
-	DescripcionMacroscopica     string                      `json:"Descripción macroscópica"`
+	Antecedentes                *string                      `json:"Material remitido - Antecedentes"`
+	DescripcionMacroscopica     *string                      `json:"Descripción macroscópica"`
 	Descripciones_microscopicas []Descripcion_microscopicas `json:"Descripción microscópica"`
 }
 
@@ -39,7 +39,7 @@ var ColumnasPermitidas = map[string]bool{
 const LIMIT_RESULTADOS_PACIENTE = 10
 
 type PacienteRepository interface {
-	CreatePaciente(ctx context.Context, paciente Paciente) error
+	InsertarDiagnostico(ctx context.Context, paciente Paciente) error
 	// GetPaciente(protocolo string) (Paciente, error)
 	// UpdatePaciente(paciente *Paciente) error
 	// DeletePaciente(protocolo string) error

@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"log"
 	"strconv"
-	"time"
 
 	"github.com/Masterminds/squirrel"
 )
@@ -26,37 +25,44 @@ func NewPacienteRepository(queries *sqlc.Queries, db *sql.DB) *PacienteRepositor
 	}
 }
 
-func (r *PacienteRepository) CreatePaciente(ctx context.Context, paciente domain.Paciente) error {
-	layout := "02-01-2006"
-	fecha_parseada, err := time.Parse(layout, paciente.Fecha)
-
+func (r *PacienteRepository) InsertarDiagnostico(ctx context.Context, paciente domain.Paciente) error {
+	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
-		fmt.Printf("ERROR al parsear fecha: %s", err)
+		return errors.New("Error al iniciar transacción")
 	}
+	defer tx.Rollback()
+	qtx := r.queries.WithTx(tx)
+	err = procesarDiagnostico(qtx, ctx, paciente)
+	if err != nil {
+		return err
+	}
+	err = tx.Commit()
+	if err != nil {
+		return errors.New("Error al finalizar transacción")
+	}
+	return nil
+}
 
-	var edad int64
-	if paciente.Edad != "" {
-		edad, err = strconv.ParseInt(paciente.Edad, 10, 16)
-		if err != nil {
-			fmt.Printf("ERROR al parsear edad: %s", err)
+func procesarDiagnostico(qtx *sqlc.Queries, ctx context.Context, paciente domain.Paciente) error{
+	fecha_parseada, edad, err := TransformarDatos(paciente.Fecha, paciente.Edad)
+	err = InsertarPaciente(paciente, fecha_parseada, edad, qtx, ctx)
+	if err != nil{
+		return err
+	}
+	for _, desc_micro := range paciente.Descripciones_microscopicas {
+		err = InsertarDescMicro(desc_micro, paciente.Protocolo, qtx, ctx)
+		if err != nil{
+			return err
 		}
 	}
+	return nil
+}
 
-	_, err = r.queries.CreatePaciente(ctx, sqlc.CreatePacienteParams{
-		Protocolo:               paciente.Protocolo,
-		Fecha:                   fecha_parseada,
-		Solicitante:             paciente.Solicitante,
-		Tecnica:                 paciente.Tecnica,
-		Familia:                 sql.NullString{String: paciente.Familia, Valid: true},
-		Especie:                 sql.NullString{String: paciente.Especie, Valid: true},
-		Raza:                    sql.NullString{String: paciente.Raza, Valid: true}, //Linea 74
-		Edad:                    sql.NullInt16{Int16: int16(edad), Valid: true},
-		Paciente:                paciente.NombrePaciente,
-		Antecedentes:            sql.NullString{String: paciente.Antecedentes, Valid: true},
-		DescripcionMacroscopica: sql.NullString{String: paciente.DescripcionMacroscopica, Valid: true},
-		ReferenciasMastocitomas: paciente.ReferenciasMastocitomas,
-	})
-	return err
+func getValueOrNil(campo sql.NullString) *string{
+	if campo.Valid{
+		return &campo.String
+	}
+	return nil
 }
 
 func (r *PacienteRepository) ListPacientes(ctx context.Context) ([]domain.Paciente, error) {
@@ -72,14 +78,14 @@ func (r *PacienteRepository) ListPacientes(ctx context.Context) ([]domain.Pacien
 			Fecha:                       p.Fecha.GoString(),
 			Solicitante:                 p.Solicitante,
 			Tecnica:                     p.Tecnica,
-			Familia:                     p.Familia.String,
-			Especie:                     p.Especie.String,
-			Raza:                        p.Raza.String,
-			Edad:                        strconv.Itoa(int(p.Edad.Int16)),
+			Familia:                     getValueOrNil(p.Familia),
+			Especie:                     getValueOrNil(p.Especie),
+			Raza:                        getValueOrNil(p.Raza),
+			Edad:                        func() *string {if p.Edad.Valid {edad := strconv.Itoa(int(p.Edad.Int16)); return &edad}; return nil} (),
 			NombrePaciente:              p.Paciente,
-			Antecedentes:                p.Antecedentes.String,
+			Antecedentes:                getValueOrNil(p.Antecedentes),
 			Descripciones_microscopicas: nil,
-			DescripcionMacroscopica:     p.DescripcionMacroscopica.String,
+			DescripcionMacroscopica:     getValueOrNil(p.DescripcionMacroscopica),
 			ReferenciasMastocitomas:     p.ReferenciasMastocitomas,
 		}
 		pacientes = append(pacientes, paciente)
@@ -131,10 +137,10 @@ func (r *PacienteRepository) GetPacienteByNombre(ctx context.Context, nombre str
 			NombrePaciente: p.Paciente,
 			Solicitante:    p.Solicitante,
 			Tecnica: p.Tecnica,
-			Familia: p.Familia.String,
-			Especie: p.Especie.String,
-			Raza: p.Raza.String,
-			Edad: strconv.FormatInt(int64(p.Edad.Int16),10),
+			Familia: getValueOrNil(p.Familia),
+			Especie: getValueOrNil(p.Especie),
+			Raza: getValueOrNil(p.Raza),
+			Edad: func() *string {if p.Edad.Valid {edad := strconv.Itoa(int(p.Edad.Int16)); return &edad}; return nil} (),
 		})
 	}
 	return pacientes, resultados_total, nil
@@ -294,7 +300,7 @@ func (r *PacienteRepository) GetAllFromPaciente(ctx context.Context, protocolo s
 			img_rutas = append(img_rutas, imagen.Ruta)
 		}
 		diagnostico := domain.Diagnostico{
-			Descripcion: desc.Diagnostico.String,
+			Descripcion: getValueOrNil(desc.Diagnostico),
 			Imagenes: img_rutas,
 		}
 		descripcion_micro := domain.Descripcion_microscopicas{
@@ -314,14 +320,14 @@ func setDatosBasePaciente(datos sqlc.Paciente) domain.Paciente {
 		Fecha: datos.Fecha.Format("02-01-2006"),
 		Solicitante: datos.Solicitante,
 		Tecnica: datos.Tecnica,
-		Familia: datos.Familia.String,
-		Especie: datos.Especie.String,
-		Raza: datos.Raza.String,
-		Edad: strconv.FormatInt(int64(datos.Edad.Int16), 10),
+		Familia: getValueOrNil(datos.Familia),
+		Especie: getValueOrNil(datos.Especie),
+		Raza: getValueOrNil(datos.Raza),
+		Edad: func() *string {if datos.Edad.Valid {edad := strconv.Itoa(int(datos.Edad.Int16)); return &edad}; return nil} (),
 		NombrePaciente: datos.Paciente,
 		ReferenciasMastocitomas: datos.ReferenciasMastocitomas,
-		Antecedentes: datos.Antecedentes.String,
-		DescripcionMacroscopica: datos.DescripcionMacroscopica.String,
+		Antecedentes: getValueOrNil(datos.Antecedentes),
+		DescripcionMacroscopica: getValueOrNil(datos.DescripcionMacroscopica),
 		Descripciones_microscopicas: nil,
 	}
 }

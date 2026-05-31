@@ -3,7 +3,7 @@ package domain
 import "context"
 
 type Diagnostico struct {
-	Descripcion string   `json:"Descripcion"`
+	Descripcion *string   `json:"Descripcion"`
 	Imagenes    []string `json:"Imagenes"`
 }
 

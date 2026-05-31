@@ -23,7 +23,7 @@ func (r *DiagnosticoRepository) CreateDiagnostico(ctx context.Context, protocolo
 	_, err := r.queries.UpdateDescripcionMicroscopica(ctx, sqlc.UpdateDescripcionMicroscopicaParams{
 		Descripcion:        descripcionMicro,
 		PacientesProtocolo: protocolo,
-		Diagnostico:        sql.NullString{String: diagnostico.Descripcion, Valid: true},
+		Diagnostico:        sql.NullString{String: *diagnostico.Descripcion, Valid: true},
 	})
 	if err != nil {
 		return err
