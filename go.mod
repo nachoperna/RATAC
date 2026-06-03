@@ -2,11 +2,18 @@ module RATAC
 
 go 1.24.12
 
-require github.com/lib/pq v1.12.3
+require (
+	github.com/Masterminds/squirrel v1.5.4
+	github.com/a-h/templ v0.3.1001
+	github.com/lib/pq v1.12.3
+	github.com/stretchr/testify v1.11.1
+)
 
 require (
-	github.com/Masterminds/squirrel v1.5.4 // indirect
-	github.com/a-h/templ v0.3.1001 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/lann/builder v0.0.0-20180802200727-47ae307949d0 // indirect
 	github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/stretchr/objx v0.5.2 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

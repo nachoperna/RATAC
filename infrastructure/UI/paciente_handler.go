@@ -17,9 +17,10 @@ type PacienteHandler struct {
 func NewPacienteHandler(pacienteService *application.PacienteService) *PacienteHandler {
 	return &PacienteHandler{pacienteService: pacienteService}
 }
+
 type PayloadRequest struct {
 	Filtros []domain.Filtro `json:"filtros"`
-	Offset int `json:"offset"`
+	Offset  int             `json:"offset"`
 }
 
 func (h *PacienteHandler) ListPacientes(w http.ResponseWriter, r *http.Request) {
@@ -34,15 +35,15 @@ func (h *PacienteHandler) ListPacientesBy(w http.ResponseWriter, r *http.Request
 	paciente := r.URL.Query().Get("paciente")
 	offset, _ := getOffset(r.URL.Query().Get("offset"))
 
-	if paciente != ""{
+	if paciente != "" {
 		pacientes, resultados_total, err := h.pacienteService.GetPacienteByNombre(r.Context(), paciente, offset)
 		if err != nil {
 			fmt.Println("ERROR: ", err)
 			// renderizar templ de error
 		}
-		if len(pacientes) == 0{
+		if len(pacientes) == 0 {
 			views.SinResultados().Render(r.Context(), w)
-		}else{
+		} else {
 			if offset == 0 {
 				views.ShowResultados(pacientes, resultados_total, offset, false).Render(r.Context(), w)
 			} else {
@@ -67,9 +68,9 @@ func (h *PacienteHandler) ListPacientesByFiltro(w http.ResponseWriter, r *http.R
 	if err != nil {
 		// renderizar templ de error
 	}
-	if len(pacientes) == 0{
+	if len(pacientes) == 0 {
 		views.SinResultados().Render(r.Context(), w)
-	}else{
+	} else {
 		if req.Offset == 0 {
 			views.ShowResultados(pacientes, resultados_total, int8(req.Offset), true).Render(r.Context(), w)
 		} else {
@@ -82,25 +83,35 @@ func (h *PacienteHandler) APIPacientes(w http.ResponseWriter, r *http.Request) {
 	pacientes, err := h.pacienteService.ListPacientes(r.Context())
 	if err != nil {
 		// renderizar templ de error
+		http.Error(w, "Error al obtener pacientes", http.StatusInternalServerError)
+		return
 	}
+
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(pacientes[:5])
+
+	// Lógica segura para evitar el panic de "out of range"
+	limite := 5
+	if len(pacientes) < limite {
+		limite = len(pacientes)
+	}
+
+	json.NewEncoder(w).Encode(pacientes[:limite])
 }
 
 func (h *PacienteHandler) ShowFullPaciente(w http.ResponseWriter, r *http.Request) {
 	protocolo := r.PathValue("protocolo")
 	paciente, err := h.pacienteService.GetAllFromPaciente(r.Context(), protocolo)
-	if err != nil || paciente == nil{
+	if err != nil || paciente == nil {
 		// renderizar templ de error
 		fmt.Println("Algo salio mal")
 	}
 	views.ShowPaciente(*paciente).Render(r.Context(), w)
 }
 
-func getOffset(offset string) (int8, error){
+func getOffset(offset string) (int8, error) {
 	var ioffset int
-	
-	if offset == ""{
+
+	if offset == "" {
 		return 0, nil
 	}
 	ioffset, err := strconv.Atoi(offset)

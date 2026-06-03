@@ -7,7 +7,7 @@ DOCKER_EXEC = docker compose exec app
 MIGRATIONS_DIR=./DB/migrations
 # Variables para herramientas de generación efímeras (con permisos corregidos)
 SQLC_DOCKER = docker run --rm -u $(shell id -u):$(shell id -g) -v "$(PWD):/src:z" -w /src sqlc/sqlc:1.28.0
-TEMPL_DOCKER = docker run --rm -u $(shell id -u):$(shell id -g) -v "$(PWD):/app:z" -w /app ghcr.io/a-h/templ:v0.3.833
+TEMPL_DOCKER = docker run --rm -u $(shell id -u):$(shell id -g) -v "$(PWD):/app:z" -w /app ghcr.io/a-h/templ:v0.3.1001
 
 # Fuerza el build para aplicar cambios en el Dockerfile/requirements
 bdocker:
@@ -83,4 +83,20 @@ server: udocker wait dependencias run
 emptyJSONS:
 	rm -rf JSONS/
 
-.PHONY: run udocker dvdocker ddocker procesarjsons sql-directo logs server bdocker wait clean-images emptyJSONS dependencias
+# Ejecuta los tests de Go dentro del contenedor
+test-go:
+	go test ./... -v
+
+# Ejecuta los tests de Python dentro del contenedor
+test-python:
+	$(DOCKER_EXEC) pytest ./ProcesadoJsons/ -v
+
+# Ejecuta todos los tests dentro del contenedor
+test: test-go test-python
+
+# Levanta toda la infraestructura en Docker y arranca el servidor backend
+on: udocker up-appdocker wait
+	go mod tidy
+	go run ./main.go
+
+.PHONY: run udocker dvdocker ddocker procesarjsons sql-directo logs server bdocker wait clean-images emptyJSONS dependencias test test-go test-python on
