@@ -94,9 +94,13 @@ test-python:
 # Ejecuta todos los tests dentro del contenedor
 test: test-go test-python
 
+
 # Levanta toda la infraestructura en Docker y arranca el servidor backend
-on: udocker up-appdocker wait
+on: udocker wait up-appdocker wait
 	go mod tidy
 	go run ./main.go
 
-.PHONY: run udocker dvdocker ddocker procesarjsons sql-directo logs server bdocker wait clean-images emptyJSONS dependencias test test-go test-python on
+off: ddocker
+	-sudo fuser -k 8080/tcp 2>/dev/null || true
+
+.PHONY: run udocker dvdocker ddocker procesarjsons sql-directo logs server bdocker wait clean-images emptyJSONS dependencias test test-go test-python on off

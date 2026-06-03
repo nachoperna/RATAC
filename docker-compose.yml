@@ -19,7 +19,7 @@ services:
       target: builder # Durante desarrollo usamos la etapa pesada para poder recompilar
     container_name: RATAC_app
     ports:
-      - "8080:8080"
+      - "8081:8080"
     depends_on:
       - db
     environment:
