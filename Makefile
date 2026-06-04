@@ -92,13 +92,10 @@ test-python:
 	$(DOCKER_EXEC) pytest ./ProcesadoJsons/ -v
 
 # Ejecuta todos los tests dentro del contenedor
-test: test-go test-python
-
+test: on test-go test-python down-appdocker
 
 # Levanta toda la infraestructura en Docker y arranca el servidor backend
 on: udocker wait up-appdocker wait
-	go mod tidy
-	go run ./main.go
 
 off: ddocker
 	-sudo fuser -k 8080/tcp 2>/dev/null || true
