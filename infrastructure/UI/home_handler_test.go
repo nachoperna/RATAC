@@ -2,6 +2,7 @@ package ui_test
 
 import (
 	"RATAC/application"
+	"RATAC/domain"
 	ui "RATAC/infrastructure/UI"
 	"RATAC/mocks"
 	"net/http"
@@ -54,6 +55,7 @@ func TestShowHome_rutaValida_ejecutaTemplate(t *testing.T) {
 	handler := ui.NewHomeHandler(srvPac, srvDesc, srvDiag)
 
 	mockPacRepo.On("CountPacientes", mock.Anything).Return(int64(10), nil)
+	mockPacRepo.On("ListUltimosPacientes", mock.Anything).Return([]domain.Paciente{}, []bool{}, nil)
 	mockDiagRepo.On("CountImagenes", mock.Anything).Return(int64(5), nil)
 	mockDescRepo.On("CountDiagnosticos", mock.Anything).Return(int64(8), nil)
 

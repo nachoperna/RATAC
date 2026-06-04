@@ -16,16 +16,20 @@ func (m *MockPacienteRepository) InsertarDiagnostico(ctx context.Context, pacien
 	return args.Error(0)
 }
 
-func (m *MockPacienteRepository) ListUltimosPacientes(ctx context.Context) ([]domain.Paciente, error) {
+func (m *MockPacienteRepository) ListUltimosPacientes(ctx context.Context) ([]domain.Paciente, []bool, error) {
 	args := m.Called(ctx)
+	var pacientes []domain.Paciente
 	if args.Get(0) != nil {
-		return args.Get(0).([]domain.Paciente), args.Error(1)
+		pacientes = args.Get(0).([]domain.Paciente)
 	}
-	return nil, args.Error(1)
+	var estados []bool
+	if args.Get(1) != nil {
+		estados = args.Get(1).([]bool)
+	}
+	return pacientes, estados, args.Error(2)
 }
 
-func (m *MockPacienteRepository) ListPacientes(ctx context.Context) ([]domain.Paciente, error) {
-	args := m.Called(ctx)
+func (m *MockPacienteRepository) ListPacientes(ctx context.Context) ([]domain.Paciente, error) { args := m.Called(ctx)
 	if args.Get(0) != nil {
 		return args.Get(0).([]domain.Paciente), args.Error(1)
 	}

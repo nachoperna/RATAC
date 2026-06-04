@@ -20,7 +20,7 @@ func TestListPacientes_ejecucionExitosa_renderizaTemplate(t *testing.T) {
 	handler := ui.NewPacienteHandler(service)
 
 	esperado := []domain.Paciente{{Protocolo: "CAN-001"}}
-	mockRepo.On("ListUltimosPacientes", mock.Anything).Return(esperado, nil)
+	mockRepo.On("ListPacientes", mock.Anything).Return(esperado, nil)
 
 	req := httptest.NewRequest(http.MethodGet, "/pacientes", nil)
 	rec := httptest.NewRecorder()

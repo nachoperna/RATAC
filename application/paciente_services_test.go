@@ -36,9 +36,9 @@ func TestListUltimosPacientes_ejecucionExitosa_retornaLista(t *testing.T) {
 
 	esperado := []domain.Paciente{{Protocolo: "CAN-999"}}
 
-	mockRepo.On("ListUltimosPacientes", mock.Anything).Return(esperado, nil)
+	mockRepo.On("ListUltimosPacientes", mock.Anything).Return(esperado, []bool{}, nil)
 
-	resultado, err := service.ListUltimosPacientes(context.Background())
+	resultado, _, err := service.ListUltimosPacientes(context.Background())
 
 	assert.NoError(t, err)
 	assert.Equal(t, esperado, resultado)
