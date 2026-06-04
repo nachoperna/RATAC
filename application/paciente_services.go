@@ -19,7 +19,7 @@ func (s *PacienteService) ListPacientes(ctx context.Context) ([]domain.Paciente,
 	return s.pacienteRepo.ListPacientes(ctx)
 }
 
-func (s *PacienteService) ListUltimosPacientes(ctx context.Context) ([]domain.Paciente, error) {
+func (s *PacienteService) ListUltimosPacientes(ctx context.Context) ([]domain.Paciente, []bool, error) {
 	return s.pacienteRepo.ListUltimosPacientes(ctx)
 }
 

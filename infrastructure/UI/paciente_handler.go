@@ -24,7 +24,7 @@ type PayloadRequest struct {
 }
 
 func (h *PacienteHandler) ListPacientes(w http.ResponseWriter, r *http.Request) {
-	pacientes, err := h.pacienteService.ListUltimosPacientes(r.Context())
+	pacientes, err := h.pacienteService.ListPacientes(r.Context())
 	if err != nil {
 		// renderizar templ de error
 	}
@@ -90,10 +90,7 @@ func (h *PacienteHandler) APIPacientes(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 	// Lógica segura para evitar el panic de "out of range"
-	limite := 5
-	if len(pacientes) < limite {
-		limite = len(pacientes)
-	}
+	limite := min(5, len(pacientes))
 
 	json.NewEncoder(w).Encode(pacientes[:limite])
 }

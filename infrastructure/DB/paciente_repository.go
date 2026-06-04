@@ -93,23 +93,31 @@ func (r *PacienteRepository) ListPacientes(ctx context.Context) ([]domain.Pacien
 	return pacientes, nil
 }
 
-func (r *PacienteRepository) ListUltimosPacientes(ctx context.Context) ([]domain.Paciente, error) {
+func (r *PacienteRepository) ListUltimosPacientes(ctx context.Context) ([]domain.Paciente, []bool, error) {
 	bd_pacientes, err := r.queries.ListUltimosPacientes(ctx)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	var pacientes []domain.Paciente
+	var tienen_diagnosticos []bool
 	for _, p := range bd_pacientes {
 		pacientes = append(pacientes, domain.Paciente{
 			Protocolo:      p.Protocolo,
-			Fecha:          p.Fecha.Format("02-01-2006"), // Formateo de fecha
+			Fecha:          p.Fecha.Format("02-01-2006"),
 			NombrePaciente: p.Paciente,
-			Solicitante:    p.Solicitante,
-			// ... (mapear el resto de campos como en ListPacientes)
+			Especie: getValueOrNil(p.Especie),
+			Raza: getValueOrNil(p.Raza),
+			Edad: func() *string {if p.Edad.Valid {var aux = strconv.Itoa(int(p.Edad.Int16)); return &aux} else {return nil}}(),
+			Tecnica: p.Tecnica,
 		})
+		if p.Diagnostico.Valid{
+			tienen_diagnosticos = append(tienen_diagnosticos, true)
+		}else{
+			tienen_diagnosticos = append(tienen_diagnosticos, false)
+		}
 	}
-	return pacientes, nil
+	return pacientes, tienen_diagnosticos, nil
 }
 
 func (r *PacienteRepository) CountPacientes(ctx context.Context) (int64, error) {
@@ -257,7 +265,7 @@ func getOperadorSQL(operador, campo, valor string) (squirrel.Sqlizer, error){
 	switch operador {
 	case "igual":
 		if campo != "Edad" {
-			return squirrel.ILike{campo: valor}, nil
+			return squirrel.ILike{campo: valor + "%"}, nil
 		}
 		return squirrel.Eq{campo: valor}, nil
 	case "mayor":

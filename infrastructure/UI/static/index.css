@@ -19,6 +19,23 @@
       --color-accent: #4a55a2;
       --color-accent-light: #ebecf7;
       --color-border: #e5e7eb;
+      --accent-primary: #3f3f8c;
+      --bg-body: #f4f5f8;
+      --bg-card: #ffffff;
+      --text-main: #14143a;
+      --text-body: #3b3b4f;
+      --text-muted: #73738c;
+      --accent-primary: #3f3f8c;
+      --border-color: #e2e4ec;
+      
+      /* Estados */
+      --status-ok-bg: #e6f7ed;
+      --status-ok-text: #1b7a43;
+      --status-ok-border: rgba(27, 122, 67, 0.2);
+      
+      --status-pending-bg: #fffbf0;
+      --status-pending-text: #8c7314;
+      --status-pending-border: rgba(220, 179, 36, 0.3);
 }
 
 html { scroll-behavior: smooth; }
@@ -346,6 +363,149 @@ animation: fadeUp 0.7s 0.35s forwards;
       font-weight: 700;
       cursor: pointer;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Contenedor principal de la previsualización */
+.preview-container {
+      margin-top: 40px;
+      margin-bottom: 40px;
+}
+
+.preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 25px;
+}
+
+.preview-title {
+      font-size: 15px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--accent-primary);
+      font-weight: 700;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+}
+
+/* =========================================
+Grid de Tarjetas de Datos (Sin Fotos)
+========================================= */
+.diagnostics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr); /* 3 columnas exactamente iguales */
+      gap: 25px;
+}
+
+/* Tarjeta individual */
+.data-summary-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px; /* Redondeo ligeramente más cuadrado */
+      overflow: hidden; 
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+      cursor: pointer;
+      text-decoration: none; 
+      min-height: 160px; /* Asegura un volumen visual agradable */
+      min-width: 300px;
+}
+
+.data-summary-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 25px rgba(20, 20, 58, 0.06);
+      border-color: #d0d2e0;
+}
+
+/* Cabecera de la Tarjeta (Protocolo y Fecha) */
+.card-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 20px;
+      background-color: #fafbfc;
+      border-bottom: 1px solid var(--border-color);
+}
+
+.prot-number {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      color: var(--text-main);
+}
+
+.diag-date {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+}
+
+/* Cuerpo de la tarjeta (Estado, Nombre, Detalles) */
+.card-body {
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      flex: 1;
+}
+
+.middle-bar{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      gap: 10px;
+}
+
+/* Etiqueta de estado integrada en el cuerpo */
+.status-badge {
+      display: inline-block;
+      width: fit-content;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+}
+
+.status-badge.diagnosticado {
+      background-color: var(--status-ok-bg);
+      color: var(--status-ok-text);
+      border: 1px solid var(--status-ok-border);
+}
+
+.status-badge.no-diagnosticado {
+      background-color: var(--status-pending-bg);
+      color: var(--status-pending-text);
+      border: 1px solid var(--status-pending-border);
+}
+
+.animal-name {
+      font-size: 20px;
+      color: var(--text-main);
+      font-weight: 800;
+      margin: 0;
+      line-height: 1.2;
+}
+
+.animal-details {
+      font-size: 13px;
+      color: var(--text-body);
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+}
+
+.dot-sep {
+      color: var(--accent-primary);
+      opacity: 0.3;
+      font-size: 10px;
 }
 
 /* ── STATS BAR ── */

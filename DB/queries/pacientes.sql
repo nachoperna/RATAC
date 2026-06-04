@@ -17,8 +17,9 @@ SELECT * FROM Pacientes
 ORDER BY Fecha DESC;
 
 -- name: ListUltimosPacientes :many
-SELECT * FROM Pacientes
-ORDER BY Fecha DESC
+SELECT DISTINCT p.Protocolo, p.Paciente, p.Fecha, p.Tecnica, p.Especie, p.Raza, p.Edad, d.Diagnostico
+FROM Pacientes p JOIN Descripciones_microscopicas d on p.protocolo = d.pacientes_protocolo
+ORDER BY p.Fecha DESC
 LIMIT 3;
 
 -- name: UpdatePaciente :one
