@@ -1,0 +1,62 @@
+name: CI Pipeline Tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+# Github Actions solo puede leer archivos, no modificarlos
+permissions:
+  contents: read
+
+jobs:
+  test-python:
+    name: Python Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip' # Activa caché automático de dependencias
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+          
+      - name: Ejecutar Test Unitarios (Python)
+        run: pytest ./ProcesadoJsons 
+
+
+  test-go:
+    name: Go Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Go 1.24
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+          cache: true # Activa caché de go.sum y build
+
+      - name: Instalar herramientas de generación
+        run: |
+          go install github.com/a-h/templ/cmd/templ@v0.3.1001
+          go install github.com/sqlc-dev/sqlc/cmd/sqlc@v1.28.0
+
+      - name: Generar código (templ y sqlc)
+        run: |
+          templ generate
+          sqlc generate
+
+      - name: Ejecutar Test Unitarios (Go)
+        # Usamos -race para detectar condiciones de carrera (crucial en concurrencia)
+        run: go test -v -race -cover ./...
