@@ -5,7 +5,7 @@ import "fmt"
 import "path/filepath"
 
 func GetValue(campo *string) string{
-      if campo != nil { return *campo}
+      if campo != nil { return fmt.Sprint(*campo, " años")}
       return "-"
 }
 

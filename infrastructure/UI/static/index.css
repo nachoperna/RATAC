@@ -78,110 +78,109 @@ header {
 }
 
 .logo-wordmark {
-font-family: 'Source Serif 4', serif;
-font-weight: 600;
-font-size: 22px;
-letter-spacing: -0.5px;
-color: var(--navy);
+      font-family: 'Source Serif 4', serif;
+      font-weight: 600;
+      font-size: 22px;
+      letter-spacing: -0.5px;
+      color: var(--navy);
 }
 
 nav {
-display: flex;
-align-items: center;
-gap: 32px;
+      display: flex;
+      align-items: center;
+      gap: 32px;
 }
 
 nav a {
-font-family: 'DM Mono', monospace;
-font-size: 12px;
-letter-spacing: 0.08em;
-text-transform: uppercase;
-color: var(--muted);
-text-decoration: none;
-transition: color 0.2s;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
 }
 
 nav a:hover { color: var(--navy); }
 
 .nav-badge {
-background: var(--navy);
-color: white;
-font-family: 'DM Mono', monospace;
-font-size: 11px;
-padding: 6px 16px;
-border-radius: 2px;
-letter-spacing: 0.06em;
-text-transform: uppercase;
-cursor: pointer;
-transition: background 0.2s;
+      background: var(--navy);
+      color: white;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      padding: 6px 16px;
+      border-radius: 2px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s;
 }
 .nav-badge:hover { background: var(--navy-mid); }
 
 .main-section {
-padding-top: 64px;
-min-height: 100vh;
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-position: relative;
-overflow: hidden;
+      padding-top: 100px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
 }
 
 .main-section-inner {
-position: relative;
-z-index: 2;
-width: 100%;
-max-width: 800px;
-padding: 0 24px;
-display: flex;
-flex-direction: column;
-align-items: center;
-text-align: center;
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 800px;
+      padding: 0 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
 }
 
 .main-section-facu {
-font-family: 'DM Mono', monospace;
-font-size: 11px;
-letter-spacing: 0.14em;
-text-transform: uppercase;
-color: var(--muted);
-margin-bottom: 28px;
-opacity: 0;
-animation: fadeUp 0.6s 0.1s forwards;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 28px;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.1s forwards;
 }
 
 .main-section-title {
-font-family: 'Playfair Display', serif;
-font-size: clamp(38px, 6vw, 64px);
-font-weight: 400;
-line-height: 1.12;
-color: var(--navy);
-margin-bottom: 20px;
-letter-spacing: -1px;
-opacity: 0;
-animation: fadeUp 0.7s 0.2s forwards;
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(38px, 6vw, 64px);
+      font-weight: 400;
+      line-height: 1.12;
+      color: var(--navy);
+      margin-bottom: 20px;
+      letter-spacing: -1px;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.2s forwards;
 }
 
 .main-section-title em {
-font-style: italic;
-color: var(--navy-mid);
+      font-style: italic;
+      color: var(--navy-mid);
 }
 
 .main-section-info {
-font-size: 17px;
-font-weight: 300;
-color: var(--muted);
-line-height: 1.7;
-max-width: 520px;
-margin-bottom: 52px;
-opacity: 0;
-animation: fadeUp 0.7s 0.35s forwards;
+      font-size: 17px;
+      font-weight: 300;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 520px;
+      margin-bottom: 52px;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.35s forwards;
 }
 
 /* Buscador Principal */
 .search-section {
-      max-width: 850px;
+      min-width: 670px;
       margin: 0 auto 4rem;
       display: flex;
       flex-direction: column;
@@ -196,7 +195,7 @@ animation: fadeUp 0.7s 0.35s forwards;
 
 .search-input {
       flex-grow: 1;
-      padding: 1rem 15rem 1rem 1rem;
+      padding: 1rem;
       border: 1px solid var(--gray-border);
       border-right: none;
       font-size: 1.1rem;
@@ -388,6 +387,19 @@ animation: fadeUp 0.7s 0.35s forwards;
       display: flex;
       align-items: center;
       gap: 8px;
+}
+
+.btn-listar-pacientes{
+      outline: 0px solid transparent;
+      padding: 3px;
+      transition: outline 0.3s, border-radius 0.3s;
+}
+
+.btn-listar-pacientes:hover{
+      cursor: pointer;
+      outline: 1px solid var(--accent-primary);
+      outline-offset: -1px;
+      border-radius: 5px;
 }
 
 /* =========================================
