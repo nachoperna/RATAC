@@ -26,21 +26,31 @@ type PayloadRequest struct {
 func (h *PacienteHandler) ListPacientes(w http.ResponseWriter, r *http.Request) {
 	pacientes, err := h.pacienteService.ListPacientes(r.Context())
 	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 		// renderizar templ de error
 	}
+	w.WriteHeader(http.StatusOK)
 	views.ShowResultados(pacientes, 0, 0, false).Render(r.Context(), w)
 }
 
 func (h *PacienteHandler) ListPacientesBy(w http.ResponseWriter, r *http.Request) {
 	paciente := r.URL.Query().Get("paciente")
-	offset, _ := getOffset(r.URL.Query().Get("offset"))
-
+	offset, err := getOffset(r.URL.Query().Get("offset"))
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+		// renderizar templ de error
+	}
 	if paciente != "" {
 		pacientes, resultados_total, err := h.pacienteService.GetPacienteByNombre(r.Context(), paciente, offset)
 		if err != nil {
 			fmt.Println("ERROR: ", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
 			// renderizar templ de error
 		}
+		w.WriteHeader(http.StatusOK)
 		if len(pacientes) == 0 {
 			views.SinResultados().Render(r.Context(), w)
 		} else {
@@ -50,6 +60,9 @@ func (h *PacienteHandler) ListPacientesBy(w http.ResponseWriter, r *http.Request
 				views.ListPacientes(pacientes, resultados_total, offset, false).Render(r.Context(), w)
 			}
 		}
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 }
 
@@ -61,13 +74,17 @@ func (h *PacienteHandler) ListPacientesByFiltro(w http.ResponseWriter, r *http.R
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		http.Error(w, "Error procesando el JSON", http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	pacientes, resultados_total, err := h.pacienteService.GetPacienteByFiltro(r.Context(), req.Filtros, int8(req.Offset))
 	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 		// renderizar templ de error
 	}
+	w.WriteHeader(http.StatusOK)
 	if len(pacientes) == 0 {
 		views.SinResultados().Render(r.Context(), w)
 	} else {
@@ -84,6 +101,7 @@ func (h *PacienteHandler) APIPacientes(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		// renderizar templ de error
 		http.Error(w, "Error al obtener pacientes", http.StatusInternalServerError)
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
@@ -100,8 +118,10 @@ func (h *PacienteHandler) ShowFullPaciente(w http.ResponseWriter, r *http.Reques
 	paciente, err := h.pacienteService.GetAllFromPaciente(r.Context(), protocolo)
 	if err != nil || paciente == nil {
 		// renderizar templ de error
-		fmt.Println("Algo salio mal")
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
+	w.WriteHeader(http.StatusOK)
 	views.ShowPaciente(*paciente).Render(r.Context(), w)
 }
 

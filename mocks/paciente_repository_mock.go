@@ -29,7 +29,8 @@ func (m *MockPacienteRepository) ListUltimosPacientes(ctx context.Context) ([]do
 	return pacientes, estados, args.Error(2)
 }
 
-func (m *MockPacienteRepository) ListPacientes(ctx context.Context) ([]domain.Paciente, error) { args := m.Called(ctx)
+func (m *MockPacienteRepository) ListPacientes(ctx context.Context) ([]domain.Paciente, error) {
+	args := m.Called(ctx)
 	if args.Get(0) != nil {
 		return args.Get(0).([]domain.Paciente), args.Error(1)
 	}

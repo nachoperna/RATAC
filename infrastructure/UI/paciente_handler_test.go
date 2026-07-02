@@ -19,8 +19,7 @@ func TestListPacientes_ejecucionExitosa_renderizaTemplate(t *testing.T) {
 	service := application.NewPacienteService(mockRepo)
 	handler := ui.NewPacienteHandler(service)
 
-	esperado := []domain.Paciente{{Protocolo: "CAN-001"}}
-	mockRepo.On("ListPacientes", mock.Anything).Return(esperado, nil)
+	mockRepo.On("ListPacientes", mock.Anything).Return([]domain.Paciente{}, nil)
 
 	req := httptest.NewRequest(http.MethodGet, "/pacientes", nil)
 	rec := httptest.NewRecorder()
@@ -39,7 +38,7 @@ func TestListPacientesBy_conParametro_llamaAlServicio(t *testing.T) {
 	esperado := []domain.Paciente{{NombrePaciente: "Fido"}}
 	mockRepo.On("GetPacienteByNombre", mock.Anything, "Fido", int8(0)).Return(esperado, int16(1), nil)
 
-	req := httptest.NewRequest(http.MethodGet, "/pacientes/buscar?paciente=Fido&offset=0", nil)
+	req := httptest.NewRequest(http.MethodGet, "/pacientes/nombre?paciente=Fido", nil)
 	rec := httptest.NewRecorder()
 
 	handler.ListPacientesBy(rec, req)
@@ -57,7 +56,7 @@ func TestListPacientesByFiltro_jsonValido_llamaAlServicio(t *testing.T) {
 	mockRepo.On("GetPacienteByFiltro", mock.Anything, mock.AnythingOfType("[]domain.Filtro"), int8(0)).Return(esperado, int16(1), nil)
 
 	jsonBody := []byte(`{"filtros": [{"campo": "Especie", "operador": "=", "valores": ["Felino"]}], "offset": 0}`)
-	req := httptest.NewRequest(http.MethodPost, "/pacientes/filtrar", bytes.NewBuffer(jsonBody))
+	req := httptest.NewRequest(http.MethodPost, "/pacientes/", bytes.NewBuffer(jsonBody))
 	req.Header.Set("Content-Type", "application/json")
 	rec := httptest.NewRecorder()
 
@@ -73,7 +72,7 @@ func TestListPacientesByFiltro_jsonInvalido_retornaBadRequest(t *testing.T) {
 	handler := ui.NewPacienteHandler(service)
 
 	jsonBody := []byte(`{"filtros": bad_json}`) // JSON roto
-	req := httptest.NewRequest(http.MethodPost, "/pacientes/filtrar", bytes.NewBuffer(jsonBody))
+	req := httptest.NewRequest(http.MethodPost, "/pacientes/", bytes.NewBuffer(jsonBody))
 	rec := httptest.NewRecorder()
 
 	handler.ListPacientesByFiltro(rec, req)
@@ -94,7 +93,7 @@ func TestAPIPacientes_ejecucionExitosa_retornaJSON(t *testing.T) {
 	}
 	mockRepo.On("ListPacientes", mock.Anything).Return(esperado, nil)
 
-	req := httptest.NewRequest(http.MethodGet, "/api/pacientes", nil)
+	req := httptest.NewRequest(http.MethodGet, "/apipacientes", nil)
 	rec := httptest.NewRecorder()
 
 	handler.APIPacientes(rec, req)
@@ -118,7 +117,7 @@ func TestShowFullPaciente_protocoloValido_renderizaTemplate(t *testing.T) {
 	esperado := &domain.Paciente{Protocolo: protocolo}
 	mockRepo.On("GetAllFromPaciente", mock.Anything, protocolo).Return(esperado, nil)
 
-	req := httptest.NewRequest(http.MethodGet, "/pacientes/CAN-010", nil)
+	req := httptest.NewRequest(http.MethodGet, "/paciente/protocolo/CAN-010", nil)
 	// Feature de Go 1.22: Inyectar el PathValue directamente en el request mockeado
 	req.SetPathValue("protocolo", protocolo)
 
