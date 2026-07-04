@@ -6,13 +6,13 @@ import (
 	"context"
 	"database/sql"
 	"log"
+	"os"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	_ "github.com/lib/pq"
+	"github.com/stretchr/testify/assert"
 )
 
-const db_conection = "host=localhost port=5433 user=admin password=password dbname=RATAC_DB_TEST sslmode=disable"
 var db *sql.DB
 var queries *sqlc.Queries
 var ctx context.Context
@@ -90,8 +90,16 @@ func TestDeletePaciente_PacienteTest_BajaPacienteDB(t *testing.T)  {
 	assert.NoError(t, queries.DeletePaciente(ctx, "PROT-001"))
 }
 
+func getConnection() string {
+	conn := os.Getenv("TEST_DB_URL")
+	if conn != "" {
+		return conn
+	}
+	return "host=localhost port=5433 user=admin password=password dbname=RATAC_DB_TEST sslmode=disable"
+}
+
 func TestMain(m *testing.M) {
-	db, err := sql.Open("postgres", db_conection)
+	db, err := sql.Open("postgres", getConnection())
 	if err != nil {
 		log.Fatalf("Error al conectar con la Base de Datos: %v", err)
 	}
