@@ -17,6 +17,13 @@ bdocker:
 udocker:
 	docker compose up -d db
 
+# Levante base de datos de testing
+up-dbtest:
+	docker compose up -d db_test
+
+down-dbtest:
+	docker compose down db_test
+
 up-appdocker:
 	docker compose up -d app
 
@@ -92,10 +99,12 @@ test-python:
 	$(DOCKER_EXEC) pytest ./ProcesadoJsons/ -v
 
 # Ejecuta todos los tests dentro del contenedor
-test: on test-go test-python down-appdocker
+test: on_test test-go test-python down-appdocker down-dbtest
 
 # Levanta toda la infraestructura en Docker y arranca el servidor backend
 on: udocker wait up-appdocker wait
+
+on_test: up-dbtest wait up-appdocker wait
 
 off: ddocker
 	-sudo fuser -k 8080/tcp 2>/dev/null || true
