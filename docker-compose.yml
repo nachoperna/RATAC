@@ -12,7 +12,21 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./DB/schema:/docker-entrypoint-initdb.d:ro,Z # ro,Z agregado por problemas especificos de Fedora
-
+  
+  db_test:
+      image: postgres:17-alpine
+      container_name: RATAC_db_test
+      restart: always
+      environment:
+        POSTGRES_USER: admin
+        POSTGRES_PASSWORD: password
+        POSTGRES_DB: RATAC_DB_TEST
+      ports:
+        - "5433:5432"
+      volumes:
+        - postgres_data_test:/var/lib/postgresql/data
+        - ./DB/schema:/docker-entrypoint-initdb.d:ro,Z # ro,Z agregado por problemas especificos de Fedora
+  
   app:
     build: 
       context: .
@@ -33,3 +47,4 @@ services:
 
 volumes:
   postgres_data:
+  postgres_data_test:
