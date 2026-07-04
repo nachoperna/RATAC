@@ -56,7 +56,19 @@ jobs:
         run: |
           templ generate
           sqlc generate
+      
+      - name: Levantar PostgreSQL para test
+        run: |
+          until PGPASSWORD=password pg_isready -h localhost -p 5433 -U admin; do
+            sleep 1
+          done
 
+      - name: Aplicar schema a postgres
+        run: |
+          PGPASSWORD=password psql -h localhost -p 5433 -U admin -d RATAC_DB_TEST -f ./DB/schema/schema.sql
+      
       - name: Ejecutar Test Unitarios (Go)
+        env:
+          TEST_DB_URL: postgres://admin:password@localhost:5433/RATAC_DB_TEST?sslmode=disable
         # Usamos -race para detectar condiciones de carrera (crucial en concurrencia)
         run: go test -v -race -cover ./...
