@@ -15,12 +15,13 @@ func TransformarDatos(fecha string, edad *string) (time.Time, *int64, error){
 	fecha_parseada, err := time.Parse(layout, fecha)
 
 	if err != nil {
-		err = errors.New("Error al parsear fecha")
+		return fecha_parseada, nil, errors.New("Error al parsear fecha")
 	}
 
 	var edad_ *int64
 	if edad != nil{
-		aux, err := strconv.ParseInt(*edad, 10, 16)
+		var aux int64
+		aux, err = strconv.ParseInt(*edad, 10, 16)
 		if err != nil {
 			err = errors.New("Error al convertir edad")
 		}else{
