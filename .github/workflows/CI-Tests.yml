@@ -37,6 +37,20 @@ jobs:
   test-go:
     name: Go Unit Tests
     runs-on: ubuntu-latest
+    services:
+      db_test:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: admin
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: RATAC_DB_TEST
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U admin"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - name: Checkout del repositorio
         uses: actions/checkout@v4
