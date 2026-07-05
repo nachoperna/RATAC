@@ -30,11 +30,11 @@ func (m *MockPacienteRepository) ListUltimosPacientes(ctx context.Context) ([]do
 }
 
 func (m *MockPacienteRepository) ListPacientes(ctx context.Context, offset int8) ([]domain.Paciente, int16, error) {
-	args := m.Called(ctx)
+	args := m.Called(ctx, offset)
 	if args.Get(0) != nil {
 		return args.Get(0).([]domain.Paciente), args.Get(1).(int16), args.Error(2)
 	}
-	return nil, 0, args.Error(1)
+	return nil, 0, args.Error(2)
 }
 
 func (m *MockPacienteRepository) CountPacientes(ctx context.Context) (int64, error) {
