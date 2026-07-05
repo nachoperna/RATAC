@@ -19,7 +19,7 @@ func TestListPacientes_ejecucionExitosa_renderizaTemplate(t *testing.T) {
 	service := application.NewPacienteService(mockRepo)
 	handler := ui.NewPacienteHandler(service)
 
-	mockRepo.On("ListPacientes", mock.Anything).Return([]domain.Paciente{}, int16(0), nil)
+	mockRepo.On("ListPacientes", mock.Anything, 0).Return([]domain.Paciente{}, int16(0), nil)
 
 	req := httptest.NewRequest(http.MethodGet, "/pacientes", nil)
 	rec := httptest.NewRecorder()
