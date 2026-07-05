@@ -19,14 +19,15 @@ func TestListPacientes_ejecucionExitosa_retornaLista(t *testing.T) {
 		{Protocolo: "CAN-001", NombrePaciente: "Fido"},
 		{Protocolo: "FEL-002", NombrePaciente: "Michi"},
 	}
+	var cant int16 = 2
 
-	mockRepo.On("ListPacientes", mock.Anything).Return(esperado, nil)
+	mockRepo.On("ListPacientes", mock.Anything).Return(esperado, cant, nil)
 
-	resultado, err := service.ListPacientes(context.Background())
+	resultado, total, err := service.ListPacientes(context.Background(), 0)
 
 	assert.NoError(t, err)
 	assert.Equal(t, esperado, resultado)
-	assert.Len(t, resultado, 2)
+	assert.Equal(t, cant, total)
 	mockRepo.AssertExpectations(t)
 }
 

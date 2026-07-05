@@ -19,7 +19,7 @@ func TestListPacientes_ejecucionExitosa_renderizaTemplate(t *testing.T) {
 	service := application.NewPacienteService(mockRepo)
 	handler := ui.NewPacienteHandler(service)
 
-	mockRepo.On("ListPacientes", mock.Anything).Return([]domain.Paciente{}, nil)
+	mockRepo.On("ListPacientes", mock.Anything).Return([]domain.Paciente{}, int16(0), nil)
 
 	req := httptest.NewRequest(http.MethodGet, "/pacientes", nil)
 	rec := httptest.NewRecorder()
@@ -91,7 +91,7 @@ func TestAPIPacientes_ejecucionExitosa_retornaJSON(t *testing.T) {
 		{Protocolo: "CAN-001"},
 		{Protocolo: "CAN-002"},
 	}
-	mockRepo.On("ListPacientes", mock.Anything).Return(esperado, nil)
+	mockRepo.On("ListPacientes", mock.Anything).Return(esperado, int16(len(esperado)), nil)
 
 	req := httptest.NewRequest(http.MethodGet, "/apipacientes", nil)
 	rec := httptest.NewRecorder()

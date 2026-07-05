@@ -44,7 +44,7 @@ type PacienteRepository interface {
 	// UpdatePaciente(paciente *Paciente) error
 	// DeletePaciente(protocolo string) error
 	ListUltimosPacientes(ctx context.Context) ([]Paciente, []bool, error)
-	ListPacientes(ctx context.Context) ([]Paciente, error)
+	ListPacientes(ctx context.Context, offset int8) ([]Paciente, int16, error)
 	CountPacientes(ctx context.Context) (int64, error)
 	GetPacienteByNombre(ctx context.Context, nombre string, offset int8) ([]Paciente, int16, error)
 	GetPacienteByFiltro(ctx context.Context, filtros []Filtro, offset int8) ([]Paciente, int16, error)

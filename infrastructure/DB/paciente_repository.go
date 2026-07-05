@@ -65,10 +65,10 @@ func getValueOrNil(campo sql.NullString) *string{
 	return nil
 }
 
-func (r *PacienteRepository) ListPacientes(ctx context.Context) ([]domain.Paciente, error) {
-	bd_pacientes, err := r.queries.ListPacientes(ctx)
+func (r *PacienteRepository) ListPacientes(ctx context.Context, offset int8) ([]domain.Paciente, int16, error) {
+	bd_pacientes, err := r.queries.ListPacientes(ctx, int32(offset))
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	var pacientes []domain.Paciente
@@ -90,7 +90,7 @@ func (r *PacienteRepository) ListPacientes(ctx context.Context) ([]domain.Pacien
 		}
 		pacientes = append(pacientes, paciente)
 	}
-	return pacientes, nil
+	return pacientes, int16(bd_pacientes[0].Total), nil
 }
 
 func (r *PacienteRepository) ListUltimosPacientes(ctx context.Context) ([]domain.Paciente, []bool, error) {

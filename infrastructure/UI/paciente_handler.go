@@ -24,14 +24,24 @@ type PayloadRequest struct {
 }
 
 func (h *PacienteHandler) ListPacientes(w http.ResponseWriter, r *http.Request) {
-	pacientes, err := h.pacienteService.ListPacientes(r.Context())
+	offset, err := getOffset(r.URL.Query().Get("offset"))
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+		// renderizar templ de error
+	}
+	pacientes, resultados_total, err := h.pacienteService.ListPacientes(r.Context(), offset)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 		// renderizar templ de error
 	}
 	w.WriteHeader(http.StatusOK)
-	views.ShowResultados(pacientes, 0, 0, false).Render(r.Context(), w)
+	if offset == 0 {
+		views.ShowResultados(pacientes, resultados_total, offset, false).Render(r.Context(), w)
+	} else {
+		views.ListPacientes(pacientes, resultados_total, offset, false).Render(r.Context(), w)
+	}
 }
 
 func (h *PacienteHandler) ListPacientesBy(w http.ResponseWriter, r *http.Request) {
@@ -97,7 +107,7 @@ func (h *PacienteHandler) ListPacientesByFiltro(w http.ResponseWriter, r *http.R
 }
 
 func (h *PacienteHandler) APIPacientes(w http.ResponseWriter, r *http.Request) {
-	pacientes, err := h.pacienteService.ListPacientes(r.Context())
+	pacientes, _, err := h.pacienteService.ListPacientes(r.Context(), 0)
 	if err != nil {
 		// renderizar templ de error
 		http.Error(w, "Error al obtener pacientes", http.StatusInternalServerError)

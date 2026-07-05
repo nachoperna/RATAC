@@ -15,8 +15,8 @@ func NewPacienteService(pacienteRepo domain.PacienteRepository) *PacienteService
 	}
 }
 
-func (s *PacienteService) ListPacientes(ctx context.Context) ([]domain.Paciente, error) {
-	return s.pacienteRepo.ListPacientes(ctx)
+func (s *PacienteService) ListPacientes(ctx context.Context, offset int8) ([]domain.Paciente, int16, error) {
+	return s.pacienteRepo.ListPacientes(ctx, offset)
 }
 
 func (s *PacienteService) ListUltimosPacientes(ctx context.Context) ([]domain.Paciente, []bool, error) {

@@ -13,8 +13,10 @@ SELECT * FROM Pacientes
 WHERE Protocolo = $1 LIMIT 1;
 
 -- name: ListPacientes :many
-SELECT * FROM Pacientes
-ORDER BY Fecha DESC;
+SELECT *, COUNT(*) OVER() AS total 
+FROM Pacientes
+ORDER BY Fecha DESC
+LIMIT 10 OFFSET $1;
 
 -- name: ListUltimosPacientes :many
 SELECT DISTINCT p.Protocolo, p.Paciente, p.Fecha, p.Tecnica, p.Especie, p.Raza, p.Edad, d.Diagnostico
