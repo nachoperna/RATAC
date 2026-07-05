@@ -21,7 +21,7 @@ func TestListPacientes_ejecucionExitosa_retornaLista(t *testing.T) {
 	}
 	var cant int16 = 2
 
-	mockRepo.On("ListPacientes", mock.Anything, 0).Return(esperado, cant, nil)
+	mockRepo.On("ListPacientes", mock.Anything, int8(0)).Return(esperado, cant, nil)
 
 	resultado, total, err := service.ListPacientes(context.Background(), 0)
 
