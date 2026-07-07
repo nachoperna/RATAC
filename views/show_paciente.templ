@@ -5,7 +5,7 @@ import "fmt"
 import "path/filepath"
 
 func GetValue(campo *string) string{
-      if campo != nil { return fmt.Sprint(*campo, " años")}
+      if campo != nil { return fmt.Sprint(*campo)}
       return "-"
 }
 
@@ -33,7 +33,11 @@ templ ShowPaciente(paciente domain.Paciente) {
                   </div>
                   <div class="info-item">
                         <span class="label">Edad</span>
-                        <span class="value">{GetValue(paciente.Edad)}</span>
+                        if valor := GetValue(paciente.Edad); valor != "-" {
+                              <span class="value">{valor} años</span>
+                        } else {
+                              <span class="value">{valor}</span>
+                        }
                   </div>
                   <div class="info-item">
                         <span class="label">Solicitante</span>
