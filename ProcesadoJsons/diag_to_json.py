@@ -1,6 +1,7 @@
 import re   # libreria de REGEX
 import json
 import os
+import sys
 from docx import Document
 # from pdf2docx import Converter
 
@@ -10,6 +11,7 @@ DESCRIPCION_MACROSCOPICA = "Descripción macroscópica"
 DESCRIPCION_MICROSCOPICA = "Descripción microscópica"
 DIAGNOSTICO_HISTOPATOLOGICO = "Diagnóstico histopatológico"
 nombre_diag_actual = ""
+CARGA_USUARIO = False
 
 # regexs que nos indican los cambios de seccion o elementos a evitar
 patron_referencias = re.compile(r"^\s*(referencias?|anexos?)", re.I)   # texto que comience con la palabra referencias o anexo, en plural o singular
@@ -44,6 +46,10 @@ def procesarTabla(tabla, nombre_diag):
             filas.append(fila)
         return ", ".join(filas)
     except Exception as e:
+        if CARGA_USUARIO:
+            print("Tablas", file=sys.stderr)
+            sys.exit(1)
+
         print(f"!-ERROR: {e}")
         with open("diagnosticos_mal_procesados.txt", "a", encoding="utf-8") as f:
             f.write(f"{nombre_diag}\n")
@@ -185,7 +191,11 @@ def resultados(datos_paciente, secciones):
             resultado[k] = v
     return resultado
 
-def procesar_docx(ruta):
+def procesar_docx(archivo):
+    if hasattr(archivo, 'path'):
+        ruta = archivo.path
+    else:
+        ruta = archivo
     doc = Document(ruta)
 
     datos_paciente = {}  # guardamos la primer tabla con los datos basicos
@@ -257,6 +267,10 @@ def procesar_docx(ruta):
                         try:
                             secciones[seccion_actual].append(linea)
                         except Exception as e:
+                            if CARGA_USUARIO:
+                                print("Seccion desconocida", file=sys.stderr)
+                                sys.exit(1)
+
                             print(f"ERROR: {e}")
                             with open("diagnosticos_mal_procesados.txt", "a", encoding="utf-8") as f:
                                 f.write(f"{nombre_diag_actual}\n")
@@ -287,28 +301,46 @@ def procesar_docx(ruta):
     return resultados(datos_paciente, secciones)
 
 if __name__ == "__main__":
-    ruta = "./Histopatología/"
+    param = sys.argv[1] if len(sys.argv) > 1 else None
+    if not param:
+        ruta = "./Histopatología/"
 
-    if not os.path.exists("JSONS/"):
-        os.makedirs("JSONS/")
-    if not os.path.exists("IMAGENES/"):
-        os.makedirs("IMAGENES/")
+        if not os.path.exists("JSONS/"):
+            os.makedirs("JSONS/")
+        if not os.path.exists("IMAGENES/"):
+            os.makedirs("IMAGENES/")
 
-    with os.scandir(ruta) as archivos:
-        for archivo in archivos:
-            nombre = os.path.basename(archivo.name)
-            nombre_diag_actual = nombre
-            nombre, ext = os.path.splitext(nombre)
-            
-            if ext == ".pdf":
-                # convertDocx(os.path.abspath(archivo)) 
-                continue
+        with os.scandir(ruta) as archivos:
+            for archivo in archivos:
+                nombre = os.path.basename(archivo.name)
+                nombre_diag_actual = nombre
+                nombre, ext = os.path.splitext(nombre)
+                
+                if ext == ".pdf":
+                    # convertDocx(os.path.abspath(archivo)) 
+                    continue
 
-            print("Procesando: ", nombre)
-            data = procesar_docx(archivo)
+                print("Procesando: ", nombre)
+                data = procesar_docx(archivo)
 
-            if data:
-                nombre = os.path.join("JSONS/", nombre)
-                nombre += ".json"
-                with open(nombre, "w", encoding="utf-8") as f:
-                    json.dump(data, f, indent=4, ensure_ascii=False)
+                if data:
+                    nombre = os.path.join("JSONS/", nombre)
+                    nombre += ".json"
+                    with open(nombre, "w", encoding="utf-8") as f:
+                        json.dump(data, f, indent=4, ensure_ascii=False)
+    else:
+        CARGA_USUARIO = True
+        data = procesar_docx(param)
+
+        nombre = os.path.basename(archivo.name)
+        nombre_diag_actual = nombre
+        nombre, ext = os.path.splitext(nombre)
+        
+        if data:
+            nombre = os.path.join("JSONS/", nombre)
+            nombre += ".json"
+
+            with open(nombre, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=4, ensure_ascii=False)
+
+            print(json.dumps(data))

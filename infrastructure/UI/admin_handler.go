@@ -10,10 +10,10 @@ import (
 type AdminHandler struct {
 	adminService *application.AdminService
 }
-//
-// func NewAdminHandler(adminService *application.AdminService) *AdminHandler {
-// 	return &AdminHandler{adminService: adminService}
-// }
+
+func NewAdminHandler(adminService *application.AdminService) *AdminHandler {
+	return &AdminHandler{adminService: adminService}
+}
 
 func (h *AdminHandler) ProcesarDocumento(w http.ResponseWriter, r *http.Request) {
 	archivos := r.MultipartForm.File["archivos"]
@@ -27,9 +27,10 @@ func (h *AdminHandler) ProcesarDocumento(w http.ResponseWriter, r *http.Request)
 			return
 		}
 		defer contenido.Close() // cerramos el archivo luego de usarlo
-		paciente, err := h.adminService.ConvertirDocumento(contenido)
+		paciente, err := h.adminService.ConvertirDocumento(contenido, archivo.Filename)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
+			// w.WriteHeader(http.StatusBadRequest)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			// Renderizar templ de error
 		}
 

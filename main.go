@@ -38,7 +38,8 @@ func main() {
 	// diagnosticoHandler := ui.NewDiagnosticoHandler(diagnosticoServices)
 
 	homeHandler := ui.NewHomeHandler(pacienteServices, desc_microServices, diagnosticoServices)
-
+	adminHandler := ui.NewAdminHandler(application.NewAdminService(&dbrepo.AdminRepository{}))
+	
 	fs_static := http.FileServer(http.Dir("./infrastructure/UI/static"))
 	fs_imagenes := http.FileServer(http.Dir("./IMAGENES/"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs_static))
@@ -49,6 +50,8 @@ func main() {
 	http.HandleFunc("/pacientes/nombre", pacienteHandler.ListPacientesBy)
 	http.HandleFunc("/paciente/protocolo/{protocolo}", pacienteHandler.ShowFullPaciente)
 	http.HandleFunc("/apipacientes", pacienteHandler.APIPacientes)
+	http.HandleFunc("/diagnosticos/alta", adminHandler.ProcesarDocumento)
+
 	err = http.ListenAndServe(port, nil)
 	if err != nil{
 		log.Fatalf("Error al exponer puerto 8080: %v", err)
