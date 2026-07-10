@@ -37,7 +37,7 @@ services:
     depends_on:
       - db
     environment:
-      DATABASE_URL: postgres://admin:password@db:5432/RATAC_DB
+      DATABASE_URL: postgres://admin:password@db:5432/RATAC_DB?sslmode=disable
     volumes:
       - .:/app # Esto sincroniza tus archivos locales con el contenedor
     command: >
