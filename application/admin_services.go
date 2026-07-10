@@ -44,18 +44,27 @@ func (s *AdminService) ConvertirDocumento(archivo multipart.File, nombre string)
 	if err != nil {
 		return nil, err
 	}
+	archivo.Seek(0,0)
 	tipo := http.DetectContentType(buffer) // detectamos el tipo del archivo segun su contenido
 	if !tipos_validos[tipo] {
 		return nil, err
 	}
 	
-	tmpFile, _ := os.CreateTemp("./ArchivosTemporales/", fmt.Sprintf("TEMP_%s", nombre))
+	os.MkdirAll("ArchivosTemporales", os.ModePerm)
+	tmpFile, err := os.CreateTemp("./ArchivosTemporales/", fmt.Sprintf("TEMP_%s", nombre))
+	if err != nil {
+		return nil, errors.New("Error al crear archivo temporal")
+	}
 	defer os.Remove(tmpFile.Name())
-	io.Copy(tmpFile, archivo)
+	_, err = io.Copy(tmpFile, archivo)
+	if err != nil {
+		return nil, errors.New("Error al copiar contenido a archivo temporal")
+	}
 	tmpFile.Close()
 
 	// Aca se debe llamar a ejecucion de diag_to_json.py / pdf_to_json.py
-	cmd := exec.Command("python3", "../ProcesadoJsons/diag_to_json.py", tmpFile.Name())
+	// cmd := exec.Command("docker", "compose", "exec", "app", "python3", "ProcesadoJsons/diag_to_json.py", tmpFile.Name())
+	cmd := exec.Command("python3", "ProcesadoJsons/diag_to_json.py", tmpFile.Name())
 	var stderr, stdout bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr

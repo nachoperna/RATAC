@@ -3,5 +3,42 @@ package views
 import "RATAC/domain"
 
 templ InformacionExtraida(pacientes []domain.Paciente) {
-      <p> Vamos por buen camino? ...</p>
+      for _, paciente := range pacientes{
+            <input hx-swap-oob="true" type="text" class="form-control" id="f-protocolo" value={paciente.Protocolo}>
+            <input hx-swap-oob="true" type="text" class="form-control" id="f-fecha" value={paciente.Fecha}>
+            
+            <input hx-swap-oob="true" type="text" class="form-control" id="f-paciente" value={paciente.NombrePaciente}>
+            <input hx-swap-oob="true" type="text" class="form-control" id="f-propietario" value={GetValue(paciente.Familia)}>
+
+            <input hx-swap-oob="true" type="text" class="form-control" id="f-especie" value={GetValue(paciente.Especie)}>
+            <input hx-swap-oob="true" type="text" class="form-control" id="f-raza" value={GetValue(paciente.Raza)}>
+
+            <input hx-swap-oob="true" type="text" class="form-control" id="f-edad" value={GetValue(paciente.Edad)}>
+            <input hx-swap-oob="true" type="text" class="form-control" id="f-solicitante" value={paciente.Solicitante}>
+
+            <input hx-swap-oob="true" type="text" class="form-control" id="f-tecnica" value={paciente.Tecnica}>
+            <input hx-swap-oob="true" type="checkbox" id="f-mastocitomas" value={paciente.ReferenciasMastocitomas}>
+
+            <!-- Textos Largos -->
+            <textarea hx-swap-oob="true" class="form-control" id="f-antecedentes">{GetValue(paciente.Antecedentes)}</textarea>
+            <textarea hx-swap-oob="true" class="form-control" id="f-macroscopica">{GetValue(paciente.DescripcionMacroscopica)}</textarea>
+            <div hx-swap-oob="true" id="micro-container">
+                  for i, desc_micro := range paciente.Descripciones_microscopicas{
+                        <div class="micro-card">
+                              <div class="micro-card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span>Muestra / Hallazgo #${i + 1}</span>
+                                    <span style="cursor: pointer; color: #d9534f; font-family: 'Source Serif 4', serif; font-size: 14px; text-transform: none; letter-spacing: 0; font-weight: normal;" onclick="this.closest('.micro-card').remove()">Eliminar</span>
+                              </div>
+                              <div class="form-group full-width" style="margin-bottom: 16px;">
+                                    <label class="form-label">Descripción Microscópica</label>
+                                    <textarea class="form-control">{desc_micro.Descripcion}</textarea>
+                              </div>
+                              <div class="form-group full-width">
+                                    <label class="form-label">Diagnóstico</label>
+                                    <input type="text" class="form-control" value={GetValue(desc_micro.Diagnostico.Descripcion)}>
+                              </div>
+                        </div>
+                  }
+            </div>
+      }
 }

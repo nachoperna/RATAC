@@ -332,7 +332,7 @@ if __name__ == "__main__":
         CARGA_USUARIO = True
         data = procesar_docx(param)
 
-        nombre = os.path.basename(archivo.name)
+        nombre = os.path.basename(param)
         nombre_diag_actual = nombre
         nombre, ext = os.path.splitext(nombre)
         
