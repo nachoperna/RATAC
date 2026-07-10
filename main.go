@@ -9,15 +9,23 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
+	"os"
 
 	_ "github.com/lib/pq"
 )
 
-const db_conection = "host=localhost port=5432 user=admin password=password dbname=RATAC_DB sslmode=disable"
 const port = ":8080"
 
+func getConnection() string {
+	conn := os.Getenv("DATABASE_URL")
+	if conn != "" {
+		return conn
+	}
+	return "host=localhost port=5432 user=admin password=password dbname=RATAC_DB sslmode=disable"
+}
+
 func main() {
-	db, err := sql.Open("postgres", db_conection)
+	db, err := sql.Open("postgres", getConnection())
 	if err != nil {
 		log.Fatalf("Error al conectar con la Base de Datos: %v", err)
 	}
@@ -50,7 +58,10 @@ func main() {
 	http.HandleFunc("/pacientes/nombre", pacienteHandler.ListPacientesBy)
 	http.HandleFunc("/paciente/protocolo/{protocolo}", pacienteHandler.ShowFullPaciente)
 	http.HandleFunc("/apipacientes", pacienteHandler.APIPacientes)
-	http.HandleFunc("/diagnosticos/alta", adminHandler.ProcesarDocumento)
+	http.HandleFunc("/diagnosticos/alta", func (w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./infrastructure/UI/static/carga_diagnostico.html")
+	})
+	http.HandleFunc("/diagnosticos/alta/procesado", adminHandler.ProcesarDocumento)
 
 	err = http.ListenAndServe(port, nil)
 	if err != nil{
