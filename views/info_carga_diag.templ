@@ -1,12 +1,13 @@
 package views
 
 import "RATAC/domain"
+import "fmt"
 
 templ InformacionExtraida(pacientes []domain.Paciente) {
       for _, paciente := range pacientes{
             <input hx-swap-oob="true" type="text" class="form-control" id="f-protocolo" value={paciente.Protocolo}>
             <input hx-swap-oob="true" type="text" class="form-control" id="f-fecha" value={paciente.Fecha}>
-            
+ 
             <input hx-swap-oob="true" type="text" class="form-control" id="f-paciente" value={paciente.NombrePaciente}>
             <input hx-swap-oob="true" type="text" class="form-control" id="f-propietario" value={GetValue(paciente.Familia)}>
 
@@ -22,11 +23,12 @@ templ InformacionExtraida(pacientes []domain.Paciente) {
             <!-- Textos Largos -->
             <textarea hx-swap-oob="true" class="form-control" id="f-antecedentes">{GetValue(paciente.Antecedentes)}</textarea>
             <textarea hx-swap-oob="true" class="form-control" id="f-macroscopica">{GetValue(paciente.DescripcionMacroscopica)}</textarea>
+
             <div hx-swap-oob="true" id="micro-container">
                   for i, desc_micro := range paciente.Descripciones_microscopicas{
                         <div class="micro-card">
                               <div class="micro-card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                                    <span>Muestra / Hallazgo #${i + 1}</span>
+                                    <span>Muestra / Hallazgo #{i + 1}</span>
                                     <span style="cursor: pointer; color: #d9534f; font-family: 'Source Serif 4', serif; font-size: 14px; text-transform: none; letter-spacing: 0; font-weight: normal;" onclick="this.closest('.micro-card').remove()">Eliminar</span>
                               </div>
                               <div class="form-group full-width" style="margin-bottom: 16px;">
@@ -36,6 +38,25 @@ templ InformacionExtraida(pacientes []domain.Paciente) {
                               <div class="form-group full-width">
                                     <label class="form-label">Diagnóstico</label>
                                     <input type="text" class="form-control" value={GetValue(desc_micro.Diagnostico.Descripcion)}>
+                              </div>
+                              <div class="micro-images-section">
+                                    <div class="micro-images-header">
+                                          <span>Imágenes Asociadas</span>
+                                    </div>
+                                    <div class="image-preview-container" id="image-preview-container">
+                                          for _, img := range desc_micro.Diagnostico.Imagenes{
+                                                <!-- Las miniaturas irán aquí -->
+                                                <div class="image-thumbnail-wrapper">
+                                                      <img src={fmt.Sprintf("/%s", img)} class="image-thumbnail" alt="Miniatura">
+                                                      <button type="button" class="image-remove-btn" title="Eliminar imagen" onclick="this.parentElement.remove()">×</button>
+                                                </div>
+                                          }
+                                    </div>
+                                    <button type="button" class="add-image-btn" onclick="this.nextElementSibling.click()">
+                                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                          Añadir Imagen
+                                    </button>
+                                    <input type="file" style="display: none;" accept="image/*" multiple onchange="handleImageSelection(this)">
                               </div>
                         </div>
                   }
