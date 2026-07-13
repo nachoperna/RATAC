@@ -51,7 +51,7 @@ func main() {
 	fs_static := http.FileServer(http.Dir("./infrastructure/UI/static"))
 	fs_imagenes := http.FileServer(http.Dir("./IMAGENES/"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs_static))
-	http.Handle("/imagenes/", http.StripPrefix("/imagenes/", fs_imagenes))
+	http.Handle("/IMAGENES/", http.StripPrefix("/IMAGENES/", fs_imagenes))
 	http.HandleFunc("/", homeHandler.ShowHome)
 	http.HandleFunc("/pacientes", pacienteHandler.ListPacientes)
 	http.HandleFunc("/pacientes/", pacienteHandler.ListPacientesByFiltro)
@@ -62,6 +62,7 @@ func main() {
 		http.ServeFile(w, r, "./infrastructure/UI/static/carga_diagnostico.html")
 	})
 	http.HandleFunc("/diagnosticos/alta/procesado", adminHandler.ProcesarDocumento)
+	http.HandleFunc("/diagnosticos/alta/borrar_temporal", adminHandler.BorrarTemporal)
 
 	err = http.ListenAndServe(port, nil)
 	if err != nil{

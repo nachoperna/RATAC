@@ -4,8 +4,9 @@ import (
 	"RATAC/application"
 	"RATAC/domain"
 	"RATAC/views"
-	"fmt"
 	"net/http"
+	"path/filepath"
+	"strings"
 )
 
 type AdminHandler struct {
@@ -43,7 +44,22 @@ func (h *AdminHandler) ProcesarDocumento(w http.ResponseWriter, r *http.Request)
 		}
 	}
 
-	fmt.Println("RETORNA PACIENTE CON PROT: ", pacientes[0].Protocolo)
 	w.WriteHeader(http.StatusOK)
 	views.InformacionExtraida(pacientes).Render(r.Context(), w)
+}
+
+func (h *AdminHandler) BorrarTemporal(w http.ResponseWriter, r *http.Request)  {
+	archivo := r.URL.Query().Get("archivo")
+	if archivo == ""{
+		w.WriteHeader(200)
+		return
+	}
+	var imagenes []string = r.URL.Query()["imagenes"]
+
+	nombre, _, _ := strings.Cut(filepath.Base(archivo), ".")
+	err := h.adminService.BorrarTemporal(nombre, imagenes)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 }

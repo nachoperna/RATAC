@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"strings"
 )
 
 var tipos_validos = map[string]bool {
@@ -50,12 +51,13 @@ func (s *AdminService) ConvertirDocumento(archivo multipart.File, nombre string)
 		return nil, err
 	}
 	
-	os.MkdirAll("ArchivosTemporales", os.ModePerm)
+	os.MkdirAll("./ArchivosTemporales", os.ModePerm)
 	tmpFile, err := os.CreateTemp("./ArchivosTemporales/", fmt.Sprintf("TEMP_%s", nombre))
 	if err != nil {
 		return nil, errors.New("Error al crear archivo temporal")
 	}
 	defer os.Remove(tmpFile.Name())
+
 	_, err = io.Copy(tmpFile, archivo)
 	if err != nil {
 		return nil, errors.New("Error al copiar contenido a archivo temporal")
@@ -80,4 +82,19 @@ func (s *AdminService) ConvertirDocumento(archivo multipart.File, nombre string)
 		return nil, err
 	}
 	return paciente, nil
+}
+
+func (s *AdminService) BorrarTemporal(archivo string, imagenes []string) error {
+	err := os.Remove(fmt.Sprintf("JSONS/%s", fmt.Sprintf("TEMP_%s.json", archivo)))
+	if err != nil {
+		return errors.New("Error borrando json temporal")
+	}
+
+	for _, img := range imagenes {
+		err := os.Remove(strings.TrimPrefix(img, "/"))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
