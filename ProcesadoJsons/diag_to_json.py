@@ -24,37 +24,6 @@ patronInflamacion = re.compile(r"inflamaci[oó]n", re.I)
 patronDiagnostico = re.compile(r"diagn[oó]stico", re.I)
 patronTablaGrado = re.compile(r"muestra|analizada", re.I)
 
-def procesarTabla(tabla, nombre_diag):
-    try:
-        filas = []
-        categorias = []
-
-        # iteramos sobre la primer fila de la tabla y obtenemos sus columnas
-        
-        for cell in tabla.rows[0].cells:
-            if cell.text.strip() == "":
-                continue
-            categorias.append(cell.text)
-
-        for row in tabla.rows[1:]:  # iteramos a partir de la segunda fila
-            # FORMATO DE SALIDA: {contenido de fila: tipo de categoria a la que corresponde}
-            fila = "{" + row.cells[0].text
-            # iteramos a partir de la segunad celda para obtener el valor de las columnas
-            for j, cell in enumerate(row.cells[1:]):
-                if cell.text.strip():   # si en la celda hay un string (normalmente X) entonces obtenemos el tipo de categoria a la que pertence la fila usando el indice sobre el que iteramos
-                    fila += ": " + categorias[j] + "}"
-            filas.append(fila)
-        return ", ".join(filas)
-    except Exception as e:
-        if CARGA_USUARIO:
-            print("Tablas", file=sys.stderr)
-            sys.exit(1)
-
-        print(f"!-ERROR: {e}")
-        with open("diagnosticos_mal_procesados.txt", "a", encoding="utf-8") as f:
-            f.write(f"{nombre_diag}\n")
-        return ""
-
 def procesarTablaGrado(tabla):
     tabla_grado = []
     contenido = {
@@ -330,11 +299,11 @@ if __name__ == "__main__":
                         json.dump(data, f, indent=4, ensure_ascii=False)
     else:
         CARGA_USUARIO = True
-        data = procesar_docx(param)
-
         nombre = os.path.basename(param)
         nombre_diag_actual = nombre
         nombre, ext = os.path.splitext(nombre)
+
+        data = procesar_docx(param)
         
         if data:
             nombre = os.path.join("JSONS/", nombre)
