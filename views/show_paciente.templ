@@ -2,7 +2,6 @@ package views
 
 import "RATAC/domain"
 import "fmt"
-import "path/filepath"
 
 func GetValue(campo *string) string{
       if campo != nil { return fmt.Sprint(*campo)}
@@ -120,7 +119,7 @@ templ ShowPaciente(paciente domain.Paciente) {
                         </div>
                         for _, imagen := range desc_micro.Diagnostico.Imagenes {
                               <div class="micro-image">
-                                    <img src={fmt.Sprintf("/imagenes/%s", filepath.Base(imagen))} alt={fmt.Sprintf("Imagen Diagnostico %d", index + 1)}>
+                                    <img src={fmt.Sprintf("/%s", imagen)} alt={fmt.Sprintf("Imagen Diagnostico %d", index + 1)}>
                               </div>
                         }
                   </div>
