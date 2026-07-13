@@ -30,6 +30,9 @@ up-appdocker:
 down-appdocker:
 	docker compose down app
 
+restart-appdocker:
+	docker compose restart app
+	#
 # Baja los contenedores y borra los volúmenes (limpieza total de la DB)
 dvdocker:
 	docker compose down -v 
