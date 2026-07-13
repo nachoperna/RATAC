@@ -23,4 +23,4 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 cover/
-application/ArchivosTemporales/
+ArchivosTemporales/
