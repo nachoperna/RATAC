@@ -4,6 +4,7 @@ FROM golang:1.24-bookworm AS builder
 # Instalar herramientas de generación
 RUN go install github.com/a-h/templ/cmd/templ@v0.3.1001
 RUN go install github.com/sqlc-dev/sqlc/cmd/sqlc@v1.28.0
+RUN go install github.com/golang-migrate/migrate/v4/cmd/migrate@v4.18.2
 
 # Instalar solo librerías de ejecución necesarias si tu app de Go llama a scripts de Python
 # 1. Instalar pip3 a nivel de sistema operativo
