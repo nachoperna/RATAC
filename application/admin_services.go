@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 )
 
@@ -66,7 +67,7 @@ func (s *AdminService) ConvertirDocumento(archivo multipart.File, nombre string)
 
 	// Aca se debe llamar a ejecucion de diag_to_json.py / pdf_to_json.py
 	// cmd := exec.Command("docker", "compose", "exec", "app", "python3", "ProcesadoJsons/diag_to_json.py", tmpFile.Name())
-	cmd := exec.Command("python3", "ProcesadoJsons/diag_to_json.py", tmpFile.Name())
+	cmd := exec.Command("python3", "ProcesadoJsons/diag_to_json.py", tmpFile.Name(), nombre)
 	var stderr, stdout bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
@@ -96,5 +97,22 @@ func (s *AdminService) BorrarTemporal(archivo string, imagenes []string) error {
 			return err
 		}
 	}
+	return nil
+}
+
+func (s *AdminService) RenombrarTemporal(nombre string) error {
+	json, err := filepath.Glob(fmt.Sprintf("JSONS/*%s*.json", nombre))
+	if err != nil {
+		return err
+	}
+	if json == nil {
+		return errors.New("No se encontro el archivo json")
+	}
+
+	err = os.Rename(json[0], fmt.Sprintf("JSONS/%s.json", nombre))
+	if err != nil {
+		return err
+	}
+	
 	return nil
 }

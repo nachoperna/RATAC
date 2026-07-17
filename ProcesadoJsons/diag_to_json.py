@@ -300,7 +300,7 @@ if __name__ == "__main__":
     else:
         CARGA_USUARIO = True
         nombre = os.path.basename(param)
-        nombre_diag_actual = nombre
+        nombre_diag_actual = sys.argv[2]
         nombre, ext = os.path.splitext(nombre)
 
         data = procesar_docx(param)

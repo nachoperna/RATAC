@@ -3,6 +3,9 @@ package application
 import (
 	"RATAC/domain"
 	"context"
+	"encoding/json"
+	"fmt"
+	"os"
 )
 
 type PacienteService struct {
@@ -13,6 +16,18 @@ func NewPacienteService(pacienteRepo domain.PacienteRepository) *PacienteService
 	return &PacienteService{
 		pacienteRepo: pacienteRepo,
 	}
+}
+func (s *PacienteService) InsertarDiagnostico(ctx context.Context, nombre_archivo string) error {
+	archivo, err := os.Open(fmt.Sprintf("JSONS/%s.json", nombre_archivo))
+	if err != nil {
+		return err
+	}
+	var paciente domain.Paciente
+	err = json.NewDecoder(archivo).Decode(&paciente)
+	if err != nil {
+		return err
+	}
+	return s.pacienteRepo.InsertarDiagnostico(ctx, paciente)
 }
 
 func (s *PacienteService) ListPacientes(ctx context.Context, offset int8) ([]domain.Paciente, int16, error) {

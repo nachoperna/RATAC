@@ -46,6 +46,7 @@
                                           hx-post="/diagnosticos/alta/procesado"
                                           hx-encoding="multipart/form-data"
                                           hx-trigger="change"
+                                          hx-on:htmx:after-request="guardarEstado()"
                                           >
                                     <div class="loader" id="loader"></div>
                               </div>
@@ -172,7 +173,10 @@
                                     <button 
                                           class="btn btn-primary" 
                                           id="btn-submit" 
-                                          onclick="submitData()"
+                                          hx-post="/diagnosticos/alta/carga"
+                                          hx-vals='js:{archivo: nombre_archivo, cambios: hayCambios(), campos: estado_pre_envio}'
+                                          hx-on:htmx:before-request="validacionDatosMinimos(event)"
+                                          hx-on:htmx:after-request="if (event.detail.successful) submitData()"
                                           >Confirmar y Subir al Servidor
                                     </button>
                               </div>

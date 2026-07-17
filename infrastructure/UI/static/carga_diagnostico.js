@@ -1,48 +1,13 @@
-const mockExtractedData = {
-      "Protocolo": "3808-021",
-      "Fecha": "04-05-2021",
-      "Solicitante": "Rana Cristian",
-      "Técnica": "HE",
-      "Propietario": "Galván Alicia",
-      "Especie": "Canino",
-      "Raza": "Golden",
-      "Edad": null,
-      "Paciente": "Homero",
-      "Referencias mastocitomas": false,
-      "Material remitido - Antecedentes": "Cx laparotomía parapeneana, orquiectomía; (A) torsión >>> testículo abdominal (pequeño) + escrotal más grande. ECT + biopsias incisionales 2 neos circunanales 1 (B)- neo a las 4, esférico 36mm y exageradamente vascularizado y sangrante (2 pequeñas muestras libres) / 2 (C)- neo ulcerado de 24mm a las 8 (punch con punto nylon negro). Especial interés en dx adenoma vs adenocarcinoma.",
-      "Descripción macroscópica": "A) Testículo de 6 x 3.5 cm, al corte presenta nódulo de color párdo. Testículo de 2.5 cm, al corte presenta zonas oscuras y amarillentas. B) Dos fragmentos milimétricos de tejido, oscuros. C) Fragmento milimétrico de tejido con punto de sutura.",
-      "Descripción microscópica": [
-            {
-                  "Descripcion": "Testículo de menor tamaño: se examina un fragmento de tejido que presenta necrosis y hemorragia. Se aprecia abundante cantidad de pigmentos de degradación de la hemoglobina: hemosiderina, hematina. Se observan macrófagos cargados con pigmentos.",
-                  "Diagnostico": {
-                  "Descripcion": "Tejido necrótico.",
-                  "Imagenes": []
-                  }
-            },
-            {
-                  "Descripcion": "Testículo de mayor tamaño: se aprecian extensas áreas de necrosis, zonas de hemorragia y múltiples proliferaciones neoplásicas nodulares milimétricas. Las proliferaciones están formadas por células de Leydig que se observan moderadamente pleomórficas, presentan citoplasmas eosinofílicos, algunos con presencia de vacuolas claras. Los nucléolos son prominentes. Los conductos seminíferos se encuentran atróficos con disminución de sus capas celulares.",
-                  "Diagnostico": {
-                  "Descripcion": "Compatible con tumor de células intersticiales (Leydig).",
-                  "Imagenes": []
-                  }
-            },
-            {
-                  "Descripcion": "Se evalúan tres fragmentos de tejido en los cuales se aprecia una proliferación neoplásica formada por células epiteliales con citoplasmas hexagonales eosinofílicos con núcleos redondos que presentan anisocariosis. El pleomorfismo es marcado. Las células se disponen en islotes separados por un estroma fibrovascular. Se aprecia un infiltrado inflamatorio severo compuesto por linfocitos. Zona de dilatación de vasos sanguíneos y zonas de hemorragia. En ambas muestras en la zona de mayor actividad mitótica se cuentan 4 mitosis en un área de 2.37mm2 de diámetro. En la muestra B se observa formación de conductos. En la muestra C el epitelio se evidencia con pérdida de continuidad",
-                  "Diagnostico": {
-                  "Descripcion": "Compatibles con adenocarcinoma de glándulas perianales bien diferenciado.",
-                  "Imagenes": []
-                  }
-            }
-      ]
-};
-
 const dropZone = document.getElementById('drop-zone');
 const fileInput = document.getElementById('file-input');
 const dropText = document.getElementById('drop-zone-text');
 const dropIcon = document.getElementById('drop-icon');
 const dropSubtext = document.getElementById('drop-subtext');
 const loader = document.getElementById('loader');
+const imagenes_subidas = []
 let nombre_archivo;
+let estado_post_carga;
+let estado_pre_envio;
 
 ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
       dropZone.addEventListener(eventName, preventDefaults, false);
@@ -168,17 +133,26 @@ function handleImageSelection(input) {
       const container = input.previousElementSibling.previousElementSibling; // el div .image-preview-container
 
       Array.from(input.files).forEach(file => {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                  const wrapper = document.createElement('div');
-                  wrapper.className = 'image-thumbnail-wrapper';
-                  wrapper.innerHTML = `
-                        <img src="${e.target.result}" class="image-thumbnail" alt="Miniatura">
-                        <button type="button" class="image-remove-btn" title="Eliminar imagen" onclick="this.parentElement.remove()">×</button>
-                  `;
-                  container.appendChild(wrapper);
-            }
-            reader.readAsDataURL(file);
+            const url = URL.createObjectURL(file);
+            const entry = { file, url };
+            imagenes_subidas.push(entry);
+
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'image-thumbnail-wrapper';
+            wrapper.innerHTML = `
+                  <img src="${url}" class="image-thumbnail" alt="Miniatura">
+                  <button type="button" class="image-remove-btn" title="Eliminar imagen" onclick="this.parentElement.remove()">×</button>
+            `;
+
+            wrapper.querySelector('.image-remove-btn').addEventListener('click', () => {
+                  URL.revokeObjectURL(url);
+                  const idx = imagenes_subidas.indexOf(entry);
+                  if (idx !== -1) imagenes_subidas.splice(idx, 1);
+                  wrapper.remove();
+            });
+
+            container.appendChild(wrapper);
       });
 
       // Limpiamos el input para permitir seleccionar la misma imagen si se borra y se vuelve a añadir
@@ -218,12 +192,10 @@ function submitData() {
             btn.classList.add('btn-success');
             btn.classList.remove('btn-primary');
             btn.style.opacity = '1';
-            
+ 
             setTimeout(() => {
-                  const confirmBox = confirm("Los datos han sido validados y guardados exitosamente.\n¿Deseas cargar un nuevo documento?");
-                  if (confirmBox) {
+                  const confirmBox = confirm("Los datos han sido validados y guardados exitosamente.");
                   resetPage();
-                  }
                   btn.innerHTML = 'Confirmar y Subir al Servidor';
                   btn.classList.add('btn-primary');
                   btn.classList.remove('btn-success');
@@ -240,4 +212,48 @@ function getNumeroDescMicro(){
 
 function getRutaImagenes(){
       return Array.from(document.querySelectorAll('.image-thumbnail')).map(img => img.getAttribute('src'));
+}
+
+function capturarEstado() {
+    const state = { fields: {}, microCards: [], images: [] };
+    
+    // Campos simples
+    const fieldIds = ['f-protocolo','f-fecha','f-paciente','f-propietario','f-especie',
+                      'f-raza','f-edad','f-solicitante','f-tecnica','f-antecedentes','f-macroscopica'];
+    fieldIds.forEach(id => state.fields[id] = document.getElementById(id)?.value ?? '');
+    state.fields['f-mastocitomas'] = document.getElementById('f-mastocitomas')?.checked ?? false;
+    
+    // Micro-cards: descripción, diagnóstico e imágenes por cada una
+    document.querySelectorAll('.micro-card').forEach(card => {
+        const desc = card.querySelector('textarea')?.value ?? '';
+        const diag = card.querySelector('input[type="text"]')?.value ?? '';
+        const images = Array.from(card.querySelectorAll('.image-thumbnail'))
+                            .map(img => img.getAttribute('src'));
+        state.microCards.push({ descripcion: desc, diagnostico: diag, imagenes: images });
+    });
+    
+    return state;
+}
+
+function guardarEstado(){
+      estado_post_carga = capturarEstado();
+}
+
+function hayCambios() {
+    if (!estado_post_carga) return true;
+    estado_pre_envio = capturarEstado();
+    return JSON.stringify(estado_post_carga) !== JSON.stringify(estado_pre_envio);
+}
+
+function hayDatos(){
+      const archivo_subido = document.getElementById('file-input').files.length > 0;
+      const protocolo_valor = document.getElementById('f-protocolo').value.trim() !== '';
+      return archivo_subido || protocolo_valor;
+}
+
+function validacionDatosMinimos(e){
+      if (!hayDatos()){
+            e.preventDefault();
+            alert('Se necesita información de diagnóstico para enviar al servidor');
+      }
 }

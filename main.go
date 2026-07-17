@@ -46,7 +46,7 @@ func main() {
 	// diagnosticoHandler := ui.NewDiagnosticoHandler(diagnosticoServices)
 
 	homeHandler := ui.NewHomeHandler(pacienteServices, desc_microServices, diagnosticoServices)
-	adminHandler := ui.NewAdminHandler(application.NewAdminService(&dbrepo.AdminRepository{}))
+	adminHandler := ui.NewAdminHandler(application.NewAdminService(&dbrepo.AdminRepository{}), pacienteServices)
 	
 	fs_static := http.FileServer(http.Dir("./infrastructure/UI/static"))
 	fs_imagenes := http.FileServer(http.Dir("./IMAGENES/"))
@@ -63,6 +63,7 @@ func main() {
 	})
 	http.HandleFunc("/diagnosticos/alta/procesado", adminHandler.ProcesarDocumento)
 	http.HandleFunc("/diagnosticos/alta/borrar_temporal", adminHandler.BorrarTemporal)
+	http.HandleFunc("/diagnosticos/alta/carga", adminHandler.AltaDiagnostico)
 
 	err = http.ListenAndServe(port, nil)
 	if err != nil{

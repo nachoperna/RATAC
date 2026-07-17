@@ -6,15 +6,20 @@ import (
 	"RATAC/views"
 	"net/http"
 	"path/filepath"
+	"strconv"
 	"strings"
 )
 
 type AdminHandler struct {
 	adminService *application.AdminService
+	pacienteService *application.PacienteService
 }
 
-func NewAdminHandler(adminService *application.AdminService) *AdminHandler {
-	return &AdminHandler{adminService: adminService}
+func NewAdminHandler(adminService *application.AdminService, pacienteService *application.PacienteService) *AdminHandler {
+	return &AdminHandler{
+		adminService: adminService,
+		pacienteService: pacienteService,
+	}
 }
 
 func (h *AdminHandler) ProcesarDocumento(w http.ResponseWriter, r *http.Request) {
@@ -62,4 +67,30 @@ func (h *AdminHandler) BorrarTemporal(w http.ResponseWriter, r *http.Request)  {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	w.WriteHeader(http.StatusOK)
+}
+
+func (h *AdminHandler) AltaDiagnostico(w http.ResponseWriter, r *http.Request)  {
+	nombre, _, _ := strings.Cut(filepath.Base(r.FormValue("archivo")), ".")
+	cambios, err := strconv.ParseBool(r.FormValue("cambios"))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if !cambios{ // significa que ya se encuentra en el servidor el json temporal y las imagenes temporales 
+		// renombrar json quitando el "TEMP_" del nombre de archivo 
+		err = h.adminService.RenombrarTemporal(nombre)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		err = h.pacienteService.InsertarDiagnostico(r.Context(), nombre)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		// Se necesitan renders de errores correspondientes
+	}
+	w.WriteHeader(http.StatusOK)
+	// Render con opcion de redireccion a la pagina completa del diagnostico
 }
