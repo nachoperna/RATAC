@@ -174,9 +174,8 @@
                                           class="btn btn-primary" 
                                           id="btn-submit" 
                                           hx-post="/diagnosticos/alta/carga"
-                                          hx-vals='js:{archivo: nombre_archivo, cambios: hayCambios(), campos: estado_pre_envio}'
-                                          hx-on:htmx:before-request="validacionDatosMinimos(event)"
-                                          hx-on:htmx:after-request="if (event.detail.successful) submitData()"
+                                          hx-encoding="multipart/form-data"
+                                          hx-on:htmx:before-request="validacionYFormData(event)"
                                           >Confirmar y Subir al Servidor
                                     </button>
                               </div>

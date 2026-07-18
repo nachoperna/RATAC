@@ -215,24 +215,27 @@ function getRutaImagenes(){
 }
 
 function capturarEstado() {
-    const state = { fields: {}, microCards: [], images: [] };
-    
-    // Campos simples
-    const fieldIds = ['f-protocolo','f-fecha','f-paciente','f-propietario','f-especie',
-                      'f-raza','f-edad','f-solicitante','f-tecnica','f-antecedentes','f-macroscopica'];
-    fieldIds.forEach(id => state.fields[id] = document.getElementById(id)?.value ?? '');
-    state.fields['f-mastocitomas'] = document.getElementById('f-mastocitomas')?.checked ?? false;
-    
-    // Micro-cards: descripción, diagnóstico e imágenes por cada una
-    document.querySelectorAll('.micro-card').forEach(card => {
-        const desc = card.querySelector('textarea')?.value ?? '';
-        const diag = card.querySelector('input[type="text"]')?.value ?? '';
-        const images = Array.from(card.querySelectorAll('.image-thumbnail'))
-                            .map(img => img.getAttribute('src'));
-        state.microCards.push({ descripcion: desc, diagnostico: diag, imagenes: images });
-    });
-    
-    return state;
+      const state = { fields: {}, microCards: [], images: [] };
+      
+      // Campos simples
+      const fieldIds = ['f-protocolo','f-fecha','f-paciente','f-propietario','f-especie',
+                        'f-raza','f-edad','f-solicitante','f-tecnica','f-antecedentes','f-macroscopica'];
+      fieldIds.forEach(id => state.fields[id] = document.getElementById(id)?.value ?? '');
+      state.fields['f-mastocitomas'] = String(document.getElementById('f-mastocitomas')?.checked ?? false);
+      
+      // Micro-cards: descripción, diagnóstico e imágenes por cada una
+      document.querySelectorAll('.micro-card').forEach(card => {
+            const desc = card.querySelector('textarea')?.value ?? '';
+            const diag = card.querySelector('input[type="text"]')?.value ?? '';
+            const images = Array.from(card.querySelectorAll('.image-thumbnail'))
+                              .map(img => img.getAttribute('src'));
+            state.microCards.push({ descripcion: desc, diagnostico: diag, imagenes: images });
+      });
+
+      // Guardamos todas las imagenes juntas para comparar con las existentes en server
+      state.images = getRutaImagenes();
+
+      return state;
 }
 
 function guardarEstado(){
@@ -256,4 +259,35 @@ function validacionDatosMinimos(e){
             e.preventDefault();
             alert('Se necesita información de diagnóstico para enviar al servidor');
       }
+}
+
+function validacionYFormData(evt) {
+      if (!hayDatos()) {
+            evt.preventDefault();
+            alert('Se necesita información de diagnóstico');
+            return;
+      }
+      evt.preventDefault(); // cancela el request de htmx
+
+      const estado = capturarEstado(); // siempre obtener fresco
+
+      const reemplazarBlob = (src) => {
+            const entry = imagenes_subidas.find(e => e.url === src);
+            return entry ? entry.file.name : src;
+      };
+
+      estado.images = estado.images.map(reemplazarBlob);
+      estado.microCards.forEach(card => {
+            card.imagenes = card.imagenes.map(reemplazarBlob);
+      });
+
+      const formData = new FormData();
+      formData.append('archivo', nombre_archivo);
+      formData.append('cambios', String(hayCambios()));
+      formData.append('campos', JSON.stringify(estado)); // usar estado, no capturarEstado()
+      imagenes_subidas.forEach(e => formData.append('imagenes', e.file));
+
+      fetch('/diagnosticos/alta/carga', { method: 'POST', body: formData })
+            .then(r => {if (r.ok) submitData(); }
+      );
 }

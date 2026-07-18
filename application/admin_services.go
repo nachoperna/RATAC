@@ -3,6 +3,7 @@ package application
 import (
 	"RATAC/domain"
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -11,6 +12,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"slices"
 	"strings"
 )
 
@@ -86,9 +88,9 @@ func (s *AdminService) ConvertirDocumento(archivo multipart.File, nombre string)
 }
 
 func (s *AdminService) BorrarTemporal(archivo string, imagenes []string) error {
-	err := os.Remove(fmt.Sprintf("JSONS/%s", fmt.Sprintf("TEMP_%s.json", archivo)))
+	err := os.Remove(fmt.Sprintf("JSONS/TEMP_%s.json", archivo))
 	if err != nil {
-		return errors.New("Error borrando json temporal")
+		return err
 	}
 
 	for _, img := range imagenes {
@@ -114,5 +116,52 @@ func (s *AdminService) RenombrarTemporal(nombre string) error {
 		return err
 	}
 	
+	return nil
+}
+
+func (s *AdminService) GetImagenesHuerfanas(imagenes []string, nombre string) ([]string, error) {
+	imgs, err := filepath.Glob(fmt.Sprintf("IMAGENES/*%s*", nombre))
+	if err != nil {
+		return nil, err
+	}
+
+	var huerfanas []string
+	for _, img := range imgs {
+		 // La imagen es huerfana si no pertenece a la informacion de diagnostico final
+		if !slices.Contains(imagenes, "/" + img) {
+			huerfanas = append(huerfanas, img)
+		}
+	}
+	return huerfanas, nil
+}
+
+func (s *AdminService) GenerarJson(nombre string, paciente domain.Paciente) error {
+	archivo, err := os.Create(fmt.Sprintf("JSONS/%s.json", nombre))
+	if err != nil {
+		return err
+	}
+	err = json.NewEncoder(archivo).Encode(paciente)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *AdminService) GuardarImagenes(imagenes []*multipart.FileHeader, nombre string) error {
+	for _, img := range imagenes {
+		nueva_imagen, err := os.Create(fmt.Sprintf("IMAGENES/%s", nombre))
+		if err != nil {
+			return err
+		}
+		contenido, err := img.Open()
+		if err != nil {
+			return err
+		}
+		defer contenido.Close()
+		_, err = io.Copy(nueva_imagen, contenido)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
