@@ -64,7 +64,6 @@ clean-images:
 procesarjsons: udocker wait up-appdocker wait
 	$(DOCKER_EXEC) ./ProcesadoJsons/eliminar_duplicados.sh
 	$(DOCKER_EXEC) python3 ./ProcesadoJsons/diag_to_json.py
-	$(DOCKER_EXEC) python3 ./ProcesadoJsons/PDF_to_json.py  
 	$(DOCKER_EXEC) go run ./ProcesadoJsons/json_to_bd.go 
 	$(MAKE) down-appdocker
 

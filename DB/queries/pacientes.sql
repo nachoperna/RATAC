@@ -19,9 +19,10 @@ ORDER BY Fecha DESC
 LIMIT 10 OFFSET $1;
 
 -- name: ListUltimosPacientes :many
-SELECT DISTINCT p.Protocolo, p.Paciente, p.Fecha, p.Tecnica, p.Especie, p.Raza, p.Edad, d.Diagnostico
-FROM Pacientes p JOIN Descripciones_microscopicas d on p.protocolo = d.pacientes_protocolo
-ORDER BY p.Fecha DESC
+SELECT DISTINCT ON (p.Protocolo) p.Protocolo, p.Paciente, p.Fecha, p.Tecnica, p.Especie, p.Raza, p.Edad, d.Diagnostico
+FROM Pacientes p 
+JOIN Descripciones_microscopicas d ON p.protocolo = d.pacientes_protocolo
+ORDER BY p.Protocolo, p.Fecha DESC
 LIMIT 3;
 
 -- name: UpdatePaciente :one
