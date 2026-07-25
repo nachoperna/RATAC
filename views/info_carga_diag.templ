@@ -9,7 +9,7 @@ templ InformacionExtraida(pacientes []domain.Paciente) {
             <input hx-swap-oob="true" type="text" class="form-control" id="f-fecha" value={paciente.Fecha}>
  
             <input hx-swap-oob="true" type="text" class="form-control" id="f-paciente" value={paciente.NombrePaciente}>
-            <input hx-swap-oob="true" type="text" class="form-control" id="f-propietario" value={GetValue(paciente.Familia)}>
+            <input hx-swap-oob="true" type="text" class="form-control" id="f-familia" value={GetValue(paciente.Familia)}>
 
             <input hx-swap-oob="true" type="text" class="form-control" id="f-especie" value={GetValue(paciente.Especie)}>
             <input hx-swap-oob="true" type="text" class="form-control" id="f-raza" value={GetValue(paciente.Raza)}>

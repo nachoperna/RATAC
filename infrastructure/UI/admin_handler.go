@@ -162,7 +162,7 @@ func mapearCamposAPaciente(info InformacionDiagnostico) domain.Paciente {
 		Fecha:                   f["f-fecha"],
 		Solicitante:             f["f-solicitante"],
 		Tecnica:                 f["f-tecnica"],
-		Familia:                 strPointer(f["f-propietario"]),
+		Familia:                 strPointer(f["f-familia"]),
 		Especie:                 strPointer(f["f-especie"]),
 		Raza:                    strPointer(f["f-raza"]),
 		Edad:                    strPointer(f["f-edad"]),

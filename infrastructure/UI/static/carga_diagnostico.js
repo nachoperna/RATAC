@@ -73,7 +73,7 @@ function populateForm(data) {
       document.getElementById('f-protocolo').value = data.Protocolo || '';
       document.getElementById('f-fecha').value = data.Fecha || '';
       document.getElementById('f-paciente').value = data.Paciente || '';
-      document.getElementById('f-propietario').value = data.Propietario || '';
+      document.getElementById('f-familia').value = data.Propietario || '';
       document.getElementById('f-especie').value = data.Especie || '';
       document.getElementById('f-raza').value = data.Raza || '';
       document.getElementById('f-edad').value = data.Edad || '';
@@ -218,7 +218,7 @@ function capturarEstado() {
       const state = { fields: {}, microCards: [], images: [] };
       
       // Campos simples
-      const fieldIds = ['f-protocolo','f-fecha','f-paciente','f-propietario','f-especie',
+      const fieldIds = ['f-protocolo','f-fecha','f-paciente','f-familia','f-especie',
                         'f-raza','f-edad','f-solicitante','f-tecnica','f-antecedentes','f-macroscopica'];
       fieldIds.forEach(id => state.fields[id] = document.getElementById(id)?.value ?? '');
       state.fields['f-mastocitomas'] = String(document.getElementById('f-mastocitomas')?.checked ?? false);
