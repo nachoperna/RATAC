@@ -6,7 +6,7 @@ from docx import Document
 import pdfplumber
 from pypdf import PdfReader
 
-# ── CONSTANTES GLOBALES Y CONFIGURACIÓN ───────────────────────────────────────
+# CONSTANTES
 MATERIAL_REMITIDO_ANTECEDENTES = "Material remitido - Antecedentes"
 DESCRIPCION_MACROSCOPICA = "Descripción macroscópica"
 DESCRIPCION_MICROSCOPICA = "Descripción microscópica"
@@ -14,7 +14,7 @@ DIAGNOSTICO_HISTOPATOLOGICO = "Diagnóstico histopatológico"
 nombre_diag_actual = ""
 CARGA_USUARIO = False
 
-# ── EXPRESIONES REGULARES (REGEX) ─────────────────────────────────────────────
+# regexs que nos indican los cambios de seccion o elementos a evitar
 patron_referencias  = re.compile(r"^\s*(referencias?|anexos?)", re.I)
 patronAntecedentes  = re.compile(r"material\s+remitido\s*-\s*antecedentes", re.I)
 patronMacro         = re.compile(r"descripci[oó]n macrosc[oó]pica", re.I)
@@ -25,11 +25,6 @@ patronInflamacion   = re.compile(r"inflamaci[oó]n", re.I)
 patronDiagnostico   = re.compile(r"diagn[oó]stico", re.I)
 patronTablaGrado    = re.compile(r"muestra|analizada", re.I)
 
-
-# ==============================================================================
-# MÓDULO 1: PROCESAMIENTO DE ARCHIVOS WORD (.docx)
-# ==============================================================================
-
 def procesarTablaGrado_docx(tabla):
     tabla_grado = []
     contenido = {
@@ -37,7 +32,8 @@ def procesarTablaGrado_docx(tabla):
         "Muestra analizada": "",
         "Puntaje": ""
     }
-    for row in tabla.rows[1:len(tabla.rows)-1]:
+    for row in tabla.rows[1:len(tabla.rows)-1]: # iteramos a partir de la segunda fila
+        # FORMATO DE SALIDA: {contenido de fila: tipo de categoria a la que corresponde}
         contenido['Caracteristica'] = row.cells[0].text
         contenido['Muestra analizada'] = row.cells[1].text
         contenido['Puntaje'] = row.cells[2].text
@@ -60,72 +56,90 @@ def datosPaciente_docx(tabla):
             v2 = cells[3].text.strip()
 
             if "Raza" in k1 or "Edad" in k1:
-                raza = re.search(r"^[^\d,-]+", v1)
-                edad = re.search(r"\d+", v1)
+                raza = re.search(r"^[^\d,-]+", v1) # nos quedamos con todo lo que no sea digitos, comas o guiones
+                edad = re.search(r"\d+", v1) # nos quedamos solo con los digitos
                 if raza: raza = raza.group().rstrip()
                 if edad: edad = edad.group().rstrip()
                 datos["Raza"] = raza
                 datos["Edad"] = edad
             else:
                 if k1:
-                    if "Familia" in k1 and v1 == "": v1 = None
+                    if "Familia" in k1 and v1 == "": 
+                        v1 = None
                     datos[k1] = v1
 
             if k2:
-                if v2.startswith("-") and len(v2) == 5: v2 = f"01-01{v2}"
-                if "Especie" in k2 and v2 == "": v2 = None
+                if v2.startswith("-") and len(v2) == 5:
+                    v2 = f"01-01{v2}"
+                if "Especie" in k2 and v2 == "":
+                    v2 = None
                 datos[k2] = v2
 
     datos["Referencias mastocitomas"] = False
     return datos
 
 def getImagenes_docx(doc, el):
-    ns = {
+    ns = {  # aparentemente hay que hacer esto para obtener bien cada imagen del doc
         'w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main',
         'a': 'http://schemas.openxmlformats.org/drawingml/2006/main',
         'r': 'http://schemas.openxmlformats.org/officeDocument/2006/relationships'
     }
     rutas = []
     for dibujo in el.findall('.//w:drawing', namespaces=ns):
+        # la etiqueta blip que contiene el ID de la imagen
         for blip in dibujo.findall('.//a:blip', namespaces=ns):
-            rId = blip.get("{http://schemas.openxmlformats.org/officeDocument/2006/relationships}embed")
+            # obtenemos el ID de la imagen
+            rId = blip.get(
+                "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}embed")
+
             if rId:
                 imagen_part = doc.part.related_parts[rId]
                 if imagen_part:
-                    binario = imagen_part.blob
-                    if len(binario) < 685000: continue
+                    binario = imagen_part.blob  # blob nos da el binario
+                    # si el binario es menor a 685k bits o 85Kb entonces seguramente sea una foto de una firma digital del doc y la evitamos directamente
+                    if len(binario) < 685000:
+                        continue
+                    # todas las imagenes de los diagnosticos ya estan en formato png
                     ruta = f"IMG_{rId}_{nombre_diag_actual}.png"
                     ruta = os.path.join("IMAGENES", ruta)
-                    with open(ruta, "wb") as img:
+                    with open(ruta, "wb") as img:   # wb = write binary
                         img.write(binario)
                     rutas.append(ruta)
+    # retornamos todas las rutas (relativas) que luego son asignadas a cada parte ed los diagnosticos
     return rutas
 
 def matcheaCategoria(linea, seccion_actual, nueva_desc_micro, nombre_tabla_actual):
+    # seteamos la seccion actual
     if patronAntecedentes.search(linea):
         return True, MATERIAL_REMITIDO_ANTECEDENTES, nueva_desc_micro, nombre_tabla_actual
     elif patronMacro.search(linea):
         return True, DESCRIPCION_MACROSCOPICA, nueva_desc_micro, nombre_tabla_actual
     elif patronMicro.search(linea):
+        # levantamos la flag que indica que debemos guardar el bloque actual de descripcion que tenemos hasta el momento
         return True, DESCRIPCION_MICROSCOPICA, True, nombre_tabla_actual
     elif patronDiag.search(linea):
         return True, DIAGNOSTICO_HISTOPATOLOGICO, nueva_desc_micro, nombre_tabla_actual
-    elif patronMorfologia.search(linea) or patronInflamacion.search(linea):
+    elif patronMorfologia.search(linea) or patronInflamacion.search(linea):     # signfica que estamos por procesar una tabla que nos sirve
         return True, seccion_actual, nueva_desc_micro, linea.strip()
+    
     return False, seccion_actual, nueva_desc_micro, nombre_tabla_actual
 
 def cargarDescMicro(descripciones_micro, bloque_actual):
+    # no se puede hacer un simple append(bloque_actual) porque las variables son mutables entonces tener que hacer un copy de cada estructura
     if bloque_actual['Diagnostico']['Descripcion'] in ("", "."):
         bloque_actual['Diagnostico']['Descripcion'] = None
     descripciones_micro.append(bloque_actual.copy())
-    return {
+    return {   # reiniciamos la estructura
         "Descripcion": "",
-        "Diagnostico": {"Descripcion": "", "Imagenes": []},
+        "Diagnostico": {
+            "Descripcion": "",
+            "Imagenes": []
+        },
         "Tabla de Grado": []
     }
 
 def resultados(datos_paciente, secciones):
-    resultado = {}
+    resultado = {}  # donde juntamos todas las estructuras para luego formar el json con dump()
     resultado.update(datos_paciente)
     for k, v in secciones.items():
         if k != DESCRIPCION_MICROSCOPICA:
@@ -138,8 +152,8 @@ def procesar_docx(archivo):
     ruta = archivo.path if hasattr(archivo, 'path') else archivo
     doc = Document(ruta)
 
-    datos_paciente = {}
-    secciones = {
+    datos_paciente = {}  # guardamos la primer tabla con los datos basicos
+    secciones = {   # cada seccion va a guardar datos y/o conjunto de datos
         MATERIAL_REMITIDO_ANTECEDENTES: [],
         DESCRIPCION_MACROSCOPICA: [],
         DESCRIPCION_MICROSCOPICA: []
@@ -148,30 +162,41 @@ def procesar_docx(archivo):
     seccion_actual = None
     en_referencias = False
     cabecera_procesada = False
+
+    # mapeamos todos los parrafos y tablas del doc para dsp al iterar uno por uno en el XML directo ir a buscar ese elemento procesado a estos mapas
     map_parrafos = {p._element: p for p in doc.paragraphs}
     map_tablas = {t._element: t for t in doc.tables}
+
+    # flag que nos indica cuando dar de alta una nueva descripcion microscopica en secciones e iniciar otra
     nueva_desc_micro = False
 
     descripciones_micro = []
-    bloque_actual = {
+    bloque_actual = {   # solo utilizado para las descripciones microscopicas
         "Descripcion": "",
-        "Diagnostico": {"Descripcion": "", "Imagenes": []},
+        "Diagnostico": {    # cada descripcion microscopica tiene su diagnostico asociado
+            "Descripcion": "",
+            "Imagenes": []
+        },
         "Tabla de Grado": []
     }
-    nombre_tabla_actual = ""
+    nombre_tabla_actual = ""    # seguramente solo morfologia o inflamacion
 
     for el in doc.element.body:
         imagenes = getImagenes_docx(doc, el)
         if len(imagenes) > 0:
             bloque_actual["Diagnostico"]["Imagenes"].extend(imagenes)
 
-        if not en_referencias:
-            if el.tag.endswith("p"):
-                p = map_parrafos.get(el)
-                for r in p.runs:
+        if not en_referencias:  # ignoramos todo el contenido de referencias o anexos
+            if el.tag.endswith("p"):    # estamos ante un parrafo
+                p = map_parrafos.get(el)    # obtenemos el parrafo pre procesado
+                for r in p.runs:    # iteramos por cada linea del parrafo
                     linea = r.text
+ 
+                    # si la linea esta vacia o va a empezar una tabla de diagnostico salteamos esta iteracion
                     if not linea or patronDiagnostico.fullmatch(linea.strip()):
                         continue
+ 
+                    # si nos encontramos con una liena que solo diga Referencias cortamos el procesado del parrafo actual
                     if patron_referencias.search(linea):
                         en_referencias = True
                         if re.compile(r"referencia graduaci[oó]n mastocitomas", re.I).search(linea):
@@ -182,6 +207,7 @@ def procesar_docx(archivo):
                     if matchea_categoria: continue
 
                     if seccion_actual == DESCRIPCION_MICROSCOPICA:
+                        # si el bloque actual tiene contenido y debemos guardarlo
                         if bloque_actual["Descripcion"] and nueva_desc_micro:
                             bloque_actual = cargarDescMicro(descripciones_micro, bloque_actual)
                         bloque_actual["Descripcion"] += linea.strip()
@@ -194,37 +220,39 @@ def procesar_docx(archivo):
                             if CARGA_USUARIO:
                                 print("Seccion desconocida", file=sys.stderr)
                                 sys.exit(1)
+                            print(f"ERROR: {e}")
                             with open("diagnosticos_mal_procesados.txt", "a", encoding="utf-8") as f:
                                 f.write(f"{nombre_diag_actual}\n")
                             return ""
+ 
+                    # volvemos al estado original para seguir completando el bloque actual
                     nueva_desc_micro = False
 
-            elif el.tag.endswith("tbl"):
-                tabla = map_tablas.get(el)
-                if not cabecera_procesada:
+            elif el.tag.endswith("tbl"):    # estamos ante una tabla
+                tabla = map_tablas.get(el)  # obtenemos la tabla pre procesada
+                if not cabecera_procesada:  # procesamos la primer tabla que tiene los datos basicos del paciente
                     datos_paciente = datosPaciente_docx(tabla)
                     cabecera_procesada = True
+                # solo procesamos tablas NO RALAS (por ejemplo dejamos afuera la de diagnostico porque dice lo mismo que la descripcion del diagnostico)
                 else:
                     es_tabla_grado = (patronTablaGrado.match(tabla.rows[0].cells[1].text.strip()) if len(tabla.rows[0].cells) > 1 else False)
                     if es_tabla_grado:
                         bloque_actual['Tabla de Grado'] = procesarTablaGrado_docx(tabla)
 
+    # agregamos el ultimo contenido de descripcion microscopica del documento
     if bloque_actual["Descripcion"]:
         descripciones_micro.append(bloque_actual.copy())
+
     secciones[DESCRIPCION_MICROSCOPICA] = descripciones_micro
 
     return resultados(datos_paciente, secciones)
 
 
-# ==============================================================================
-# MÓDULO 2: PROCESAMIENTO DE ARCHIVOS PDF (.pdf)
-# ==============================================================================
-
 def limpiar_celda_pdf(celda):
     return (celda or "").replace('\n', ' ').strip()
 
 def reordenar_datos_pdf(datos):
-    orden_esperado = ["Protocolo", "Fecha", "Solicitante", "Técnica", "Propietario", "Especie", "Raza", "Edad", "Paciente", "Referencias mastocitomas"]
+    orden_esperado = ["Protocolo", "Fecha", "Solicitante", "Técnica", "Familia", "Especie", "Raza", "Edad", "Paciente", "Referencias mastocitomas"]
     resultado = {}
     for k in orden_esperado:
         val = datos.get(k, None)
@@ -255,12 +283,12 @@ def extraer_cabecera_regex_pdf(lineas_buffer):
     if m: datos["Protocolo"] = m.group(1)
     m = re.search(r"Fecha\s*:?\s*([\d-]+)", texto, re.I)
     if m: datos["Fecha"] = m.group(1)
-    m = re.search(r"Solicitante\s*:?\s*(.*?)\s*(?:T[ée]cnica|Propietario|Especie|$)", texto, re.I)
+    m = re.search(r"Solicitante\s*:?\s*(.*?)\s*(?:T[ée]cnica|Propietario|Familia|Especie|$)", texto, re.I)
     if m: datos["Solicitante"] = m.group(1).strip(' -:,')
     m = re.search(r"T[ée]cnica\s*:?\s*(\S+)", texto, re.I)
     if m: datos["Técnica"] = m.group(1)
-    m = re.search(r"Propietario\s*:?\s*(.*?)\s*(?:Especie|Raza|Paciente|Edad|$)", texto, re.I)
-    if m: datos["Propietario"] = m.group(1).strip(' -:,')
+    m = re.search(r"(?:Propietario|Familia)\s*:?\s*(.*?)\s*(?:Especie|Raza|Paciente|Edad|$)", texto, re.I)
+    if m: datos["Familia"] = m.group(1).strip(' -:,')
     m = re.search(r"Especie\s*:?\s*(\S+)", texto, re.I)
     if m: datos["Especie"] = m.group(1)
     m = re.search(r"Raza[\s\-]*Edad\s*:?\s*(.*?)\s*(?:Paciente|$)", texto, re.I)
@@ -454,17 +482,12 @@ def procesar_pdf(ruta):
     return resultados(datos_paciente, secciones)
 
 
-# ==============================================================================
-# MÓDULO 3: ENRUTADOR PRINCIPAL (Maneja masivo y por parámetro individual)
-# ==============================================================================
-
 if __name__ == "__main__":
     param = sys.argv[1] if len(sys.argv) > 1 else None
     os.makedirs("JSONS/", exist_ok=True)
     os.makedirs("IMAGENES/", exist_ok=True)
 
     if not param:
-        # Modo Masivo (Escanea la carpeta de Histopatología)
         ruta = "./Histopatología/"
         if os.path.exists(ruta):
             with os.scandir(ruta) as archivos:
@@ -474,10 +497,10 @@ if __name__ == "__main__":
                     nombre, ext = os.path.splitext(nombre)
                     
                     data = None
-                    if ext.lower() == ".pdf":
+                    if ext.lower().startswith(".pdf"):
                         print("Procesando PDF:", nombre)
                         data = procesar_pdf(archivo.path)
-                    elif ext.lower() == ".docx":
+                    elif ext.lower().startswith(".docx"):
                         print("Procesando DOCX:", nombre)
                         data = procesar_docx(archivo.path)
                     else:
@@ -490,28 +513,20 @@ if __name__ == "__main__":
         else:
             print(f"Carpeta {ruta} no encontrada.")
     else:
-        # Modo Individual (Llamado desde Go / paciente_handler.go)
         CARGA_USUARIO = True
-        ruta_archivo = param
-        
-        # Mantenemos la lógica de captura de nombre que tenía tu diag_to_json original
-        if len(sys.argv) > 2:
-            nombre_diag_actual = sys.argv[2]
-        else:
-            nombre_diag_actual = os.path.basename(ruta_archivo)
-            
-        nombre, ext = os.path.splitext(os.path.basename(ruta_archivo))
+        nombre = os.path.basename(param)
+        nombre_diag_actual = sys.argv[2]
+        nombre, ext = os.path.splitext(nombre)
 
         data = None
-        if ext.lower() == ".pdf":
-            data = procesar_pdf(ruta_archivo)
-        elif ext.lower() == ".docx":
-            data = procesar_docx(ruta_archivo)
+        if ext.lower().startswith(".pdf"):
+            data = procesar_pdf(param)
+        elif ext.lower().startswith(".docx"):
+            data = procesar_docx(param)
 
         if data:
             ruta_salida = os.path.join("JSONS/", nombre + ".json")
             with open(ruta_salida, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=4, ensure_ascii=False)
-            
-            # Imprimimos el JSON en consola (stdout) para que Go lo reciba si lo necesita
-            print(json.dumps(data, indent=4, ensure_ascii=False))
+ 
+            print(json.dumps(data))
