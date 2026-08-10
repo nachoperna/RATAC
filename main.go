@@ -46,7 +46,7 @@ func main() {
 	// diagnosticoHandler := ui.NewDiagnosticoHandler(diagnosticoServices)
 
 	homeHandler := ui.NewHomeHandler(pacienteServices, desc_microServices, diagnosticoServices)
-	adminHandler := ui.NewAdminHandler(application.NewAdminService(&dbrepo.AdminRepository{}), pacienteServices)
+	adminHandler := ui.NewAdminHandler(application.NewAdminService(dbrepo.NewAdminRepository(queries)), pacienteServices)
 	
 	fs_static := http.FileServer(http.Dir("./infrastructure/UI/static"))
 	fs_imagenes := http.FileServer(http.Dir("./IMAGENES/"))

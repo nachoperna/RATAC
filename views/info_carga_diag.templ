@@ -5,7 +5,8 @@ import "fmt"
 
 templ InformacionExtraida(pacientes []domain.Paciente) {
       for _, paciente := range pacientes{
-            <input hx-swap-oob="true" type="text" class="form-control" id="f-protocolo" value={paciente.Protocolo}>
+            <input hx-swap-oob="true" type="text" class="form-control" id="f-protocolo" value={paciente.Protocolo}
+                  hx-on:htmx:after-settle="guardarEstado(); processFile(document.getElementById('file-input').files[0])">
             <input hx-swap-oob="true" type="text" class="form-control" id="f-fecha" value={paciente.Fecha}>
  
             <input hx-swap-oob="true" type="text" class="form-control" id="f-paciente" value={paciente.NombrePaciente}>
@@ -60,6 +61,7 @@ templ InformacionExtraida(pacientes []domain.Paciente) {
                               </div>
                         </div>
                   }
+                  <script> procesado_exitoso = {true} </script>
             </div>
       }
 }

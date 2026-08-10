@@ -58,12 +58,13 @@ func (h *AdminHandler) ProcesarDocumento(w http.ResponseWriter, r *http.Request)
 			return
 		}
 		defer contenido.Close() // cerramos el archivo luego de usarlo
-		paciente, err := h.adminService.ConvertirDocumento(contenido, archivo.Filename)
+		paciente, err := h.adminService.ConvertirDocumento(contenido, archivo.Filename, r.Context())
 		if err != nil {
-			// w.WriteHeader(http.StatusBadRequest)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			nombre, _, _ := strings.Cut(filepath.Base(archivo.Filename), ".")
+			_ = h.adminService.BorrarTemporal(nombre, nil)
+			w.WriteHeader(http.StatusOK)
+			views.ErrorCargaDiagnostico("", "El diagnóstico subido ya se encuentra cargado en el sistema.").Render(r.Context(), w)
 			return
-			// Renderizar templ de error
 		} else {
 			pacientes = append(pacientes, *paciente)
 		}
@@ -139,7 +140,7 @@ func (h *AdminHandler) AltaDiagnostico(w http.ResponseWriter, r *http.Request)  
 			return
 		}
 		imagenes := r.MultipartForm.File["imagenes"]
-		err = h.adminService.GuardarImagenes(imagenes, nombre_original)
+		err = h.adminService.GuardarImagenes(imagenes)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

@@ -3,6 +3,7 @@ package application
 import (
 	"RATAC/domain"
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -42,7 +43,7 @@ func NewAdminService(adminRepo domain.AdminRepository) *AdminService {
 * 		porque es mas simple hacerlo de vuelta que editar un archivo en una linea especifica
 * */
 
-func (s *AdminService) ConvertirDocumento(archivo multipart.File, nombre string) (*domain.Paciente, error) {
+func (s *AdminService) ConvertirDocumento(archivo multipart.File, nombre string, ctx context.Context) (*domain.Paciente, error) {
 	buffer := make([]byte, 512) // necesitamos generar un pequeño buffer en memoria RAM de 512 BYTES para leer los primeros bytes del archivo
 	_, err := archivo.Read(buffer)
 	if err != nil {
@@ -83,6 +84,10 @@ func (s *AdminService) ConvertirDocumento(archivo multipart.File, nombre string)
 	paciente, err := s.adminRepo.MapeoDocumento(stdout)
 	if err != nil {
 		return nil, err
+	}
+	// Obtenemos el protocolo del paciente y buscamos si ya estaba registrado en nuestro sistema
+	if s.adminRepo.PacienteYaRegistrado(ctx, paciente.Protocolo) {
+		return nil, errors.New("Diagnóstico ya registrado en el sistema")
 	}
 	return paciente, nil
 }
@@ -147,9 +152,9 @@ func (s *AdminService) GenerarJson(nombre string, paciente domain.Paciente) erro
 	return nil
 }
 
-func (s *AdminService) GuardarImagenes(imagenes []*multipart.FileHeader, nombre string) error {
+func (s *AdminService) GuardarImagenes(imagenes []*multipart.FileHeader) error {
 	for _, img := range imagenes {
-		nueva_imagen, err := os.Create(fmt.Sprintf("IMAGENES/%s", nombre))
+		nueva_imagen, err := os.Create(fmt.Sprintf("IMAGENES/%s", img.Filename))
 		if err != nil {
 			return err
 		}

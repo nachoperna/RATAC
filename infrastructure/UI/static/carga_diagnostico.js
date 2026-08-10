@@ -27,9 +27,6 @@ function preventDefaults(e) {
 
 dropZone.addEventListener('drop', handleDrop, false);
 dropZone.addEventListener('click', () => fileInput.click());
-fileInput.addEventListener('change', function() {
-      if (this.files && this.files[0]) processFile(this.files[0]);
-});
 
 function handleDrop(e) {
       let dt = e.dataTransfer;
@@ -46,11 +43,9 @@ function processFile(file) {
       dropSubtext.style.display = 'none';
       loader.style.display = 'block';
 
-      // Animación simulada de IA extrayendo datos
       setTimeout(() => {
             loader.style.display = 'none';
             
-            // Mostrar estado de éxito en el dropzone (en lugar de ocultarlo todo)
             dropIcon.innerHTML = '✅';
             dropIcon.style.display = 'block';
             dropText.innerHTML = '¡Documento procesado!';
@@ -59,36 +54,12 @@ function processFile(file) {
             dropSubtext.style.display = 'block';
             dropZone.style.borderColor = 'var(--success)';
             dropZone.style.backgroundColor = 'var(--success-bg)';
-
-            // populateForm(mockExtractedData);
             
             // Si la pantalla es pequeña, hacer scroll automático al formulario
             if(window.innerWidth <= 900) {
                   document.getElementById('form-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
-      }, 1500);
-}
-
-function populateForm(data) {
-      document.getElementById('f-protocolo').value = data.Protocolo || '';
-      document.getElementById('f-fecha').value = data.Fecha || '';
-      document.getElementById('f-paciente').value = data.Paciente || '';
-      document.getElementById('f-familia').value = data.Propietario || '';
-      document.getElementById('f-especie').value = data.Especie || '';
-      document.getElementById('f-raza').value = data.Raza || '';
-      document.getElementById('f-edad').value = data.Edad || '';
-      document.getElementById('f-solicitante').value = data.Solicitante || '';
-      document.getElementById('f-tecnica').value = data.Técnica || '';
-      document.getElementById('f-mastocitomas').checked = data["Referencias mastocitomas"] === true;
-      document.getElementById('f-antecedentes').value = data["Material remitido - Antecedentes"] || '';
-      document.getElementById('f-macroscopica').value = data["Descripción macroscópica"] || '';
-
-      const microContainer = document.getElementById('micro-container');
-      microContainer.innerHTML = ''; 
-
-      data["Descripción microscópica"].forEach((item, index) => {
-            addMicroCard(item.Descripcion, item.Diagnostico.Descripcion, index);
-      });
+      }, 500);
 }
 
 function addMicroCard(descripcion = '', diagnostico = '', index = null) {
@@ -290,4 +261,8 @@ function validacionYFormData(evt) {
       fetch('/diagnosticos/alta/carga', { method: 'POST', body: formData })
             .then(r => {if (r.ok) submitData(); }
       );
+}
+
+function closeError() {
+      document.getElementById('error').classList.remove('active');
 }
