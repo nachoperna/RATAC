@@ -1,0 +1,51 @@
+package views
+
+templ Page(content templ.Component, list_pacientes_page bool) {
+      <!DOCTYPE html>
+      <html lang="es">
+      <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>RATAC — Registro Argentino de Tumores en Animales de Compañía</title>
+            <link rel="stylesheet" href="/static/index.css">
+            <link rel="stylesheet" href="/static/results.css">
+            <link rel="stylesheet" href="/static/paciente.css">
+            <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+            <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+            <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+            <script src="/static/index.js"></script>
+      </head>
+      <body>
+            <header>
+                  <a class="logo" href="/">
+                        <img src="/static/img/logo.png" alt="RATAC" style="height:32px; width:auto; display:block;">
+                  </a>
+                  <nav>
+                        <a class="nav-badge" href="/diagnosticos/alta">Cargar Diagnostico</a>
+                        <div class="nav-badge">Ingresar</div>
+                  </nav>
+            </header>
+      
+            if list_pacientes_page {
+                  @content
+            } else {
+                  <section class="main-section" id="main-section">
+                        @content
+                  </section>
+            }
+
+            <!-- FOOTER -->
+            <footer>
+                  <div class="footer-left">
+                        <span class="footer-faculty">Facultad de Ciencias Veterinarias · UNMdP</span>
+                  <div class="footer-sep"></div>
+                        <span class="footer-copy">RATAC © 2025</span>
+                  </div>
+                  <span class="footer-copy" style="font-style: italic; font-family: 'Source Serif 4', serif; font-size: 12px;">
+                        Registro Argentino de Tumores en Animales de Compañía
+                  </span>
+            </footer>
+
+      </body>
+      </html>
+}
