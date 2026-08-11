@@ -11,7 +11,7 @@ templ ShowResultados(pacientes []domain.Paciente, resultados_total int16, offset
                   </div>
             </div>
             <div id="cards-grid">
-                  @ListPacientes(pacientes, resultados_total, offset, filtros_avanzados)
+                  @generateCards(pacientes)
             </div>
  
             <div class="container-mostrar-mas" id="container-mostrar-mas">
@@ -22,6 +22,16 @@ templ ShowResultados(pacientes []domain.Paciente, resultados_total int16, offset
 
 templ ListPacientes(pacientes []domain.Paciente, resultados_total int16, offset int8, filtros_avanzados bool) {
       @resultadosMostrados(len(pacientes), resultados_total, offset)
+      
+      @generateCards(pacientes)
+
+      <div class="container-mostrar-mas" id="container-mostrar-mas" hx-swap-oob="true">
+            @botonMostrarMas(resultados_total, offset, filtros_avanzados)
+      </div>
+
+}
+
+templ generateCards(pacientes []domain.Paciente) {
       for _, p := range pacientes {
             <article class="case-card" hx-get={fmt.Sprintf("/paciente/protocolo/%s", p.Protocolo)} hx-target=".container" hx-swap="innerHTML" hx-push-url="true">
                   <div class="card-header">
@@ -52,11 +62,6 @@ templ ListPacientes(pacientes []domain.Paciente, resultados_total int16, offset 
                   </div>
             </article>
       }
-
-      <div class="container-mostrar-mas" id="container-mostrar-mas" hx-swap-oob="true">
-            @botonMostrarMas(resultados_total, offset, filtros_avanzados)
-      </div>
-
 }
 
 templ botonMostrarMas(resultados_total int16, offset int8, filtros_avanzados bool) {

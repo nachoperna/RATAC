@@ -38,9 +38,9 @@ func (h *PacienteHandler) ListPacientes(w http.ResponseWriter, r *http.Request) 
 	}
 	w.WriteHeader(http.StatusOK)
 	if offset == 0 {
-		views.ShowResultados(pacientes, resultados_total, offset, false).Render(r.Context(), w)
+		render(w, r, views.ShowResultados(pacientes, resultados_total, offset, false), true)
 	} else {
-		views.ListPacientes(pacientes, resultados_total, offset, false).Render(r.Context(), w)
+		render(w, r, views.ListPacientes(pacientes, resultados_total, offset, false), true)
 	}
 }
 
@@ -62,12 +62,12 @@ func (h *PacienteHandler) ListPacientesBy(w http.ResponseWriter, r *http.Request
 		}
 		w.WriteHeader(http.StatusOK)
 		if len(pacientes) == 0 {
-			views.SinResultados().Render(r.Context(), w)
+			render(w, r, views.SinResultados(), true)
 		} else {
 			if offset == 0 {
-				views.ShowResultados(pacientes, resultados_total, offset, false).Render(r.Context(), w)
+				render(w, r, views.ShowResultados(pacientes, resultados_total, offset, false), true)
 			} else {
-				views.ListPacientes(pacientes, resultados_total, offset, false).Render(r.Context(), w)
+				render(w, r, views.ListPacientes(pacientes, resultados_total, offset, false), true)
 			}
 		}
 	} else {
@@ -96,12 +96,12 @@ func (h *PacienteHandler) ListPacientesByFiltro(w http.ResponseWriter, r *http.R
 	}
 	w.WriteHeader(http.StatusOK)
 	if len(pacientes) == 0 {
-		views.SinResultados().Render(r.Context(), w)
+		render(w, r, views.SinResultados(), true)
 	} else {
 		if req.Offset == 0 {
-			views.ShowResultados(pacientes, resultados_total, int8(req.Offset), true).Render(r.Context(), w)
+			render(w, r, views.ShowResultados(pacientes, resultados_total, int8(req.Offset), true), true)
 		} else {
-			views.ListPacientes(pacientes, resultados_total, int8(req.Offset), true).Render(r.Context(), w)
+			render(w, r, views.ListPacientes(pacientes, resultados_total, int8(req.Offset), true), true)
 		}
 	}
 }
@@ -132,7 +132,7 @@ func (h *PacienteHandler) ShowFullPaciente(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	views.ShowPaciente(*paciente).Render(r.Context(), w)
+	render(w, r, views.ShowPaciente(*paciente), false)
 }
 
 func getOffset(offset string) (int8, error) {

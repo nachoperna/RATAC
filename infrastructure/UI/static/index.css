@@ -52,7 +52,7 @@ body {
 
 /* ── HEADER ── */
 header {
-      position: fixed;
+      position: sticky;
       top: 0; left: 0; right: 0;
       z-index: 100;
       background: rgba(247, 246, 251, 0.92);
@@ -60,6 +60,7 @@ header {
       border-bottom: 1px solid var(--border);
       padding: 0 48px;
       height: 64px;
+      margin-bottom: 40px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -118,7 +119,6 @@ nav a:hover { color: var(--navy); }
 .nav-badge:hover { background: var(--navy-mid); }
 
 .main-section {
-      padding-top: 100px;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
