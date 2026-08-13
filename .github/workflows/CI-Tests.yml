@@ -55,15 +55,15 @@ jobs:
       - name: Checkout del repositorio
         uses: actions/checkout@v4
 
-      - name: Configurar Go 1.24
+      - name: Configurar Go 1.25
         uses: actions/setup-go@v5
         with:
-          go-version: '1.24'
+          go-version: '1.25'
           cache: true # Activa caché de go.sum y build
 
       - name: Instalar herramientas de generación
         run: |
-          go install github.com/a-h/templ/cmd/templ@v0.3.1001
+          go install github.com/a-h/templ/cmd/templ@v0.3.1020
           go install github.com/sqlc-dev/sqlc/cmd/sqlc@v1.28.0
 
       - name: Generar código (templ y sqlc)
