@@ -1,10 +1,10 @@
 module RATAC
 
-go 1.24.12
+go 1.25.0
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
-	github.com/a-h/templ v0.3.1001
+	github.com/a-h/templ v0.3.1020
 	github.com/lib/pq v1.12.3
 	github.com/stretchr/testify v1.11.1
 )

@@ -1,8 +1,8 @@
 # ETAPA 1: Builder (Imagen pesada con todas las herramientas)
-FROM golang:1.24-bookworm AS builder
+FROM golang:1.25-bookworm AS builder
 
 # Instalar herramientas de generación
-RUN go install github.com/a-h/templ/cmd/templ@v0.3.1001
+RUN go install github.com/a-h/templ/cmd/templ@v0.3.1020
 RUN go install github.com/sqlc-dev/sqlc/cmd/sqlc@v1.28.0
 RUN go install github.com/golang-migrate/migrate/v4/cmd/migrate@v4.18.2
 

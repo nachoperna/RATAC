@@ -7,7 +7,7 @@ DOCKER_EXEC = docker compose exec app
 MIGRATIONS_DIR=./DB/migrations
 # Variables para herramientas de generación efímeras (con permisos corregidos)
 SQLC_DOCKER = docker run --rm -u $(shell id -u):$(shell id -g) -v "$(PWD):/src:z" -w /src sqlc/sqlc:1.28.0
-TEMPL_DOCKER = docker run --rm -u $(shell id -u):$(shell id -g) -v "$(PWD):/app:z" -w /app ghcr.io/a-h/templ:v0.3.1001
+TEMPL_DOCKER = docker run --rm -u $(shell id -u):$(shell id -g) -v "$(PWD):/app:z" -w /app ghcr.io/a-h/templ:v0.3.1020
 
 # Fuerza el build para aplicar cambios en el Dockerfile/requirements
 bdocker:
