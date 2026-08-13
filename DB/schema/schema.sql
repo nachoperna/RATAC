@@ -1,7 +1,7 @@
 -- Table: Pacientes
 CREATE TABLE Pacientes (
     id serial NOT NULL,
-    Protocolo varchar(20) NOT NULL,
+    Protocolo varchar(50) NOT NULL UNIQUE,
     Fecha date  NOT NULL,
     Solicitante varchar(100) NOT NULL,
     Tecnica varchar(15) NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE Pacientes (
 CREATE TABLE Descripciones_microscopicas (
     Descripcion text NOT NULL,
     Diagnostico text NULL,
-    Pacientes_Protocolo varchar(20) NOT NULL,
+    Pacientes_Protocolo varchar(50) NOT NULL,
     CONSTRAINT Descripciones_microscopicas_pk PRIMARY KEY (Descripcion,Pacientes_Protocolo)
 );
 
@@ -28,7 +28,7 @@ CREATE TABLE Descripciones_microscopicas (
 CREATE TABLE Imagenes (
     Ruta text NOT NULL,
     Descripciones_microscopicas_Descripcion text NOT NULL,
-    Descripciones_microscopicas_Pacientes_Protocolo varchar(20) NOT NULL,
+    Descripciones_microscopicas_Pacientes_Protocolo varchar(50) NOT NULL,
     CONSTRAINT Imagenes_pk PRIMARY KEY (Ruta)
 );
 
@@ -39,7 +39,7 @@ CREATE TABLE Grado_oncologico (
     Muestra_analizada varchar(100) NULL,
     Puntaje smallint NOT NULL,
     Descripciones_microscopicas_Descripcion text NOT NULL,
-    Descripciones_microscopicas_Pacientes_Protocolo varchar(20) NOT NULL,
+    Descripciones_microscopicas_Pacientes_Protocolo varchar(50) NOT NULL,
     CONSTRAINT Grado_oncologico_pk PRIMARY KEY (id,Descripciones_microscopicas_Pacientes_Protocolo,Descripciones_microscopicas_Descripcion)
 );
 
