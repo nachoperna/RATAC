@@ -2,6 +2,7 @@ package views
 
 import "RATAC/domain"
 import "fmt"
+import "strconv"
 
 templ ShowResultados(pacientes []domain.Paciente, resultados_total int16, offset int8, filtros_avanzados bool) {
       <div class="container">
@@ -34,13 +35,15 @@ templ ListPacientes(pacientes []domain.Paciente, resultados_total int16, offset 
 templ generateCards(pacientes []domain.Paciente) {
       for _, p := range pacientes {
             <article class="case-card" hx-get={fmt.Sprintf("/paciente/protocolo/%s", p.Protocolo)} hx-target=".container" hx-swap="innerHTML" hx-push-url="true">
-                  <div class="card-header">
-                        <span class="protocol-chip">{p.Protocolo}</span>
-                        <span class="date-label">{p.Fecha}</span>
-                  </div>
-                  <div class="patient-info">
-                        <span class="patient-name">{p.NombrePaciente}</span>
-                        <span class="species-breed">{GetValue(p.Especie)} • {GetValue(p.Raza)}</span>
+                  <div class="top-info">
+                        <div class="card-header">
+                              <span class="protocol-chip">{p.Protocolo}</span>
+                              <span class="date-label">{p.Fecha}</span>
+                        </div>
+                        <div class="patient-info">
+                              <span class="patient-name">{p.NombrePaciente}</span>
+                              <span class="species-breed">{GetValue(p.Especie)} • {GetValue(p.Raza)}</span>
+                        </div>
                   </div>
                   <div class="data-grid">
                         <div class="data-item">
@@ -55,9 +58,26 @@ templ generateCards(pacientes []domain.Paciente) {
                               <span class="data-label">Edad</span>
                               <span class="not-specified">{GetValue(p.Edad)}</span>
                         </div>
-                        <div class="data-item">
-                              <span class="data-label">Familia</span>
-                              <span class="not-specified">{GetValue(p.Familia)}</span>
+                        <div class="data-item grade-cell">
+                              <span class="data-label">Grado Tumoral</span>
+                              if grado_tumoral := getMaxGradoTumoral(p.Descripciones_microscopicas); grado_tumoral == 0 {
+                                    <span class="not-specified">No definido</span>
+                              } else if grado_tumoral == 1 {
+                                    <div class="grade-pill g1">
+                                          <span class="pill-dot"></span>
+                                          Grado I
+                                    </div>
+                              } else if grado_tumoral == 2 {
+                                    <div class="grade-pill g2">
+                                          <span class="pill-dot"></span>
+                                          Grado II
+                                    </div>
+                              } else if grado_tumoral == 3 {
+                                    <div class="grade-pill g3">
+                                          <span class="pill-dot"></span>
+                                          Grado III
+                                    </div>
+                              }
                         </div>
                   </div>
             </article>
@@ -95,4 +115,17 @@ templ resultadosMostrados(cant_pacientes int, resultados_total int16, offset int
       <div class="results-info" id="results-info" hx-swap-oob="true">
             <span>{offset + int8(cant_pacientes)}</span> de <strong class="highlight">{resultados_total}</strong> RESULTADOS MOSTRADOS
       </div>     
+}
+
+func getMaxGradoTumoral(desc_micros []domain.Descripcion_microscopicas) int8 {
+      var aux int8 = 0
+      for _, desc := range desc_micros {
+            for _, tabla := range desc.TablaGrado{
+                  puntaje, _ := strconv.Atoi(tabla.Puntaje)
+                  if int8(puntaje) > aux {
+                        aux = int8(puntaje)
+                  }
+            }
+      }
+      return aux
 }

@@ -1,3 +1,10 @@
+:root{
+      /* Variantes de Grado */
+      --grade1-color: #f59e0b; /* Amarillo/Naranja cálido */
+      --grade2-color: #ea580c; /* Naranja intenso */
+      --grade3-color: #dc2626; /* Rojo elegante */
+}
+
 /* Grid de Tarjetas - Contenedor HTMX */
 #cards-grid {
       display: grid;
@@ -19,7 +26,7 @@
 
 .results-info {
       display: inline-block;
-      background-color: #f1f5f9;
+      background-color: var(--lavender);
       border: 1px solid #e2e8f0;
       padding: 0.4rem 1rem;
       border-radius: 9999px;
@@ -36,7 +43,6 @@
       background: var(--white);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 24px;
       transition: all 0.3s ease;
       display: flex;
       flex-direction: column;
@@ -170,11 +176,16 @@ box-shadow: 0 12px 24px rgba(26, 26, 110, 0.06);
 border-color: var(--lavender-mid);
 }
 
+.top-info {
+      background-color: var(--bg-patient);
+      padding: 24px;
+}
+
 .card-header {
-display: flex;
-justify-content: space-between;
-align-items: flex-start;
-margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
 }
 
 .protocol-chip {
@@ -188,17 +199,15 @@ font-weight: 500;
 }
 
 .date-label {
-font-size: 0.85rem;
-color: var(--muted);
-font-style: italic;
+      color: var(--navy);
 }
 
 .patient-name {
-font-family: 'Playfair Display', serif;
-font-size: 1.6rem;
-color: var(--ink);
-margin-bottom: 4px;
-display: block;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem !important;
+      color: var(--ink);
+      margin-bottom: 4px;
+      display: block;
 }
 
 .species-breed {
@@ -209,12 +218,10 @@ display: block;
 }
 
 .data-grid {
-display: grid;
-grid-template-columns: 1fr 1fr;
-gap: 16px;
-padding-top: 16px;
-border-top: 1px dashed var(--border);
-margin-top: auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      padding: 24px;
+      gap: 16px;
 }
 
 .data-item { display: flex; flex-direction: column; }
@@ -229,13 +236,62 @@ margin-bottom: 2px;
 }
 
 .data-value {
-font-size: 0.9rem;
-color: var(--navy-mid);
-font-weight: 500;
+      font-size: 0.9rem;
+      color: var(--navy-mid);
+      font-weight: 500;
 }
 
 .not-specified {
-color: #b0afc5;
-font-style: italic;
-font-size: 0.85rem;
+      color: #b0afc5;
+      font-size: 0.85rem;
+}
+
+.grade-pill {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid;
+      border-radius: 20px;
+      padding: 4px 12px;
+      background-color: var(--bg-card-bottom);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      gap: 8px;
+      margin-top: 4px;
+}
+
+.grade-pill.g1 {
+      border-color: var(--grade1-color); 
+      color: var(--grade1-color); 
+      background-color: #fff7ed; 
+}
+
+.grade-pill.g2 {
+      border-color: var(--grade2-color); 
+      color: var(--grade2-color); 
+      background-color: #fff7ed; 
+}
+
+.grade-pill.g3 { 
+      border-color: var(--grade3-color); 
+      color: var(--grade3-color); 
+      background-color: #fef2f2; 
+}
+
+
+.pill-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+}
+
+.grade-pill.g1 .pill-dot { 
+      background-color: var(--grade1-color); 
+}
+
+.grade-pill.g2 .pill-dot { 
+      background-color: var(--grade2-color); 
+}
+.grade-pill.g3 .pill-dot {
+      background-color: var(--grade3-color); 
 }
