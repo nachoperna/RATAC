@@ -75,7 +75,7 @@ func (r *PacienteRepository) ListPacientes(ctx context.Context, offset int8) ([]
 	for _, p := range bd_pacientes {
 		paciente := domain.Paciente{
 			Protocolo:                   p.Protocolo,
-			Fecha:                       p.Fecha.GoString(),
+			Fecha:                       p.Fecha.Format("02-01-2006"),
 			Solicitante:                 p.Solicitante,
 			Tecnica:                     p.Tecnica,
 			Familia:                     getValueOrNil(p.Familia),
