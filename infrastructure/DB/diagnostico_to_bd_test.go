@@ -75,7 +75,7 @@ func TestInsertarPaciente_DatosInvalidos_SinAltaDB(t *testing.T)  {
 	fecha := "07-06-2001"
 	edad := strPointer("10")
 	paciente := domain.Paciente{
-		Protocolo: "ProtocoloMayorA20CaracteresNoPermitido",
+		Protocolo: "TestValidacionProtocoloMayorDeCincuentaCaracteresParaPruebas",
 	}
 	
 	fecha_parseada, edad_parseada, err := TransformarDatos(fecha, edad)
