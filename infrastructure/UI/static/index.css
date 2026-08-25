@@ -46,8 +46,9 @@ body {
       color: var(--ink);
       min-height: 100vh;
       overflow-x: hidden;
-      background-image: url("img/fondo_celulas.svg");
-      background-size: contain;
+      background-image: url("img/PATTERN CANGREJOS2.svg");
+      background-size: cover;
+      background-blend-mode: darken;
 }
 
 /* ── HEADER ── */
