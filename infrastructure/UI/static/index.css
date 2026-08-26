@@ -47,7 +47,6 @@ body {
       min-height: 100vh;
       overflow-x: hidden;
       background-image: url("img/PATTERN CANGREJOS2.svg");
-      background-size: cover;
       background-blend-mode: darken;
 }
 
@@ -103,21 +102,34 @@ nav a {
       transition: color 0.2s;
 }
 
-nav a:hover { color: var(--navy); }
-
 .nav-badge {
-      background: var(--navy);
-      color: white;
+      position: relative;
+      color: var(--navy);
       font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      padding: 6px 16px;
-      border-radius: 2px;
+      font-size: 13px;
+      font-weight: 500;
       letter-spacing: 0.06em;
       text-transform: uppercase;
+      text-decoration: none;
       cursor: pointer;
+      padding-bottom: 6px;
       transition: background 0.2s;
 }
-.nav-badge:hover { background: var(--navy-mid); }
+
+.nav-badge::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background-color: var(--navy);
+      transition: width 0.3s ease-out;
+}
+
+.nav-badge:hover::after {
+      width: 100%;
+}
 
 .main-section {
       min-height: 100vh;
