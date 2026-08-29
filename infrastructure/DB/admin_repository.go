@@ -34,3 +34,16 @@ func (r *AdminRepository) PacienteYaRegistrado(ctx context.Context, protocolo st
 	}
 	return true
 }
+
+func (r  *AdminRepository) GetUltimosDiagnosticosCargados(ctx context.Context, offset int8) ([]domain.Paciente, error) {
+	pacientes_rows, err := r.queries.ListPacientes(ctx, int32(offset))
+	if err != nil {
+		return nil, err
+	}
+	var pacientes []domain.Paciente
+	for _, p := range pacientes_rows {
+		paciente := pacienteORM(p)
+		pacientes = append(pacientes, paciente)
+	}
+	return pacientes, nil
+}

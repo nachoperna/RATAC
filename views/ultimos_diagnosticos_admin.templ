@@ -1,0 +1,37 @@
+package views
+
+import "RATAC/domain"
+import "fmt"
+
+templ TablaUltimosDiagnosticos(pacientes []domain.Paciente) {
+      <table>
+            <thead>
+                  <tr>
+                        <th>Protocolo</th>
+                        <th>Paciente</th>
+                        <th>Carga</th>
+                        <th>Modificación</th>
+                        <th>Opciones</th>
+                  </tr>
+            </thead>
+            <tbody id="diagnoses-table-body">
+                  for _, p := range pacientes{
+                        <tr>
+                              <td class="cell-protocol">{p.Protocolo}</td>
+                              <td class="cell-patient">{p.NombrePaciente}</td>
+                              <td class="cell-date">{p.Fecha}</td>
+                              <td class="cell-date">-</td>
+                              <td class="actions-cell">
+                                    <a 
+                                          class="action-btn" title="Ver detalle"
+                                          href={fmt.Sprintf("/paciente/protocolo/%s", p.Protocolo)}
+                                          target="_blank"
+                                          rel="noopener"
+                                          ><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> Ver</a>
+                                    <button class="action-btn action-delete" title="Eliminar" onclick="openDeleteModal(this, '10124-025')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> Eliminar</button>
+                              </td>
+                        </tr>
+                  }
+            </tbody>
+      </table>
+}

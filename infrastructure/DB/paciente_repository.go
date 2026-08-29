@@ -73,24 +73,28 @@ func (r *PacienteRepository) ListPacientes(ctx context.Context, offset int8) ([]
 
 	var pacientes []domain.Paciente
 	for _, p := range bd_pacientes {
-		paciente := domain.Paciente{
-			Protocolo:                   p.Protocolo,
-			Fecha:                       p.Fecha.Format("02-01-2006"),
-			Solicitante:                 p.Solicitante,
-			Tecnica:                     p.Tecnica,
-			Familia:                     getValueOrNil(p.Familia),
-			Especie:                     getValueOrNil(p.Especie),
-			Raza:                        getValueOrNil(p.Raza),
-			Edad:                        func() *string {if p.Edad.Valid {edad := strconv.Itoa(int(p.Edad.Int16)); return &edad}; return nil} (),
-			NombrePaciente:              p.Paciente,
-			Antecedentes:                getValueOrNil(p.Antecedentes),
-			Descripciones_microscopicas: nil,
-			DescripcionMacroscopica:     getValueOrNil(p.DescripcionMacroscopica),
-			ReferenciasMastocitomas:     p.ReferenciasMastocitomas,
-		}
+		paciente := pacienteORM(p)
 		pacientes = append(pacientes, paciente)
 	}
 	return pacientes, int16(bd_pacientes[0].Total), nil
+}
+
+func pacienteORM(p sqlc.ListPacientesRow) domain.Paciente {
+	return domain.Paciente{
+		Protocolo:                   p.Protocolo,
+		Fecha:                       p.Fecha.Format("02-01-2006"),
+		Solicitante:                 p.Solicitante,
+		Tecnica:                     p.Tecnica,
+		Familia:                     getValueOrNil(p.Familia),
+		Especie:                     getValueOrNil(p.Especie),
+		Raza:                        getValueOrNil(p.Raza),
+		Edad:                        func() *string {if p.Edad.Valid {edad := strconv.Itoa(int(p.Edad.Int16)); return &edad}; return nil} (),
+		NombrePaciente:              p.Paciente,
+		Antecedentes:                getValueOrNil(p.Antecedentes),
+		Descripciones_microscopicas: nil,
+		DescripcionMacroscopica:     getValueOrNil(p.DescripcionMacroscopica),
+		ReferenciasMastocitomas:     p.ReferenciasMastocitomas,
+	}
 }
 
 func (r *PacienteRepository) ListUltimosPacientes(ctx context.Context) ([]domain.Paciente, []bool, error) {

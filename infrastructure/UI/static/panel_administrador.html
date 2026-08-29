@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>RATAC - Panel de Administración</title>
+      <link rel="stylesheet" href="/static/index.css">
+      <link rel="stylesheet" href="/static/results.css">
+      <link rel="stylesheet" href="/static/paciente.css">
+      <link rel="stylesheet" href="/static/panel_administrador.css">
+      <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+      <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+      <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+      <script src="../static/index.js"></script>
+</head>
+<body>
+      <header>
+            <a class="logo" href="/">
+                  <img src="../static/img/RATAC LOGO FULL COLOR HORIZONTAL.svg" alt="RATAC" style="height:38px; width:auto; display:block;">
+            </a>
+            <nav>
+                  <a class="nav-badge" href="/diagnosticos/alta">Cargar Diagnostico</a>
+                  <a class="nav-badge" href="/admin/panel">Mi Panel</a>
+            </nav>
+      </header>
+
+      <main class="container">
+            <div class="admin-header">
+                  <span class="tag">Panel de Administración</span>
+                  <h1>Facultad de Ciencias Veterinarias<br>UNICEN · Argentina</h1>
+            </div>
+
+            <div class="dashboard-layout">
+                  
+                  <!-- COLUMNA IZQUIERDA: TABLA -->
+                  <div class="table-section">
+                  <h2 class="section-title">Últimos diagnósticos cargados</h2>
+                  <div class="table-container">
+                        <div class="table-scroll">
+                              {{render .TablaDiagnosticos}}
+                        </div>
+                        
+                        <!-- Paginación -->
+                        <div class="pagination-controls">
+                              <span class="page-info">Mostrando 1-10 de 124 resultados</span>
+                              <div class="page-buttons">
+                                    <button class="page-btn" disabled>
+                                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                                    </button>
+                                    <button class="page-btn active">1</button>
+                                    <button class="page-btn">2</button>
+                                    <button class="page-btn">3</button>
+                                    <button class="page-btn" style="border:none; background:none; cursor:default; pointer-events:none;">...</button>
+                                    <button class="page-btn">13</button>
+                                    <button class="page-btn">
+                                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                    </button>
+                              </div>
+                        </div>
+                  </div>
+                  </div>
+
+                  <div class="requests-section">
+                  <h2 class="section-title">Solicitudes (Laboratorios)</h2>
+                  <div class="requests-column" id="requests-container">
+                        
+                        <!-- Solicitud 1 -->
+                        <article class="request-card">
+                              <div class="request-header">
+                              <div>
+                                    <h3 class="lab-name">Lab. DiagVet SRL</h3>
+                                    <span class="lab-location">
+                                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                          Mar del Plata, Bs. As.
+                                    </span>
+                              </div>
+                              <span class="request-date">10-03-2026</span>
+                              </div>
+                              
+                              <div class="vet-list">
+                              <strong>Veterinarios:</strong> Dr. H. Martin, Dra. S. Lana
+                              </div>
+
+                              <div class="request-message">
+                              "Solicitamos acceso a la plataforma RATAC para registrar diagnósticos histopatológicos y colaborar."
+                              </div>
+
+                              <div class="request-actions">
+                              <button class="btn btn-outline" onclick="openRequestModal(this, 'rechazar', 'Lab. DiagVet SRL')">Rechazar</button>
+                              <button class="btn btn-primary" onclick="openRequestModal(this, 'aceptar', 'Lab. DiagVet SRL')">Aceptar</button>
+                              </div>
+                        </article>
+
+                        <!-- Solicitud 2 -->
+                        <article class="request-card">
+                              <div class="request-header">
+                              <div>
+                                    <h3 class="lab-name">Patología Animal Sur</h3>
+                                    <span class="lab-location">
+                                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                          Bahía Blanca, Bs. As.
+                                    </span>
+                              </div>
+                              <span class="request-date">08-03-2026</span>
+                              </div>
+                              
+                              <div class="vet-list">
+                              <strong>Veterinarios:</strong> Dra. R. Wilwert
+                              </div>
+
+                              <div class="request-message">
+                              "Deseamos integrar nuestros reportes oncológicos al registro central. Adjuntamos documentación."
+                              </div>
+
+                              <div class="request-actions">
+                              <button class="btn btn-outline" onclick="openRequestModal(this, 'rechazar', 'Patología Animal Sur')">Rechazar</button>
+                              <button class="btn btn-primary" onclick="openRequestModal(this, 'aceptar', 'Patología Animal Sur')">Aceptar</button>
+                              </div>
+                        </article>
+
+                        <!-- Solicitud 3 -->
+                        <article class="request-card">
+                              <div class="request-header">
+                              <div>
+                                    <h3 class="lab-name">VetLab Central</h3>
+                                    <span class="lab-location">
+                                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                          Tandil, Bs. As.
+                                    </span>
+                              </div>
+                              <span class="request-date">05-03-2026</span>
+                              </div>
+                              
+                              <div class="vet-list">
+                              <strong>Veterinarios:</strong> Dr. C. Gomez
+                              </div>
+
+                              <div class="request-message">
+                              "Solicitud de alta para nueva sucursal de análisis oncológicos."
+                              </div>
+
+                              <div class="request-actions">
+                              <button class="btn btn-outline" onclick="openRequestModal(this, 'rechazar', 'VetLab Central')">Rechazar</button>
+                              <button class="btn btn-primary" onclick="openRequestModal(this, 'aceptar', 'VetLab Central')">Aceptar</button>
+                              </div>
+                        </article>
+                        
+                        <!-- Paginación de Solicitudes -->
+                        <div class="requests-pagination">
+                              <span class="page-info">1-3 de 15</span>
+                              <div class="page-buttons">
+                              <button class="page-btn" disabled>
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                              </button>
+                              <button class="page-btn active" style="width: 28px; height: 28px; font-size: 11px;">1</button>
+                              <button class="page-btn" style="width: 28px; height: 28px; font-size: 11px;">2</button>
+                              <button class="page-btn">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                              </button>
+                              </div>
+                        </div>
+                  </div>
+                  </div>
+            </div>
+      </main>
+
+    
+    <!-- Modal: Eliminar Fila -->
+      <div id="delete-modal" class="modal-overlay">
+            <div class="modal-content">
+                  <h3 class="modal-title">Eliminar registro</h3>
+                  <p class="modal-body" id="delete-modal-text">¿Está seguro que desea eliminar el protocolo de la base de datos? Esta acción no se puede deshacer.</p>
+                  <div class="modal-actions-row">
+                  <button class="btn btn-outline" onclick="closeModals()">Cancelar</button>
+                  <button class="btn btn-danger" onclick="confirmDelete()">Sí, Eliminar</button>
+                  </div>
+            </div>
+      </div>
+
+    <!-- Modal: Aceptar/Rechazar Solicitud -->
+      <div id="request-modal" class="modal-overlay">
+            <div class="modal-content">
+                  <h3 class="modal-title" id="request-modal-title">Acción</h3>
+                  <p class="modal-body" id="request-modal-text">Escriba un mensaje para notificar al laboratorio de su decisión (opcional).</p>
+                  
+                  <textarea class="modal-input" placeholder="Escriba su mensaje aquí..."></textarea>
+                  
+                  <div class="modal-actions-row">
+                  <button class="btn btn-outline" onclick="closeModals()">Cancelar</button>
+                  <button class="btn btn-primary" id="btn-confirm-request" onclick="submitRequest()">Confirmar</button>
+                  </div>
+            </div>
+      </div>
+</body>
+</html>
