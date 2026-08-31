@@ -343,3 +343,8 @@ func setDatosBasePaciente(datos sqlc.Paciente) domain.Paciente {
 		Descripciones_microscopicas: nil,
 	}
 }
+
+func (r *PacienteRepository) DeletePaciente(ctx context.Context, protocolo string) error {
+	err := r.queries.DeletePaciente(ctx, protocolo)
+	return err
+}

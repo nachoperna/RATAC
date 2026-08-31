@@ -73,7 +73,7 @@ header.navbar {
 }
 
 main.container {
-      max-width: 1300px;
+      max-width: 1500px;
       margin: 0 auto;
       padding: 40px 5%;
 }
@@ -269,6 +269,14 @@ tr:hover td {
       opacity: 0.5;
       cursor: not-allowed;
       background-color: transparent;
+}
+
+.page-btn-text {
+      width: auto;
+      padding: 0 12px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
 }
 
 .requests-column {

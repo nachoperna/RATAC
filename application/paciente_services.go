@@ -53,3 +53,7 @@ func (s *PacienteService) GetPacienteByFiltro(ctx context.Context, filtros []dom
 func (s *PacienteService) GetAllFromPaciente(ctx context.Context, protocolo string) (*domain.Paciente, error) {
 	return s.pacienteRepo.GetAllFromPaciente(ctx, protocolo)
 }
+
+func (s *PacienteService) DeletePaciente(ctx context.Context, protocolo string) error {
+	return s.pacienteRepo.DeletePaciente(ctx, protocolo)
+}

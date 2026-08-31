@@ -64,6 +64,8 @@ func main() {
 	http.HandleFunc("/diagnosticos/alta/procesado", adminHandler.ProcesarDocumento)
 	http.HandleFunc("/diagnosticos/alta/borrar_temporal", adminHandler.BorrarTemporal)
 	http.HandleFunc("/diagnosticos/alta/carga", adminHandler.AltaDiagnostico)
+	http.HandleFunc("/diagnosticos/baja/{protocolo}", pacienteHandler.BorrarPaciente)
+	http.HandleFunc("/diagnosticos", adminHandler.DiagnosticosByUser)
 	http.HandleFunc("/admin/panel", adminHandler.ShowAdminPanel)
 
 	err = http.ListenAndServe(port, nil)

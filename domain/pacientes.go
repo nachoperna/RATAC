@@ -42,7 +42,7 @@ type PacienteRepository interface {
 	InsertarDiagnostico(ctx context.Context, paciente Paciente) error
 	// GetPaciente(protocolo string) (Paciente, error)
 	// UpdatePaciente(paciente *Paciente) error
-	// DeletePaciente(protocolo string) error
+	DeletePaciente(ctx context.Context, protocolo string) error
 	ListUltimosPacientes(ctx context.Context) ([]Paciente, []bool, error)
 	ListPacientes(ctx context.Context, offset int8) ([]Paciente, int16, error)
 	CountPacientes(ctx context.Context) (int64, error)

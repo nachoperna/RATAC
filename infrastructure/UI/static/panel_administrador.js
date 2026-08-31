@@ -1,29 +1,29 @@
 let currentRowToDelete = null;
 let currentRequestCard = null;
 let currentRequestAction = null;
-
+offset = 0;
 // ==========================================
 // Lógica de Eliminación de Filas
 // ==========================================
-function openDeleteModal(btn, protocolo) {
+function openDeleteModal(btn) {
       currentRowToDelete = btn.closest('tr');
+      const protocolo = currentRowToDelete.querySelector('.cell-protocol').innerHTML;
       const textElement = document.getElementById('delete-modal-text');
-      textElement.innerHTML = `¿Está seguro que desea eliminar el protocolo <strong>${protocolo}</strong> de la base de datos? Esta acción no se puede deshacer.`;
+      textElement.innerHTML = `¿Está seguro que desea eliminar el diagnóstico con protocolo <strong>${protocolo}</strong> de la base de datos? Esta acción no se puede deshacer.`;
 
       document.getElementById('delete-modal').classList.add('active');
 }
 
-function confirmDelete() {
-      if(currentRowToDelete) {
-            // Pequeña animación de desvanecimiento
-            currentRowToDelete.style.transition = 'opacity 0.3s ease';
-            currentRowToDelete.style.opacity = '0';
-            setTimeout(() => {
-                  currentRowToDelete.remove();
-                  currentRowToDelete = null;
-                  closeModals();
-            }, 300);
-      }
+function confirmDelete(btn) {
+      currentRowToDelete = btn.closest('tr');
+      // Pequeña animación de desvanecimiento
+      currentRowToDelete.style.transition = 'opacity 0.3s ease';
+      currentRowToDelete.style.opacity = '0';
+      setTimeout(() => {
+            currentRowToDelete.remove();
+            currentRowToDelete = null;
+            closeModals();
+      }, 300);
 }
 
 // ==========================================
@@ -68,7 +68,7 @@ function submitRequest() {
 // ==========================================
 // Utilidades Generales
 // ==========================================
-function closeModals() {
+function closeModals(event) {
       document.querySelectorAll('.modal-overlay').forEach(modal => {
             modal.classList.remove('active');
       });
@@ -81,7 +81,11 @@ function closeModals() {
 document.querySelectorAll('.modal-overlay').forEach(overlay => {
       overlay.addEventListener('click', (e) => {
             if(e.target === overlay) {
-                  closeModals();
+                  closeModals(e);
             }
       });
 });
+
+function habilitarAnterior() {
+      document.getElementById('btn-anterior').disabled = false;
+}

@@ -159,13 +159,14 @@ func (h *AdminHandler) AltaDiagnostico(w http.ResponseWriter, r *http.Request)  
 }
 
 func (h *AdminHandler) ShowAdminPanel(w http.ResponseWriter, r *http.Request) {
-	pacientes, err := h.adminService.GetUltimosDiagnosticosCargados(r.Context(), 0)
+	pacientes, total, err := h.adminService.GetUltimosDiagnosticosCargados(r.Context(), 0)
 	if err != nil {
 		// renderizar templ de error
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	var tabla_diagnosticos templ.Component = views.TablaUltimosDiagnosticos(pacientes)
+	var tabla_diagnosticos templ.Component = views.TablaUltimosDiagnosticos(pacientes, 0, total, true)
+	var paginacion templ.Component = views.ResultadosRestantes(int8(len(pacientes)), 0, total)
 	tmp_aux := template.New("panel_administrador.html").Funcs(template.FuncMap{ "render": renderTempl })
 	tmp, err := tmp_aux.ParseFiles("./infrastructure/UI/static/panel_administrador.html")
 	if err != nil {
@@ -176,8 +177,26 @@ func (h *AdminHandler) ShowAdminPanel(w http.ResponseWriter, r *http.Request) {
 
 	datos := map[string]any{
 		"TablaDiagnosticos": tabla_diagnosticos,
+		"Paginacion": paginacion,
 	}
 	tmp.Execute(w, datos)
+}
+
+func (h *AdminHandler) DiagnosticosByUser(w http.ResponseWriter, r *http.Request)  {
+	offset, err := getOffset(r.URL.Query().Get("offset"))
+	if err != nil {
+		// renderizar templ de error
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	pacientes, total, err := h.adminService.GetUltimosDiagnosticosCargados(r.Context(), offset)
+	if err != nil {
+		// renderizar templ de error
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	views.TablaUltimosDiagnosticos(pacientes, offset, total, false).Render(r.Context(), w)
 }
 
 func mapearCamposAPaciente(info InformacionDiagnostico) domain.Paciente {

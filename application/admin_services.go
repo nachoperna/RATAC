@@ -171,10 +171,10 @@ func (s *AdminService) GuardarImagenes(imagenes []*multipart.FileHeader) error {
 	return nil
 }
 
-func (s  *AdminService) GetUltimosDiagnosticosCargados(ctx context.Context, offset int8) ([]domain.Paciente, error) {
-	diagnosticos, err := s.adminRepo.GetUltimosDiagnosticosCargados(ctx, offset)
+func (s  *AdminService) GetUltimosDiagnosticosCargados(ctx context.Context, offset int8) ([]domain.Paciente, int16, error) {
+	diagnosticos, total, err := s.adminRepo.GetUltimosDiagnosticosCargados(ctx, offset)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	return diagnosticos, nil
+	return diagnosticos, total, nil
 }
