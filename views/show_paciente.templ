@@ -129,7 +129,8 @@ templ ShowPaciente(paciente domain.Paciente) {
                               } else {
                                     for _, imagen := range desc_micro.Diagnostico.Imagenes {
                                           <div class="micro-image">
-                                                <img src={fmt.Sprintf("/%s", imagen)} alt={fmt.Sprintf("Imagen Diagnostico %d", index + 1)}>
+                                                <img src={fmt.Sprintf("/%s", imagen)} alt={fmt.Sprintf("Imagen Diagnostico %d", index + 1)}
+                                                      onclick="window.open(this.src, '_blank')">
                                           </div>
                                     }
                               }
