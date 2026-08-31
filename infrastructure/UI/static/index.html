@@ -3,7 +3,7 @@
 <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>RATAC — Registro Argentino de Tumores en Animales de Compañía</title>
+      <title id="ratac-title">RATAC — Registro Argentino de Tumores en Animales de Compañía</title>
       <link rel="icon" type="image/svg" href="/static/img/RATAC ISOLOGO FULL COLOR.svg">
       <link rel="stylesheet" href="../static/index.css">
       <link rel="stylesheet" href="../static/results.css">
@@ -21,7 +21,7 @@
             </a>
             <nav>
                   <a class="nav-badge" href="/diagnosticos/alta">Cargar Diagnostico</a>
-                  <div class="nav-badge">Ingresar</div>
+                  <a class="nav-badge" href="/admin/panel">Mi Panel</a>
             </nav>
       </header>
  
@@ -161,7 +161,7 @@
       <!-- FOOTER -->
       <footer>
             <div class="footer-left">
-                  <span class="footer-faculty">Facultad de Ciencias Veterinarias · UNMdP</span>
+                  <span class="footer-faculty">Facultad de Ciencias Veterinarias · UNICEN</span>
             <div class="footer-sep"></div>
                   <span class="footer-copy">RATAC © 2025</span>
             </div>
@@ -170,5 +170,8 @@
             </span>
       </footer>
 
+      <label id="scroll-up" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" ><path d="M440-160v-487L216-423l-56-57 320-320 320 320-56 57-224-224v487h-80Z"/></svg>
+      </label>
 </body>
 </html>

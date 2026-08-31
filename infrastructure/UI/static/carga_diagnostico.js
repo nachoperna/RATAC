@@ -32,7 +32,12 @@ function handleDrop(e) {
       let dt = e.dataTransfer;
       let files = dt.files;
       if(files.length > 0) {
-            processFile(files[0]);
+            // Asignar archivo al fileInput para que htmx lo detecte
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(files[0]);
+            fileInput.files = dataTransfer.files;
+            // Disparar change para que htmx envíe el POST
+            fileInput.dispatchEvent(new Event('change', { bubbles: true }));
       }
 }
 

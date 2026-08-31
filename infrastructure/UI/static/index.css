@@ -47,7 +47,6 @@ body {
       min-height: 100vh;
       overflow-x: hidden;
       background-image: url("img/PATTERN CANGREJOS2.svg");
-      background-size: cover;
       background-blend-mode: darken;
 }
 
@@ -103,21 +102,34 @@ nav a {
       transition: color 0.2s;
 }
 
-nav a:hover { color: var(--navy); }
-
 .nav-badge {
-      background: var(--navy);
-      color: white;
+      position: relative;
+      color: var(--navy);
       font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      padding: 6px 16px;
-      border-radius: 2px;
+      font-size: 13px;
+      font-weight: 500;
       letter-spacing: 0.06em;
       text-transform: uppercase;
+      text-decoration: none;
       cursor: pointer;
+      padding-bottom: 6px;
       transition: background 0.2s;
 }
-.nav-badge:hover { background: var(--navy-mid); }
+
+.nav-badge::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background-color: var(--navy);
+      transition: width 0.3s ease-out;
+}
+
+.nav-badge:hover::after {
+      width: 100%;
+}
 
 .main-section {
       min-height: 100vh;
@@ -629,6 +641,49 @@ font-size: 14px;
 font-weight: 300;
 color: var(--muted);
 line-height: 1.7;
+}
+
+#scroll-up {
+      position: fixed;
+      z-index: 100;
+      right: 30px; /* Movido a la izquierda */
+      bottom: 30px;
+      
+      background-color: #383896; 
+      border: 1px solid #2d2d8f;
+      border-radius: 6px; 
+      box-shadow: 0 4px 15px rgba(26, 26, 110, 0.15); 
+      
+      /* Centrado del SVG */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+#scroll-up:hover {
+      cursor: pointer;
+      background-color: var(--navy); /* Se oscurece al pasar el ratón */
+      border-color: var(--navy);
+      transform: translateY(-4px); 
+      box-shadow: 0 8px 25px rgba(26, 26, 110, 0.3);
+}
+
+#scroll-up svg {
+      height: 42px;
+      width: 42px;
+      padding: 10px;
+
+      /* Flecha blanca fija por el fondo oscuro */
+      fill: #ffffff;
+      stroke: #ffffff;
+      stroke-width: 2; /* Grosor para flecha clásica */
+
+      transition: transform 0.3s ease;
+}
+
+#scroll-up:hover svg {
+      transform: translateY(-2px);
 }
 
 /* ── FOOTER ── */

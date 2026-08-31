@@ -9,6 +9,8 @@ func GetValue(campo *string) string{
 }
 
 templ ShowPaciente(paciente domain.Paciente) {
+      <title id="ratac-title" hx-swap-oob="true">RATAC — {paciente.NombrePaciente}</title>
+
       <div class="container-paciente">
             <div class="card patient-card">
                   <div class="header-top">

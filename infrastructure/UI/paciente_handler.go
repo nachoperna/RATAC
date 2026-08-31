@@ -135,6 +135,18 @@ func (h *PacienteHandler) ShowFullPaciente(w http.ResponseWriter, r *http.Reques
 	render(w, r, views.ShowPaciente(*paciente), false)
 }
 
+func (h *PacienteHandler) BorrarPaciente(w http.ResponseWriter, r *http.Request) {
+	protocolo := r.PathValue("protocolo")
+	err := h.pacienteService.DeletePaciente(r.Context(), protocolo)
+	if err != nil {
+		// renderizar templ de error
+		http.Error(w, "Error al eliminar pacientes", http.StatusInternalServerError)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+}
+
 func getOffset(offset string) (int8, error) {
 	var ioffset int
 

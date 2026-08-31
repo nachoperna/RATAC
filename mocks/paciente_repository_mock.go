@@ -67,3 +67,7 @@ func (m *MockPacienteRepository) GetAllFromPaciente(ctx context.Context, protoco
 	}
 	return nil, args.Error(1)
 }
+
+func (m *MockPacienteRepository) DeletePaciente(ctx context.Context, protocolo string) error {
+	return nil
+}

@@ -1,0 +1,59 @@
+package views
+
+import "RATAC/domain"
+import "fmt"
+
+templ TablaUltimosDiagnosticos(pacientes []domain.Paciente, offset int8, total int16, primer_render bool) {
+      <table>
+            <thead>
+                  <tr>
+                        <th>Protocolo</th>
+                        <th>Paciente</th>
+                        <th>Carga</th>
+                        <th>Modificación</th>
+                        <th>Opciones</th>
+                  </tr>
+            </thead>
+            <tbody id="diagnoses-table-body">
+                  for _, p := range pacientes{
+                        <tr>
+                              <td class="cell-protocol">{p.Protocolo}</td>
+                              <td class="cell-patient">{p.NombrePaciente}</td>
+                              <td class="cell-date">{p.Fecha}</td>
+                              <td class="cell-date">-</td>
+                              <td class="actions-cell">
+                                    <a 
+                                          class="action-btn" title="Ver detalle"
+                                          href={fmt.Sprintf("/paciente/protocolo/%s", p.Protocolo)}
+                                          target="_blank"
+                                          rel="noopener"
+                                          ><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> 
+                                          Ver
+                                    </a>
+                                    <button 
+                                          class="action-btn action-delete" 
+                                          title="Eliminar" 
+                                          hx-delete={fmt.Sprintf("/diagnosticos/baja/%s", p.Protocolo)}
+                                          hx-swap="none"
+                                          hx-confirm={fmt.Sprintf("¿Está seguro de eliminar el diagnóstico con protocolo %s? Esta acción no se puede deshacer.", p.Protocolo)}
+                                          hx-on::after-request="confirmDelete(this)"
+                                          ><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> 
+                                          Eliminar
+                                    </button>
+                              </td>
+                        </tr>
+                  }
+            </tbody>
+      </table>
+      if !primer_render {
+            @ResultadosRestantes(int8(len(pacientes)), offset, total)
+      }
+}
+
+templ ResultadosRestantes(cant_actual int8, offset int8, total int16){
+      if offset == 0 {
+            <span class="page-info" id="page-info" hx-swap-oob="true">Mostrando 1-{offset + cant_actual} de {total} resultados</span>
+      } else {
+            <span class="page-info" id="page-info" hx-swap-oob="true">Mostrando {offset}-{offset + cant_actual} de {total} resultados</span>
+      }
+}

@@ -1,5 +1,5 @@
 const arrayFiltros = [];
-let offset = -1;
+var offset = -1;
 
 function addFiltro() {
       const filtroPrimero = document.querySelector('.filtro');
@@ -87,6 +87,14 @@ function getOffset(){
       return offset;
 }
 
+function getOffsetRestando(){
+      offset -= 10;
+      if (offset == 0){
+            document.getElementById('btn-anterior').disabled = true;
+      }
+      return offset;
+}
+
 function removeFiltro(btn) {
       if (document.querySelectorAll('.filtro').length == 1) {
           toggleFiltros();  
@@ -104,6 +112,10 @@ function obtenerFiltros(){
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+      // Si encontramos un #ratac-title dentro del body es porque accedimos a un diagnostico desde el panel de admin, y le cambiamos el title
+      const t = document.querySelector("body #ratac-title");
+      if (t) document.title = t.textContent;
+
       // .filtros solo existe en la pantalla de listado: sin esta guarda,
       // querySelector devuelve null y el TypeError corta el resto del handler.
       var filtros = document.querySelector('.filtros');
