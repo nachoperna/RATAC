@@ -43,6 +43,18 @@ CREATE TABLE Grado_oncologico (
     CONSTRAINT Grado_oncologico_pk PRIMARY KEY (id,Descripciones_microscopicas_Pacientes_Protocolo,Descripciones_microscopicas_Descripcion)
 );
 
+-- Table: usuarios
+CREATE TABLE usuarios (
+    id            SERIAL PRIMARY KEY,
+    usuario       VARCHAR(50)  NOT NULL UNIQUE,
+    password_hash VARCHAR(60)  NOT NULL,
+    nombre        VARCHAR(100) NOT NULL,
+    rol           VARCHAR(20)  NOT NULL DEFAULT 'laboratorio'
+                  CHECK (rol IN ('admin','laboratorio')),
+    activo        BOOLEAN      NOT NULL DEFAULT TRUE,
+    creado_en     TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 -- CREATE TABLE historial_acciones (
 --     id serial PRIMARY KEY,
 --     usuario varchar(50) NOT NULL DEFAULT 'sistema',

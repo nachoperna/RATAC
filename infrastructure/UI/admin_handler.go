@@ -178,6 +178,24 @@ func (h *AdminHandler) ShowAdminPanel(w http.ResponseWriter, r *http.Request) {
 	datos := map[string]any{
 		"TablaDiagnosticos": tabla_diagnosticos,
 		"Paginacion": paginacion,
+		"Nav": renderTemplCtx(r.Context(), views.Nav(domain.UsuarioDeCtx(r.Context()))),
+	}
+	tmp.Execute(w, datos)
+}
+
+// ShowCargaDiagnostico reemplaza al ServeFile directo: el HTML se parsea con el
+// FuncMap para poder inyectarle el nav segun los permisos del usuario.
+func (h *AdminHandler) ShowCargaDiagnostico(w http.ResponseWriter, r *http.Request) {
+	tmp_aux := template.New("carga_diagnostico.html").Funcs(template.FuncMap{"render": renderTempl})
+	tmp, err := tmp_aux.ParseFiles("./infrastructure/UI/static/carga_diagnostico.html")
+	if err != nil {
+		fmt.Printf("Error al parsear el template: %v", err)
+		http.Error(w, "No se pudo cargar la página", http.StatusInternalServerError)
+		return
+	}
+
+	datos := map[string]any{
+		"Nav": renderTemplCtx(r.Context(), views.Nav(domain.UsuarioDeCtx(r.Context()))),
 	}
 	tmp.Execute(w, datos)
 }

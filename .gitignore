@@ -3,6 +3,8 @@ JSONS/
 IMAGENES/
 sqlc/
 views/*.go
+# los _templ.go son generados, pero los tests escritos a mano si se versionan
+!views/*_test.go
 diagnosticos_mal_procesados.txt
 /venv
 ProcesadoJsons/prueba/

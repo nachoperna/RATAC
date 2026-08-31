@@ -1,0 +1,19 @@
+package views
+
+import "RATAC/domain"
+
+templ Nav(u *domain.Usuario) {
+      <nav>
+            if domain.Puede(u, domain.PermCargarDiag) {
+                  <a class="nav-badge" href="/diagnosticos/alta">Cargar Diagnostico</a>
+            }
+            if u.Autenticado() {
+                  <a class="nav-badge" href="/admin/panel">Mi Panel</a>
+                  <form method="post" action="/logout" style="display:inline">
+                        <button class="nav-badge" type="submit">Salir</button>
+                  </form>
+            } else {
+                  <a class="nav-badge" href="/login">Ingresar</a>
+            }
+      </nav>
+}

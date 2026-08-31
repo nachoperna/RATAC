@@ -1,0 +1,20 @@
+package views
+
+templ SinPermiso() {
+      <div class="container-sin-resultados">
+            <div class="sin-resultados">
+                  <div class="sin-resultados-estado">Acceso denegado</div>
+
+                  <h2>No tiene permisos</h2>
+                  <p>Su usuario no está autorizado para acceder a esta sección</p>
+
+                  <button
+                        class="btn-volver"
+                        hx-get="/"
+                        hx-target="body"
+                        hx-push-url="true"
+                        >Volver
+                  </button>
+            </div>
+      </div>
+}

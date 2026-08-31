@@ -45,30 +45,45 @@ func main() {
 	diagnosticoServices := application.NewDiagnosticoService(diagnosticoRepo)
 	// diagnosticoHandler := ui.NewDiagnosticoHandler(diagnosticoServices)
 
+	var usuarioRepo domain.UsuarioRepository = dbrepo.NewUsuarioRepository(queries)
+	authService := application.NewAuthService(usuarioRepo)
+	authHandler := ui.NewAuthHandler(authService)
+
 	homeHandler := ui.NewHomeHandler(pacienteServices, desc_microServices, diagnosticoServices)
 	adminHandler := ui.NewAdminHandler(application.NewAdminService(dbrepo.NewAdminRepository(queries)), pacienteServices)
 	
 	fs_static := http.FileServer(http.Dir("./infrastructure/UI/static"))
 	fs_imagenes := http.FileServer(http.Dir("./IMAGENES/"))
-	http.Handle("/static/", http.StripPrefix("/static/", fs_static))
-	http.Handle("/IMAGENES/", http.StripPrefix("/IMAGENES/", fs_imagenes))
-	http.HandleFunc("/", homeHandler.ShowHome)
-	http.HandleFunc("/pacientes", pacienteHandler.ListPacientes)
-	http.HandleFunc("/pacientes/", pacienteHandler.ListPacientesByFiltro)
-	http.HandleFunc("/pacientes/nombre", pacienteHandler.ListPacientesBy)
-	http.HandleFunc("/paciente/protocolo/{protocolo}", pacienteHandler.ShowFullPaciente)
-	http.HandleFunc("/apipacientes", pacienteHandler.APIPacientes)
-	http.HandleFunc("/diagnosticos/alta", func (w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./infrastructure/UI/static/carga_diagnostico.html")
-	})
-	http.HandleFunc("/diagnosticos/alta/procesado", adminHandler.ProcesarDocumento)
-	http.HandleFunc("/diagnosticos/alta/borrar_temporal", adminHandler.BorrarTemporal)
-	http.HandleFunc("/diagnosticos/alta/carga", adminHandler.AltaDiagnostico)
-	http.HandleFunc("/diagnosticos/baja/{protocolo}", pacienteHandler.BorrarPaciente)
-	http.HandleFunc("/diagnosticos", adminHandler.DiagnosticosByUser)
-	http.HandleFunc("/admin/panel", adminHandler.ShowAdminPanel)
 
-	err = http.ListenAndServe(port, nil)
+	mux := http.NewServeMux()
+
+	// --- Publico ---
+	mux.Handle("/static/", http.StripPrefix("/static/", fs_static))
+	mux.Handle("/IMAGENES/", http.StripPrefix("/IMAGENES/", fs_imagenes))
+	mux.HandleFunc("/", homeHandler.ShowHome)
+	mux.HandleFunc("/pacientes", pacienteHandler.ListPacientes)
+	mux.HandleFunc("/pacientes/", pacienteHandler.ListPacientesByFiltro)
+	mux.HandleFunc("/pacientes/nombre", pacienteHandler.ListPacientesBy)
+	mux.HandleFunc("/paciente/protocolo/{protocolo}", pacienteHandler.ShowFullPaciente)
+	mux.HandleFunc("/apipacientes", pacienteHandler.APIPacientes)
+
+	// --- Sesion ---
+	mux.HandleFunc("GET /login", authHandler.ShowLogin)
+	mux.HandleFunc("POST /login", authHandler.Login)
+	mux.HandleFunc("POST /logout", authHandler.Logout)
+
+	// --- Protegido ---
+	// Regla a mantener: todo lo que cuelgue de /admin/ o /diagnosticos/ se
+	// registra con ui.Requiere. El eje rol -> permiso vive en domain/permisos.go.
+	mux.HandleFunc("/admin/panel", ui.Requiere(domain.PermVerPanel, adminHandler.ShowAdminPanel))
+	mux.HandleFunc("/diagnosticos", ui.Requiere(domain.PermVerDiagnosticos, adminHandler.DiagnosticosByUser))
+	mux.HandleFunc("/diagnosticos/alta", ui.Requiere(domain.PermCargarDiag, adminHandler.ShowCargaDiagnostico))
+	mux.HandleFunc("/diagnosticos/alta/procesado", ui.Requiere(domain.PermCargarDiag, adminHandler.ProcesarDocumento))
+	mux.HandleFunc("/diagnosticos/alta/borrar_temporal", ui.Requiere(domain.PermCargarDiag, adminHandler.BorrarTemporal))
+	mux.HandleFunc("/diagnosticos/alta/carga", ui.Requiere(domain.PermCargarDiag, adminHandler.AltaDiagnostico))
+	mux.HandleFunc("/diagnosticos/baja/{protocolo}", ui.Requiere(domain.PermBorrarDiag, pacienteHandler.BorrarPaciente))
+
+	err = http.ListenAndServe(port, ui.ConUsuario(authService, mux))
 	if err != nil{
 		log.Fatalf("Error al exponer puerto 8080: %v", err)
 	}

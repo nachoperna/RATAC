@@ -31,6 +31,9 @@ func (r *PacienteRepository) InsertarDiagnostico(ctx context.Context, paciente d
 		return errors.New("Error al iniciar transacción")
 	}
 	defer tx.Rollback()
+	if err := fijarUsuarioAuditoria(ctx, tx); err != nil {
+		return errors.New("Error al fijar usuario de auditoría")
+	}
 	qtx := r.queries.WithTx(tx)
 	err = procesarDiagnostico(qtx, ctx, paciente)
 	if err != nil {
@@ -345,6 +348,21 @@ func setDatosBasePaciente(datos sqlc.Paciente) domain.Paciente {
 }
 
 func (r *PacienteRepository) DeletePaciente(ctx context.Context, protocolo string) error {
-	err := r.queries.DeletePaciente(ctx, protocolo)
-	return err
+	// Se envuelve en transaccion para que el set_config de la auditoria aplique:
+	// es local a la transaccion y sin ella el trigger no lo veria.
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return errors.New("Error al iniciar transacción")
+	}
+	defer tx.Rollback()
+	if err := fijarUsuarioAuditoria(ctx, tx); err != nil {
+		return errors.New("Error al fijar usuario de auditoría")
+	}
+	if err := r.queries.WithTx(tx).DeletePaciente(ctx, protocolo); err != nil {
+		return err
+	}
+	if err := tx.Commit(); err != nil {
+		return errors.New("Error al finalizar transacción")
+	}
+	return nil
 }

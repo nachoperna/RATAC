@@ -2,6 +2,7 @@ package ui
 
 import (
 	"RATAC/application"
+	"RATAC/domain"
 	"RATAC/views"
 	"context"
 	"fmt"
@@ -69,6 +70,7 @@ func (h *HomeHandler) ShowHome(w http.ResponseWriter, r *http.Request) {
 		"cant_imgs": cant_imgs,
 		"cant_diagnosticos": cant_diagnosticos,
 		"UltimosCasos": casos,
+		"Nav": renderTemplCtx(r.Context(), views.Nav(domain.UsuarioDeCtx(r.Context()))),
 	}
 	tmp.Execute(w, datos)
 }
@@ -76,5 +78,13 @@ func (h *HomeHandler) ShowHome(w http.ResponseWriter, r *http.Request) {
 func renderTempl(c templ.Component) template.HTML {
 	var buf strings.Builder
 	c.Render(context.Background(), &buf)
+	return template.HTML(buf.String())
+}
+
+// renderTemplCtx renderiza con el context real del request. Es necesario para
+// el nav: renderTempl usa context.Background() y por ahi no viaja el usuario.
+func renderTemplCtx(ctx context.Context, c templ.Component) template.HTML {
+	var buf strings.Builder
+	c.Render(ctx, &buf)
 	return template.HTML(buf.String())
 }
