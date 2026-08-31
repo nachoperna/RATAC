@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 )
 
 type PacienteService struct {
@@ -55,5 +56,18 @@ func (s *PacienteService) GetAllFromPaciente(ctx context.Context, protocolo stri
 }
 
 func (s *PacienteService) DeletePaciente(ctx context.Context, protocolo string) error {
-	return s.pacienteRepo.DeletePaciente(ctx, protocolo)
+	err := s.pacienteRepo.DeletePaciente(ctx, protocolo)
+	if err != nil {
+		return err
+	}
+	json, err := filepath.Glob(fmt.Sprintf("JSONS/*%s*.json", protocolo))
+	err = os.Remove(json[0])
+	imgs, err := filepath.Glob(fmt.Sprintf("IMAGENES/*%s*", protocolo))
+	for _, img := range imgs {
+		err = os.Remove(img)
+	}
+	if err != nil {
+		return err
+	}
+	return nil
 }
