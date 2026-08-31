@@ -12,6 +12,9 @@ DESCRIPCION_MACROSCOPICA = "Descripción macroscópica"
 DESCRIPCION_MICROSCOPICA = "Descripción microscópica"
 DIAGNOSTICO_HISTOPATOLOGICO = "Diagnóstico histopatológico"
 nombre_diag_actual = ""
+# Tamaño minimo (en BYTES) para considerar que una imagen es una microfotografia
+# y no un logo o una firma del encabezado del documento.
+TAM_MINIMO_IMAGEN = 85_000
 CARGA_USUARIO = False
 
 # regexs que nos indican los cambios de seccion o elementos a evitar
@@ -96,8 +99,9 @@ def getImagenes_docx(doc, el):
                 imagen_part = doc.part.related_parts[rId]
                 if imagen_part:
                     binario = imagen_part.blob  # blob nos da el binario
-                    # si el binario es menor a 685k bits o 85Kb entonces seguramente sea una foto de una firma digital del doc y la evitamos directamente
-                    if len(binario) < 685000:
+                    # descartamos logos y firmas digitales del documento (rondan los 30Kb)
+                    # las microfotografias reales superan holgadamente este umbral
+                    if len(binario) < TAM_MINIMO_IMAGEN:
                         continue
                     # todas las imagenes de los diagnosticos ya estan en formato png
                     ruta = f"IMG_{rId}_{nombre_diag_actual}.png"
@@ -344,7 +348,7 @@ def getImagenes_pdf(reader, page_num):
         page = reader.pages[page_num]
         for idx, image_obj in enumerate(page.images):
             binario = image_obj.data
-            if len(binario) < 685_000: continue
+            if len(binario) < TAM_MINIMO_IMAGEN: continue
             nombre_img = f"IMG_p{page_num}_{idx}_{nombre_diag_actual}.png"
             ruta = os.path.join("IMAGENES", nombre_img)
             with open(ruta, "wb") as img:
@@ -524,9 +528,17 @@ if __name__ == "__main__":
         elif ext.lower().startswith(".docx"):
             data = procesar_docx(param)
 
-        if data:
-            ruta_salida = os.path.join("JSONS/", nombre + ".json")
-            with open(ruta_salida, "w", encoding="utf-8") as f:
-                json.dump(data, f, indent=4, ensure_ascii=False)
- 
-            print(json.dumps(data))
+        if not data:
+            print(
+                f"No se pudo extraer informacion del archivo '{nombre}{ext}'. "
+                "Verifique que el formato del diagnostico sea el esperado.",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+
+        ruta_salida = os.path.join("JSONS/", nombre + ".json")
+        os.makedirs("JSONS/", exist_ok=True)
+        with open(ruta_salida, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=4, ensure_ascii=False)
+
+        print(json.dumps(data))

@@ -126,7 +126,7 @@ templ ShowPaciente(paciente domain.Paciente) {
                                     </div>
                               } else {
                                     for _, imagen := range desc_micro.Diagnostico.Imagenes {
-                                          <div class="micro-image">
+                                          <div class="micro-image" tabindex="0" role="button" aria-label="Ampliar imagen">
                                                 <img src={fmt.Sprintf("/%s", imagen)} alt={fmt.Sprintf("Imagen Diagnostico %d", index + 1)}>
                                           </div>
                                     }

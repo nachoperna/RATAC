@@ -17,12 +17,12 @@ import (
 	"strings"
 )
 
-var tipos_validos = map[string]bool {
+var tipos_validos = map[string]bool{
 	"application/pdf": true,
 	"application/zip": true,
 }
 
-type AdminService struct{
+type AdminService struct {
 	adminRepo domain.AdminRepository
 }
 
@@ -33,13 +33,13 @@ func NewAdminService(adminRepo domain.AdminRepository) *AdminService {
 }
 
 /*
-* POSIBLE LOGICA: 
+* POSIBLE LOGICA:
 * 1. python crea el json real y ademas devuelve el contenido al stdout
 * 2. adminservice retorna el objeto al handler
 * 3. adminhandler renderiza informacion en pantalla
 * 	4. si el usuario no edito ningun campo de informacion extraida, el archivo json creado se guarda tal cual en JSONS/
 * 	4. si el usuario edito algun campo de informacion extraida se usa un discernible para que el servidor sepa
-* 		y se mapean todos los campos a un objeto para luego crear el json 
+* 		y se mapean todos los campos a un objeto para luego crear el json
 * 		porque es mas simple hacerlo de vuelta que editar un archivo en una linea especifica
 * */
 
@@ -49,12 +49,12 @@ func (s *AdminService) ConvertirDocumento(archivo multipart.File, nombre string,
 	if err != nil {
 		return nil, err
 	}
-	archivo.Seek(0,0)
+	archivo.Seek(0, 0)
 	tipo := http.DetectContentType(buffer) // detectamos el tipo del archivo segun su contenido
 	if !tipos_validos[tipo] {
 		return nil, err
 	}
-	
+
 	os.MkdirAll("./ArchivosTemporales", os.ModePerm)
 	tmpFile, err := os.CreateTemp("./ArchivosTemporales/", fmt.Sprintf("TEMP_%s", nombre))
 	if err != nil {
@@ -69,7 +69,7 @@ func (s *AdminService) ConvertirDocumento(archivo multipart.File, nombre string,
 	tmpFile.Close()
 
 	// Aca se debe llamar a ejecucion de diag_to_json.py / pdf_to_json.py
-	// cmd := exec.Command("docker", "compose", "exec", "app", "python3", "ProcesadoJsons/diag_to_json.py", tmpFile.Name())
+	//cmd := exec.Command("docker", "compose", "exec", "app", "python3", "ProcesadoJsons/diag_to_json.py", tmpFile.Name())
 	cmd := exec.Command("python3", "ProcesadoJsons/diag_to_json.py", tmpFile.Name(), nombre)
 	var stderr, stdout bytes.Buffer
 	cmd.Stdout = &stdout
@@ -120,7 +120,7 @@ func (s *AdminService) RenombrarTemporal(nombre string) error {
 	if err != nil {
 		return err
 	}
-	
+
 	return nil
 }
 
@@ -132,8 +132,8 @@ func (s *AdminService) GetImagenesHuerfanas(imagenes []string, nombre string) ([
 
 	var huerfanas []string
 	for _, img := range imgs {
-		 // La imagen es huerfana si no pertenece a la informacion de diagnostico final
-		if !slices.Contains(imagenes, "/" + img) {
+		// La imagen es huerfana si no pertenece a la informacion de diagnostico final
+		if !slices.Contains(imagenes, "/"+img) {
 			huerfanas = append(huerfanas, img)
 		}
 	}

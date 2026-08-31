@@ -104,7 +104,11 @@ function obtenerFiltros(){
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-      document.querySelector('.filtros').addEventListener('change', function(e) {
+      // .filtros solo existe en la pantalla de listado: sin esta guarda,
+      // querySelector devuelve null y el TypeError corta el resto del handler.
+      var filtros = document.querySelector('.filtros');
+      if (!filtros) return;
+      filtros.addEventListener('change', function(e) {
       if (e.target.classList.contains('filtro-selector')) {
             const es_edad = e.target.value === 'Edad';
             const operador_select = e.target.closest('.filtro-header').querySelector('.operador');

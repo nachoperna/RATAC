@@ -5,7 +5,6 @@ import (
 	"RATAC/domain"
 	"bytes"
 	"context"
-	"database/sql"
 	"encoding/json"
 	"errors"
 )
@@ -28,8 +27,11 @@ func (r *AdminRepository) MapeoDocumento(contenido bytes.Buffer) (*domain.Pacien
 }
 
 func (r *AdminRepository) PacienteYaRegistrado(ctx context.Context, protocolo string) bool {
+	if protocolo == "" { // sin protocolo no hay nada que buscar; evita falsos positivos
+		return false
+	}
 	_, err := r.queries.GetPaciente(ctx, protocolo)
-	if err == sql.ErrNoRows{
+	if err != nil { // ErrNoRows o cualquier otro error => no podemos afirmar que ya existe
 		return false
 	}
 	return true
