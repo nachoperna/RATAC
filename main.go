@@ -45,9 +45,11 @@ func main() {
 	diagnosticoServices := application.NewDiagnosticoService(diagnosticoRepo)
 	// diagnosticoHandler := ui.NewDiagnosticoHandler(diagnosticoServices)
 
-	homeHandler := ui.NewHomeHandler(pacienteServices, desc_microServices, diagnosticoServices)
+	authService := application.NewAuthService(dbrepo.NewAuthRepository(queries, db))
+	authHandler := ui.NewAuthHandler(authService)
+	homeHandler := ui.NewHomeHandler(pacienteServices, desc_microServices, diagnosticoServices, authService)
 	adminHandler := ui.NewAdminHandler(application.NewAdminService(dbrepo.NewAdminRepository(queries)), pacienteServices)
-	
+
 	fs_static := http.FileServer(http.Dir("./infrastructure/UI/static"))
 	fs_imagenes := http.FileServer(http.Dir("./IMAGENES/"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs_static))
@@ -67,6 +69,15 @@ func main() {
 	http.HandleFunc("/diagnosticos/baja/{protocolo}", pacienteHandler.BorrarPaciente)
 	http.HandleFunc("/diagnosticos", adminHandler.DiagnosticosByUser)
 	http.HandleFunc("/admin/panel", adminHandler.ShowAdminPanel)
+
+	http.HandleFunc("/registrarse", authHandler.Registrarse)
+	http.HandleFunc("/login", authHandler.Login)
+	http.HandleFunc("/logout", authHandler.Logout)
+	http.HandleFunc("/activo", authHandler.SesionActiva)
+	
+	http.HandleFunc("/ingreso/formulario", func (w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./infrastructure/UI/static/panel_acceso.html")
+	})
 
 	err = http.ListenAndServe(port, nil)
 	if err != nil{

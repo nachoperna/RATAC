@@ -1,0 +1,14 @@
+package views
+
+templ HeaderLinks(sesion_activa bool, rol_usuario string) {
+      // SI el rol es ADMIN se debe renderizar carga de diagnostico, panel y seccion de estadisticas
+      // Si el rol es LABORATORIO se debe renderizar carga de diagnostico y panel
+      if (sesion_activa){
+            <a class="nav-badge" href="/diagnosticos/alta">Cargar Diagnostico</a>
+            <a class="nav-badge" href="/admin/panel">Mi Panel</a>
+      } else {
+            <a class="nav-badge" href="/ingreso/formulario?tab=collab">Ser Parte</a>
+            <a class="nav-badge" href="/ingreso/formulario">Ingresar</a>
+      }
+}
+

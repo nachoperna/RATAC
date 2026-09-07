@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title id="ratac-title">RATAC — Registro Argentino de Tumores en Animales de Compañía</title>
+      <link rel="icon" type="image/svg" href="/static/img/RATAC ISOLOGO FULL COLOR.svg">
+      <link rel="stylesheet" href="../static/index.css">
+      <link rel="stylesheet" href="../static/results.css">
+      <link rel="stylesheet" href="../static/paciente.css">
+      <link rel="stylesheet" href="../static/panel_acceso.css">
+      <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+      <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+      <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+      <script defer src="/static/panel_acceso.js"></script>
+</head>
+<body>
+      <header>
+            <a class="logo" href="/">
+                  <img src="../static/img/RATAC LOGO FULL COLOR HORIZONTAL.svg" alt="RATAC" style="height:38px; width:auto; display:block;">
+            </a>
+      </header>
+
+    <main>
+        <div class="auth-wrapper">
+            
+            <!-- Aviso informativo (Navy claro) -->
+            <div class="auth-notice">
+                <div class="auth-notice-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                </div>
+                <div class="auth-notice-text">
+                    <strong>Red Colaborativa RATAC</strong>
+                    <p>Cualquier laboratorio patológico puede solicitar un registro en la página para colaboración y carga de datos epidemiológicos.</p>
+                </div>
+            </div>
+
+            <!-- Tarjeta de Formularios -->
+            <div class="auth-card">
+                
+                <!-- Pestañas -->
+                <div class="auth-tabs">
+                    <button class="tab-btn active" onclick="switchTab('login', this)">Ingresar</button>
+                    <button class="tab-btn" id="tab-btn-collab" onclick="switchTab('collab', this)">Solicitar Colaboración</button>
+                </div>
+
+                <div id="form-login" class="form-container active">
+                    <h2 class="form-title" id="login-title">Bienvenido</h2>
+                    <p class="form-subtitle" id="login-subtitle">Ingresa tus credenciales para acceder al sistema.</p>
+                    
+                    <form hx-post="/login" hx-on::before-request="mismaContraseña(event)">
+                        <div class="form-group">
+                            <label class="form-label">Correo Electrónico</label>
+                            <input type="email" class="form-control" name="email" placeholder="usuario@laboratorio.com" required>
+                        </div>
+                        <div class="form-group">
+                              <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                                    <label class="form-label" id="label-password">Contraseña</label>
+                                    <a href="#" id="link-change-pwd" onclick="toggleChangePasswordMode(true)" style="font-family: 'DM Mono', monospace; font-size: 11px; color: var(--navy); text-decoration: underline; margin-bottom: 8px;">Cambiar contraseña</a>
+                              </div>
+                            <input type="password" class="form-control" id="reg-password" name="contraseña" placeholder="••••••••" required>
+                        </div>
+                        <!-- Campos expandibles para Nueva Contraseña -->
+                        <div id="new-password-fields" style="display: none; transition: opacity 0.3s ease; opacity: 0;">
+                            <div class="form-group">
+                                <label class="form-label">Nueva Contraseña</label>
+                                <input type="password" id="new-pwd" class="form-control" name="nueva_contraseña" placeholder="Ingresa la nueva contraseña">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Confirmar Nueva Contraseña</label>
+                                <input type="password" id="new-pwd-confirm" class="form-control" placeholder="Vuelve a escribir la nueva contraseña">
+                            </div>
+                              <!-- Contenedor para el mensaje de error (oculto por defecto) -->
+                              <div id="password-error" style="color: #d32f2f; font-size: 13px; margin-bottom: 10px; display: none; font-weight: 500;">
+                                    Las confirmaciones de contraseñas no coinciden.
+                              </div>
+                            <div style="text-align: right; margin-bottom: 16px;">
+                                <a href="#" onclick="toggleChangePasswordMode(false)" style="font-family: 'DM Mono', monospace; font-size: 11px; color: #d9534f; text-decoration: underline;">Cancelar cambio</a>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-submit" id="btn-login-submit">Iniciar Sesión</button>
+                    </form>
+                </div>
+
+                <div id="form-collab" class="form-container">
+                    <h2 class="form-title">Solicitud de Red</h2>
+                    <p class="form-subtitle">Envía los datos de tu laboratorio para evaluación administrativa.</p>
+                    
+                    <form onsubmit="event.preventDefault();">
+                        <div class="form-group">
+                            <label class="form-label">Nombre del Laboratorio</label>
+                            <input type="text" class="form-control" name="nombre-lab" placeholder="Ej. Patología Veterinaria Sur" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Correo de Contacto</label>
+                            <input type="email" class="form-control" name="email" placeholder="contacto@laboratorio.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Ciudad / Provincia</label>
+                            <input type="text" class="form-control" name="ciudad-origen" placeholder="Ej. Tandil, Buenos Aires" required>
+                        </div>
+
+                        <!-- Lista dinámica de veterinarios -->
+                        <div class="form-group" style="margin-top: 32px;">
+                            <label class="form-label" style="border-bottom: 1px solid var(--border-light); padding-bottom: 8px;">Veterinarios Asociados</label>
+                            
+                            <div class="vets-list" id="vets-container">
+                                <!-- Primera fila por defecto -->
+                                <div class="vet-row">
+                                    <div class="vet-input-group">
+                                        <label class="form-label">Nombre y Apellido</label>
+                                        <input type="text" name="nombre-vet" class="form-control" placeholder="Dr/Dra. Nombre" required>
+                                    </div>
+                                    <div class="vet-input-group">
+                                        <label class="form-label">Matrícula (MP/MN)</label>
+                                        <input type="text" name="matricula-vet" class="form-control" placeholder="N° de Matrícula" required>
+                                    </div>
+                                    <button type="button" class="btn-remove-vet" title="Eliminar veterinario" onclick="removeVetRow(this)" style="visibility: hidden; pointer-events: none;">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <button type="button" class="btn-add-vet" onclick="addVetRow()">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                Añadir otro veterinario
+                            </button>
+                        </div>
+
+                        <button type="submit" class="btn-submit">Enviar Solicitud</button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>
