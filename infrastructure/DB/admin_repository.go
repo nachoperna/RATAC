@@ -35,15 +35,21 @@ func (r *AdminRepository) PacienteYaRegistrado(ctx context.Context, protocolo st
 	return true
 }
 
-func (r  *AdminRepository) GetUltimosDiagnosticosCargados(ctx context.Context, offset int8) ([]domain.Paciente, int16, error) {
-	pacientes_rows, err := r.queries.ListPacientes(ctx, int32(offset))
+func (r  *AdminRepository) GetUltimosDiagnosticosCargados(ctx context.Context, offset int8, token string) ([]domain.Paciente, int16, error) {
+	pacientes_rows, err := r.queries.ListPacientesByLab(ctx, sqlc.ListPacientesByLabParams{
+		Offset: int32(offset),
+		Token: token,
+	})
 	if err != nil {
 		return nil, 0, err
 	}
 	var pacientes []domain.Paciente
-	var total int16 = int16(pacientes_rows[0].Total)
+	var total int16 = 0
+	if len(pacientes_rows) > 0 {
+		total = int16(pacientes_rows[0].Total)
+	}
 	for _, p := range pacientes_rows {
-		paciente := pacienteORM(p)
+		paciente := pacienteByLabORM(p)
 		pacientes = append(pacientes, paciente)
 	}
 	return pacientes, total, nil

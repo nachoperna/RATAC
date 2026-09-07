@@ -43,7 +43,7 @@ func NewAdminService(adminRepo domain.AdminRepository) *AdminService {
 * 		porque es mas simple hacerlo de vuelta que editar un archivo en una linea especifica
 * */
 
-func (s *AdminService) ConvertirDocumento(archivo multipart.File, nombre string, ctx context.Context) (*domain.Paciente, error) {
+func (s *AdminService) ConvertirDocumento(archivo multipart.File, nombre, email string, ctx context.Context) (*domain.Paciente, error) {
 	buffer := make([]byte, 512) // necesitamos generar un pequeño buffer en memoria RAM de 512 BYTES para leer los primeros bytes del archivo
 	_, err := archivo.Read(buffer)
 	if err != nil {
@@ -70,7 +70,7 @@ func (s *AdminService) ConvertirDocumento(archivo multipart.File, nombre string,
 
 	// Aca se debe llamar a ejecucion de diag_to_json.py / pdf_to_json.py
 	// cmd := exec.Command("docker", "compose", "exec", "app", "python3", "ProcesadoJsons/diag_to_json.py", tmpFile.Name())
-	cmd := exec.Command("python3", "ProcesadoJsons/diag_to_json.py", tmpFile.Name(), nombre)
+	cmd := exec.Command("python3", "ProcesadoJsons/diag_to_json.py", tmpFile.Name(), nombre, email)
 	var stderr, stdout bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
@@ -171,8 +171,8 @@ func (s *AdminService) GuardarImagenes(imagenes []*multipart.FileHeader) error {
 	return nil
 }
 
-func (s  *AdminService) GetUltimosDiagnosticosCargados(ctx context.Context, offset int8) ([]domain.Paciente, int16, error) {
-	diagnosticos, total, err := s.adminRepo.GetUltimosDiagnosticosCargados(ctx, offset)
+func (s  *AdminService) GetUltimosDiagnosticosCargados(ctx context.Context, offset int8, token string) ([]domain.Paciente, int16, error) {
+	diagnosticos, total, err := s.adminRepo.GetUltimosDiagnosticosCargados(ctx, offset, token)
 	if err != nil {
 		return nil, 0, err
 	}

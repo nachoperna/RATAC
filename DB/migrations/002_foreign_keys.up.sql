@@ -1,6 +1,14 @@
 ALTER TABLE Pacientes ADD CONSTRAINT Pacientes_Protocolo_unique UNIQUE (Protocolo);
 
 -- foreign keys
+-- Reference: Paciente_Laboratorio (table: Pacientes)
+ALTER TABLE Pacientes ADD CONSTRAINT Paciente_Laboratorio
+      FOREIGN KEY (Email_Lab)
+      REFERENCES Usuarios (email) 
+      NOT DEFERRABLE 
+      INITIALLY IMMEDIATE
+;
+
 -- Reference: Descripciones_microscopicas_Pacientes (table: Descripciones_microscopicas)
 ALTER TABLE Descripciones_microscopicas ADD CONSTRAINT Descripciones_microscopicas_Pacientes
       FOREIGN KEY (Pacientes_Protocolo)

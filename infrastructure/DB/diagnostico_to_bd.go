@@ -36,6 +36,7 @@ func InsertarPaciente(paciente domain.Paciente, fecha_parseada time.Time, edad *
 		Protocolo:               paciente.Protocolo,
 		Fecha:                   fecha_parseada,
 		Solicitante:             paciente.Solicitante,
+		EmailLab: 			 paciente.Email_Lab,
 		Tecnica:                 paciente.Tecnica,
 		Familia:                 SetvalueOrNull(paciente.Familia),
 		Especie:                 SetvalueOrNull(paciente.Especie),

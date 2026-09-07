@@ -13,6 +13,7 @@ DESCRIPCION_MICROSCOPICA = "Descripción microscópica"
 DIAGNOSTICO_HISTOPATOLOGICO = "Diagnóstico histopatológico"
 nombre_diag_actual = ""
 CARGA_USUARIO = False
+EMAIL_LABORATORIO = "lab1@mail.com"
 
 # regexs que nos indican los cambios de seccion o elementos a evitar
 patron_referencias  = re.compile(r"^\s*(referencias?|anexos?)", re.I)
@@ -76,6 +77,7 @@ def datosPaciente_docx(tabla):
                 datos[k2] = v2
 
     datos["Referencias mastocitomas"] = False
+    datos["Email_Lab"] = EMAIL_LABORATORIO
     return datos
 
 def getImagenes_docx(doc, el):
@@ -252,7 +254,7 @@ def limpiar_celda_pdf(celda):
     return (celda or "").replace('\n', ' ').strip()
 
 def reordenar_datos_pdf(datos):
-    orden_esperado = ["Protocolo", "Fecha", "Solicitante", "Técnica", "Familia", "Especie", "Raza", "Edad", "Paciente", "Referencias mastocitomas"]
+    orden_esperado = ["Protocolo", "Fecha", "Solicitante", "Email_Lab", "Técnica", "Familia", "Especie", "Raza", "Edad", "Paciente", "Referencias mastocitomas"]
     resultado = {}
     for k in orden_esperado:
         val = datos.get(k, None)
@@ -336,6 +338,7 @@ def datosPaciente_pdf(tabla_filas):
         m = re.search(r"Raza[\s\-]*Edad\s*:?\s*(.*?)(?:Paciente|Especie|$)", texto_tabla, re.I)
         if m: datos = procesar_raza_edad_pdf(m.group(1), datos)
     datos["Referencias mastocitomas"] = False
+    datos["Email_Lab"] = EMAIL_LABORATORIO
     return datos
 
 def getImagenes_pdf(reader, page_num):
@@ -516,6 +519,7 @@ if __name__ == "__main__":
         CARGA_USUARIO = True
         nombre = os.path.basename(param)
         nombre_diag_actual = sys.argv[2]
+        EMAIL_LABORATORIO = sys.argv[3]
         nombre, ext = os.path.splitext(nombre)
 
         data = None

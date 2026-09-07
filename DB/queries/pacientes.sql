@@ -1,10 +1,10 @@
 -- name: CreatePaciente :one
 INSERT INTO Pacientes (
-    Protocolo, Fecha, Solicitante, Tecnica, Familia, 
+    Protocolo, Fecha, Solicitante, Email_Lab, Tecnica, Familia, 
     Especie, Raza, Edad, Paciente, Antecedentes, 
     Descripcion_macroscopica, Referencias_mastocitomas
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13
 )
 RETURNING *;
 
@@ -53,3 +53,12 @@ SELECT count(*) FROM pacientes;
 SELECT *, COUNT(*) OVER() AS total FROM Pacientes
 WHERE Paciente ilike CONCAT('%', $1::VARCHAR, '%')
 LIMIT 10 OFFSET $2;
+
+-- name: ListPacientesByLab :many
+SELECT p.*, COUNT(p.*) OVER() AS total 
+FROM Sesiones s
+      JOIN Usuarios u ON s.id_usuario = u.id 
+      JOIN Pacientes p ON u.email = p.email_lab
+WHERE s.token = $2
+ORDER BY Fecha DESC
+LIMIT 10 OFFSET $1;

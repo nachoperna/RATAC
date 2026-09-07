@@ -98,3 +98,7 @@ func (r *AuthRepository) CambiarContraseña(ctx context.Context, email, vieja_co
 	})
 	return err
 }
+
+func (r *AuthRepository) GetEmail(ctx context.Context, token string) (string, error) {
+	return r.queries.GetEmail(ctx, token)
+}

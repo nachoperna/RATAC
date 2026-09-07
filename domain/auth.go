@@ -11,4 +11,5 @@ type AuthRepository interface {
 	Logout(ctx context.Context, token string) error
 	Validacion(ctx context.Context, token string) (bool, error)
 	CambiarContraseña(ctx context.Context, email, vieja_contraseña, nueva_contraseña string) error
+	GetEmail(ctx context.Context, token string) (string, error)
 }

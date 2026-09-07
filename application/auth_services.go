@@ -29,3 +29,6 @@ func (s *AuthService) Validacion (ctx context.Context, token string) (bool, erro
 func (s *AuthService) CambiarContraseña (ctx context.Context, email, vieja_contraseña, nueva_contraseña string) error  {
 	return s.AuthRepo.CambiarContraseña(ctx, email, vieja_contraseña, nueva_contraseña)
 }
+func (s *AuthService) GetEmail (ctx context.Context, token string) (string, error)  {
+	return s.AuthRepo.GetEmail(ctx, token)
+}

@@ -4,6 +4,7 @@ CREATE TABLE Pacientes (
       Protocolo varchar(50) NOT NULL UNIQUE,
       Fecha date NOT NULL,
       Solicitante varchar(100) NOT NULL,
+      Email_Lab VARCHAR(255) NOT NULL,
       Tecnica varchar(15) NOT NULL,
       Familia varchar(100) NULL,
       Especie varchar(6) NULL,

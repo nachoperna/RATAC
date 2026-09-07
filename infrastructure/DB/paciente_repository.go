@@ -84,6 +84,26 @@ func pacienteORM(p sqlc.ListPacientesRow) domain.Paciente {
 		Protocolo:                   p.Protocolo,
 		Fecha:                       p.Fecha.Format("02-01-2006"),
 		Solicitante:                 p.Solicitante,
+		Email_Lab: 			     p.EmailLab,
+		Tecnica:                     p.Tecnica,
+		Familia:                     getValueOrNil(p.Familia),
+		Especie:                     getValueOrNil(p.Especie),
+		Raza:                        getValueOrNil(p.Raza),
+		Edad:                        func() *string {if p.Edad.Valid {edad := strconv.Itoa(int(p.Edad.Int16)); return &edad}; return nil} (),
+		NombrePaciente:              p.Paciente,
+		Antecedentes:                getValueOrNil(p.Antecedentes),
+		Descripciones_microscopicas: nil,
+		DescripcionMacroscopica:     getValueOrNil(p.DescripcionMacroscopica),
+		ReferenciasMastocitomas:     p.ReferenciasMastocitomas,
+	}
+}
+
+func pacienteByLabORM(p sqlc.ListPacientesByLabRow) domain.Paciente {
+	return domain.Paciente{
+		Protocolo:                   p.Protocolo,
+		Fecha:                       p.Fecha.Format("02-01-2006"),
+		Solicitante:                 p.Solicitante,
+		Email_Lab: 			     p.EmailLab,
 		Tecnica:                     p.Tecnica,
 		Familia:                     getValueOrNil(p.Familia),
 		Especie:                     getValueOrNil(p.Especie),

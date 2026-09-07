@@ -14,12 +14,20 @@ func NewAuthHandler(AuthService *application.AuthService) *AuthHandler {
 	return &AuthHandler{AuthService: AuthService}
 }
 
+const NOMBRE_TOKEN = "token_sesion"
+
 func (h *AuthHandler) Registrarse (w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		// renderizar templ de error
+		http.Error(w, "Error al parsear formulario: " + err.Error(), http.StatusBadRequest)
+		return 
+	}
 	email := r.FormValue("email")
 	nombre_lab := r.FormValue("nombre-lab")
 	contraseña := "contraseña-auto-generada" // Luego el laboratorio debera cambiarla
-	// veterinarios := r.FormValue("nombre-vet")
-	// matriculas := r.FormValue("matricula-vet")
+	// veterinarios := r.Form["nombre-vet"]
+	// matriculas := r.Form["matricula-vet"]
 	ciudad_origen := r.FormValue("ciudad-origen")
 	rol := "laboratorio"
 
@@ -30,7 +38,7 @@ func (h *AuthHandler) Registrarse (w http.ResponseWriter, r *http.Request) {
 		return 
 	}
 	http.SetCookie(w, &http.Cookie{
-		Name: "token_sesion",
+		Name: NOMBRE_TOKEN,
 		Value: token,
 		Expires: expiracion,
 	})
@@ -58,7 +66,7 @@ func (h *AuthHandler) Login (w http.ResponseWriter, r *http.Request) {
 		return 
 	}
 	http.SetCookie(w, &http.Cookie{
-		Name: "token_sesion",
+		Name: NOMBRE_TOKEN,
 		Value: token,
 		Expires: expiracion,
 	})
@@ -67,7 +75,7 @@ func (h *AuthHandler) Login (w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *AuthHandler) Logout (w http.ResponseWriter, r *http.Request) {
-	token, err := r.Cookie("token_sesion")
+	token, err := r.Cookie(NOMBRE_TOKEN)
 	if err != nil {
 		http.Error(w, "SESION TERMINADA", http.StatusBadRequest)
 		return
@@ -79,7 +87,7 @@ func (h *AuthHandler) Logout (w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.SetCookie(w, &http.Cookie{
-		Name:    "token_sesion",
+		Name:    NOMBRE_TOKEN,
 		Value:   "",
 		Expires: time.Now(),
 		MaxAge:  -1,
@@ -89,7 +97,7 @@ func (h *AuthHandler) Logout (w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *AuthHandler) SesionActiva (w http.ResponseWriter, r *http.Request) {
-	token, err := r.Cookie("token_sesion")
+	token, err := r.Cookie(NOMBRE_TOKEN)
 	if err != nil {
 		http.Error(w, "SESION TERMINADA", http.StatusBadRequest)
 		return
