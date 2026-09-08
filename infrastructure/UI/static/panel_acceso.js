@@ -1,3 +1,7 @@
+const searchInput = document.getElementById('citySearch');
+const suggestionsList = document.getElementById('suggestionsList');
+const submitBtn = document.getElementById('submitBtn');
+
 document.addEventListener('DOMContentLoaded', () => {
     const tab = new URLSearchParams(window.location.search).get('tab');
     if (tab === 'collab') {
@@ -129,3 +133,62 @@ function toggleChangePasswordMode(isChanging) {
             document.getElementById('new-pwd-confirm').value = '';
       }
 }
+
+function parsearJsonApi(evt) {
+      try {
+            // 2. Convertimos la respuesta de texto a un objeto JSON real
+            const data = JSON.parse(evt.detail.xhr.response);
+            let htmlGenerado = "";
+
+            // 3. Iteramos sobre los resultados y armamos los <li>
+            if (data.localidades && data.localidades.length > 0) {
+                data.localidades.forEach(loc => {
+                    htmlGenerado += `
+                        <li class="suggestion-item" onclick="seleccionarCiudad('${loc.nombre}', '${loc.provincia.nombre}')">
+                            <span class="city-name">${loc.nombre}</span>
+                            <span class="prov-name">${loc.provincia.nombre}</span>
+                        </li>
+                    `;
+                });
+            } else {
+                // Si la API no encontró la ciudad
+                htmlGenerado = `
+                    <li class="suggestion-item" style="cursor: default; background: white;">
+                        <span class="prov-name">No se encontraron resultados.</span>
+                    </li>
+                `;
+            }
+
+            // 4. ¡La magia! Reemplazamos el JSON crudo por nuestro HTML.
+            // Ahora HTMX insertará este HTML directamente en el #suggestionsList
+            evt.detail.serverResponse = htmlGenerado;
+
+        } catch (error) {
+            console.error("Error al procesar el JSON de Georef:", error);
+            evt.detail.serverResponse = ""; // Dejamos vacío en caso de error
+        }
+}
+
+function seleccionarCiudad(nombre, provincia) {
+      searchInput.value = `${nombre}, ${provincia}`;
+      document.getElementById('hiddenCity').value = searchInput.value;
+
+      suggestionsList.innerHTML = ''; 
+      submitBtn.disabled = false;
+}
+
+searchInput.addEventListener('input', () => {
+      submitBtn.disabled = true;
+});
+
+document.body.addEventListener('htmx:configRequest', function(evt) {
+      // Solo modificamos la petición si va dirigida a Georef
+      if (evt.detail.path.startsWith("https://apis.datos.gob.ar")) {
+      // Eliminamos las cabeceras que causan el bloqueo CORS en APIs públicas
+      delete evt.detail.headers['HX-Request'];
+      delete evt.detail.headers['HX-Target'];
+      delete evt.detail.headers['HX-Current-URL'];
+      delete evt.detail.headers['HX-Trigger'];
+      delete evt.detail.headers['HX-Trigger-Name'];
+      }
+});

@@ -11,7 +11,6 @@
       <link rel="stylesheet" href="../static/panel_acceso.css">
       <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
       <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-      <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
       <script defer src="/static/panel_acceso.js"></script>
 </head>
 <body>
@@ -97,7 +96,27 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Ciudad / Provincia</label>
-                            <input type="text" class="form-control" name="ciudad-origen" placeholder="Ej. Tandil, Buenos Aires" required>
+                              <div class="input-wrapper">
+                                    <input 
+                                          type="text" 
+                                          class="form-control"
+                                          id="citySearch" 
+                                          name="nombre" 
+                                          placeholder="Ej. Tandil, Buenos Aires" 
+                                          autocomplete="off"
+                                          hx-get="https://apis.datos.gob.ar/georef/api/localidades?max=8&campos=id,nombre,provincia.nombre"
+                                          hx-trigger="input[target.value.trim().length > 2] changed delay:300ms, search"
+                                          hx-target="#suggestionsList"
+                                          hx-swap="innerHTML"
+                                          hx-indicator="#spinner"
+                                    >
+                                    <!-- Spinner controlado por HTMX -->
+                                    <div id="spinner" class="htmx-indicator spinner"></div>
+                                    <!-- Lista donde HTMX inyecta los resultados -->
+                                    <ul id="suggestionsList" class="suggestions-dropdown" hx-on::before-swap="parsearJsonApi(event)"></ul>
+                              </div>
+                              <!-- Campos ocultos para Go -->
+                              <input type="hidden" id="hiddenCity" name="ciudad-origen">
                         </div>
 
                         <!-- Lista dinámica de veterinarios -->
@@ -127,10 +146,9 @@
                             </button>
                         </div>
 
-                        <button type="submit" class="btn-submit">Enviar Solicitud</button>
+                        <button type="submit" class="btn-submit" id="submitBtn">Enviar Solicitud</button>
                     </form>
                 </div>
-
             </div>
         </div>
     </main>
