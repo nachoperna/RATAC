@@ -16,6 +16,7 @@ import (
 var db *sql.DB
 var queries *sqlc.Queries
 var ctx context.Context
+const email_lab = "mail@mail.com"
 
 func strPointer(s string) *string { return &s }
 
@@ -48,6 +49,7 @@ func TestInsertarPaciente_DatosValidos_AltaPacienteDB(t *testing.T)  {
 		Protocolo: protocolo,
 		Fecha: fecha,
 		Solicitante: "Veterinaria",
+		Email_Lab: email_lab,
 		Tecnica: "HE",
 		Familia: strPointer("Perna"),
 		Especie: strPointer("Canino"),
@@ -106,6 +108,15 @@ func TestMain(m *testing.M) {
 	defer db.Close()
 	queries = sqlc.New(db)
 	ctx = context.Background()
-
+	_, err = queries.CreateUsuario(ctx, sqlc.CreateUsuarioParams{
+		Email: email_lab,
+		NombreLab: "lab",
+		ContraseñaHash: "no-importa",
+		Rol: "laboratorio",
+		CiudadOrigen: "testinglandia",
+	})
+	if err != nil {
+		log.Fatalf("Error al insertar Usuario Lab a BD: %v", err)
+	}
 	m.Run() // ejecuto todos los test
 }

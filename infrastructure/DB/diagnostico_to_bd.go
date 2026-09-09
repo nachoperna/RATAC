@@ -48,7 +48,7 @@ func InsertarPaciente(paciente domain.Paciente, fecha_parseada time.Time, edad *
 		ReferenciasMastocitomas: paciente.ReferenciasMastocitomas,
 	})
 	if err != nil {
-		return errors.New("Error al insertar paciente")
+		return err
 	}
 	return nil
 }
