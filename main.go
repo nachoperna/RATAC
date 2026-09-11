@@ -60,20 +60,20 @@ func main() {
 	http.HandleFunc("/pacientes/nombre", pacienteHandler.ListPacientesBy)
 	http.HandleFunc("/paciente/protocolo/{protocolo}", pacienteHandler.ShowFullPaciente)
 	http.HandleFunc("/apipacientes", pacienteHandler.APIPacientes)
-	http.HandleFunc("/diagnosticos/alta", func (w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/diagnosticos/alta", authHandler.LoggerChecker(func (w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./infrastructure/UI/static/carga_diagnostico.html")
-	})
-	http.HandleFunc("/diagnosticos/alta/procesado", adminHandler.ProcesarDocumento)
-	http.HandleFunc("/diagnosticos/alta/borrar_temporal", adminHandler.BorrarTemporal)
-	http.HandleFunc("/diagnosticos/alta/carga", adminHandler.AltaDiagnostico)
-	http.HandleFunc("/diagnosticos/baja/{protocolo}", pacienteHandler.BorrarPaciente)
-	http.HandleFunc("/diagnosticos", adminHandler.DiagnosticosByUser)
-	http.HandleFunc("/admin/panel", adminHandler.ShowAdminPanel)
+	}))
+	http.HandleFunc("/diagnosticos/alta/procesado", authHandler.LoggerChecker(adminHandler.ProcesarDocumento))
+	http.HandleFunc("/diagnosticos/alta/borrar_temporal", authHandler.LoggerChecker(adminHandler.BorrarTemporal))
+	http.HandleFunc("/diagnosticos/alta/carga", authHandler.LoggerChecker(adminHandler.AltaDiagnostico))
+	http.HandleFunc("/diagnosticos/baja/{protocolo}", authHandler.LoggerChecker(pacienteHandler.BorrarPaciente))
+	http.HandleFunc("/diagnosticos", authHandler.LoggerChecker(adminHandler.DiagnosticosByUser))
+	http.HandleFunc("/admin/panel", authHandler.LoggerChecker(adminHandler.ShowAdminPanel))
 
 	http.HandleFunc("/registrarse", authHandler.Registrarse)
 	http.HandleFunc("/login", authHandler.Login)
 	http.HandleFunc("/logout", authHandler.Logout)
-	http.HandleFunc("/activo", authHandler.SesionActiva)
+	http.HandleFunc("/activo", authHandler.LoggerChecker(authHandler.SesionActiva))
 	
 	http.HandleFunc("/ingreso/formulario", func (w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./infrastructure/UI/static/panel_acceso.html")

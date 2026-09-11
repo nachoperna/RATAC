@@ -16,6 +16,25 @@ func NewAuthHandler(AuthService *application.AuthService) *AuthHandler {
 
 const NOMBRE_TOKEN = "token_sesion"
 
+func (h *AuthHandler) LoggerChecker(handler http.HandlerFunc) http.HandlerFunc {
+	return func (w http.ResponseWriter, r *http.Request) {
+		token, err := r.Cookie(NOMBRE_TOKEN)
+		if err != nil || token.Value == ""{
+			w.WriteHeader(http.StatusUnauthorized)
+			http.ServeFile(w, r, "./infrastructure/UI/static/acceso_restringido.html")
+			return
+		}
+		if !r.URL.Query().Has("login_reciente") { // Evito la consulta si el usuario accedio a la ruta desde una redireccion por login/register
+			activa, err := h.AuthService.Validacion(r.Context(), token.Value)
+			if err != nil || !activa {
+				http.Error(w, "SESION TERMINADA", http.StatusBadRequest)
+				return
+			}
+		}
+		handler(w,r)
+	}
+}
+
 func (h *AuthHandler) Registrarse (w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
@@ -42,7 +61,7 @@ func (h *AuthHandler) Registrarse (w http.ResponseWriter, r *http.Request) {
 		Value: token,
 		Expires: expiracion,
 	})
-	w.Header().Set("HX-Redirect", "/admin/panel")
+	w.Header().Set("HX-Redirect", "/admin/panel?login_reciente=true")
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -70,7 +89,7 @@ func (h *AuthHandler) Login (w http.ResponseWriter, r *http.Request) {
 		Value: token,
 		Expires: expiracion,
 	})
-	w.Header().Set("HX-Redirect", "/admin/panel")
+	w.Header().Set("HX-Redirect", "/admin/panel?login_reciente=true")
 	w.WriteHeader(http.StatusOK)
 }
 
