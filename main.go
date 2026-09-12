@@ -46,9 +46,10 @@ func main() {
 	// diagnosticoHandler := ui.NewDiagnosticoHandler(diagnosticoServices)
 
 	authService := application.NewAuthService(dbrepo.NewAuthRepository(queries, db))
-	authHandler := ui.NewAuthHandler(authService)
+	adminService := application.NewAdminService(dbrepo.NewAdminRepository(queries))
+	authHandler := ui.NewAuthHandler(authService, adminService)
 	homeHandler := ui.NewHomeHandler(pacienteServices, desc_microServices, diagnosticoServices, authService)
-	adminHandler := ui.NewAdminHandler(application.NewAdminService(dbrepo.NewAdminRepository(queries)), pacienteServices, authService)
+	adminHandler := ui.NewAdminHandler(adminService, pacienteServices, authService)
 
 	fs_static := http.FileServer(http.Dir("./infrastructure/UI/static"))
 	fs_imagenes := http.FileServer(http.Dir("./IMAGENES/"))

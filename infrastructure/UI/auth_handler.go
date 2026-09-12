@@ -2,16 +2,24 @@ package ui
 
 import (
 	"RATAC/application"
+	"fmt"
 	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
 	"time"
 )
 
 type AuthHandler struct {
 	AuthService *application.AuthService
+	AdminService *application.AdminService
 }
 
-func NewAuthHandler(AuthService *application.AuthService) *AuthHandler {
-	return &AuthHandler{AuthService: AuthService}
+func NewAuthHandler(AuthService *application.AuthService, AdminService *application.AdminService) *AuthHandler {
+	return &AuthHandler{
+		AuthService: AuthService,
+		AdminService: AdminService,
+	}
 }
 
 const NOMBRE_TOKEN = "token_sesion"
@@ -20,18 +28,37 @@ func (h *AuthHandler) LoggerChecker(handler http.HandlerFunc) http.HandlerFunc {
 	return func (w http.ResponseWriter, r *http.Request) {
 		token, err := r.Cookie(NOMBRE_TOKEN)
 		if err != nil || token.Value == ""{
-			w.WriteHeader(http.StatusUnauthorized)
-			http.ServeFile(w, r, "./infrastructure/UI/static/acceso_restringido.html")
+			h.ifCargaFallida(r)
+			setRedireccionIngreso(w)
 			return
 		}
 		if !r.URL.Query().Has("login_reciente") { // Evito la consulta si el usuario accedio a la ruta desde una redireccion por login/register
 			activa, err := h.AuthService.Validacion(r.Context(), token.Value)
 			if err != nil || !activa {
-				http.Error(w, "SESION TERMINADA", http.StatusBadRequest)
+				h.ifCargaFallida(r)
+				setRedireccionIngreso(w)
 				return
 			}
 		}
 		handler(w,r)
+	}
+}
+
+func setRedireccionIngreso(w http.ResponseWriter)  {
+	w.Header().Set("HX-Redirect", "/ingreso/formulario")
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.WriteHeader(http.StatusUnauthorized)
+	contenido, _ := os.ReadFile("./infrastructure/UI/static/acceso_restringido.html")
+	w.Write(contenido)
+}
+
+func (h *AuthHandler) ifCargaFallida (r *http.Request)  {
+	if r.URL.Path == "/diagnosticos/alta/carga" { // borramos los archivos temporales creados
+		nombre_base, _, _ := strings.Cut(filepath.Base(r.FormValue("archivo")), ".")
+		fmt.Printf("\nNOMBRE BASE: %s", nombre_base)
+		imgs, _ := h.AdminService.GetImagenesHuerfanas([]string{}, nombre_base)
+		go h.AdminService.BorrarTemporal(nombre_base, imgs) // borramos en segundo plano
+		// en el futuro se debe tratar el error de forma asincrona para terminar de borrar todos los archivos temporales
 	}
 }
 
