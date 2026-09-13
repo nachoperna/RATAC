@@ -185,6 +185,8 @@ func (h *AdminHandler) ShowAdminPanel(w http.ResponseWriter, r *http.Request) {
 	}
 	var tabla_diagnosticos templ.Component = views.TablaUltimosDiagnosticos(pacientes, 0, total, true)
 	var paginacion templ.Component = views.ResultadosRestantes(int8(len(pacientes)), 0, total)
+	var header templ.Component = views.HeaderLinks(true, "")
+
 	tmp_aux := template.New("panel_administrador.html").Funcs(template.FuncMap{ "render": renderTempl })
 	tmp, err := tmp_aux.ParseFiles("./infrastructure/UI/static/panel_administrador.html")
 	if err != nil {
@@ -196,6 +198,7 @@ func (h *AdminHandler) ShowAdminPanel(w http.ResponseWriter, r *http.Request) {
 	datos := map[string]any{
 		"TablaDiagnosticos": tabla_diagnosticos,
 		"Paginacion": paginacion,
+		"Header": header,
 	}
 	tmp.Execute(w, datos)
 }

@@ -2,7 +2,6 @@ package ui
 
 import (
 	"RATAC/application"
-	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -55,7 +54,6 @@ func setRedireccionIngreso(w http.ResponseWriter)  {
 func (h *AuthHandler) ifCargaFallida (r *http.Request)  {
 	if r.URL.Path == "/diagnosticos/alta/carga" { // borramos los archivos temporales creados
 		nombre_base, _, _ := strings.Cut(filepath.Base(r.FormValue("archivo")), ".")
-		fmt.Printf("\nNOMBRE BASE: %s", nombre_base)
 		imgs, _ := h.AdminService.GetImagenesHuerfanas([]string{}, nombre_base)
 		go h.AdminService.BorrarTemporal(nombre_base, imgs) // borramos en segundo plano
 		// en el futuro se debe tratar el error de forma asincrona para terminar de borrar todos los archivos temporales
@@ -87,6 +85,9 @@ func (h *AuthHandler) Registrarse (w http.ResponseWriter, r *http.Request) {
 		Name: NOMBRE_TOKEN,
 		Value: token,
 		Expires: expiracion,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+		Path: "/",
 	})
 	w.Header().Set("HX-Redirect", "/admin/panel?login_reciente=true")
 	w.WriteHeader(http.StatusOK)
@@ -115,6 +116,9 @@ func (h *AuthHandler) Login (w http.ResponseWriter, r *http.Request) {
 		Name: NOMBRE_TOKEN,
 		Value: token,
 		Expires: expiracion,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+		Path: "/",
 	})
 	w.Header().Set("HX-Redirect", "/admin/panel?login_reciente=true")
 	w.WriteHeader(http.StatusOK)
@@ -123,23 +127,23 @@ func (h *AuthHandler) Login (w http.ResponseWriter, r *http.Request) {
 func (h *AuthHandler) Logout (w http.ResponseWriter, r *http.Request) {
 	token, err := r.Cookie(NOMBRE_TOKEN)
 	if err != nil {
-		http.Error(w, "SESION TERMINADA", http.StatusBadRequest)
-		return
-	}
-
-	err = h.AuthService.Logout(r.Context(), token.Value)
-	if err != nil {
 		http.Error(w, "Error al desloguear", http.StatusBadRequest)
 		return
 	}
+
+	_ = h.AuthService.Logout(r.Context(), token.Value) // si hay error en borrar la sesion de la bd deslogueamos igual
+	
 	http.SetCookie(w, &http.Cookie{
 		Name:    NOMBRE_TOKEN,
 		Value:   "",
 		Expires: time.Now(),
 		MaxAge:  -1,
 		Path:    "/",
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
 	})
-	w.Write([]byte("<h1> DESLOGUEADO CON EXITO </h1>")) 
+	w.Header().Set("HX-Redirect", "/")
+	w.WriteHeader(http.StatusOK)
 }
 
 func (h *AuthHandler) SesionActiva (w http.ResponseWriter, r *http.Request) {

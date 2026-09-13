@@ -27,7 +27,7 @@
       --text-muted: #73738c;
       --accent-primary: #3f3f8c;
       --border-color: #e2e4ec;
-      
+      --danger: #dc2626;
       /* Estados */
       --status-ok-bg: #e6f7ed;
       --status-ok-text: #1b7a43;
@@ -129,6 +129,57 @@ nav a {
 
 .nav-badge:hover::after {
       width: 100%;
+}
+
+.nav-logout {
+      display: flex;
+      align-items: center;
+      color: var(--navy);
+      text-decoration: none;
+      cursor: pointer;
+      padding-bottom: 6px;
+      transition: color 0.3s ease;
+      position: relative;
+}
+
+.logout-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      /* Previene que el ícono se encoja cuando el texto aparece */
+      flex-shrink: 0; 
+}
+
+.logout-text {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      white-space: nowrap;
+      overflow: hidden;
+
+      /* Estado inicial: oculto y sin ancho */
+      max-width: 0;
+      opacity: 0;
+      margin-left: 0;
+
+      /* Transición fluida para que "salga" hacia la derecha */
+      transition: max-width 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                  opacity 0.6s ease, 
+                  margin-left 0.6s ease;
+}
+
+/* Al pasar el cursor por el contenedor */
+.nav-logout:hover {
+      color: var(--danger);
+}
+
+.nav-logout:hover .logout-text {
+      /* Expande el texto y lo hace visible */
+      max-width: 150px; 
+      opacity: 1;
+      margin-left: 8px; /* Separa el texto del ícono */
 }
 
 .main-section {
@@ -313,7 +364,7 @@ nav a {
       align-items: center;
 }
 
-.btn-remove:hover { color: #dc2626; }
+.btn-remove:hover { color: var(--danger); }
 
 .valores-container {
       display: flex;
