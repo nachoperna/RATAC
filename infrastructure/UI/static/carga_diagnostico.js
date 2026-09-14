@@ -264,7 +264,13 @@ function validacionYFormData(evt) {
       imagenes_subidas.forEach(e => formData.append('imagenes', e.file));
 
       fetch('/diagnosticos/alta/carga', { method: 'POST', body: formData })
-            .then(r => {if (r.ok) submitData(); }
+            .then(r => {
+                  if (r.ok) submitData(); 
+                  else if (r.status === 401){
+                        alert('Alerta: Se venció su sesión en RATAC. Deberá ingresar nuevamente.');
+                        window.location.href = '/ingreso/formulario';
+                  } 
+            }
       );
 }
 

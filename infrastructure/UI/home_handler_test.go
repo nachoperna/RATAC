@@ -28,7 +28,7 @@ func TestShowHome_rutaInvalida_retornaArchivoError(t *testing.T) {
 	srvDiag := application.NewDiagnosticoService(mockDiagRepo)
 	srvDesc := application.NewDescripcionMicroscopicaService(mockDescRepo)
 
-	handler := ui.NewHomeHandler(srvPac, srvDesc, srvDiag)
+	handler := ui.NewHomeHandler(srvPac, srvDesc, srvDiag, nil)
 
 	req := httptest.NewRequest(http.MethodGet, "/ruta-que-no-existe", nil)
 	rec := httptest.NewRecorder()
@@ -52,7 +52,7 @@ func TestShowHome_rutaValida_ejecutaTemplate(t *testing.T) {
 	srvDiag := application.NewDiagnosticoService(mockDiagRepo)
 	srvDesc := application.NewDescripcionMicroscopicaService(mockDescRepo)
 
-	handler := ui.NewHomeHandler(srvPac, srvDesc, srvDiag)
+	handler := ui.NewHomeHandler(srvPac, srvDesc, srvDiag, nil)
 
 	mockPacRepo.On("CountPacientes", mock.Anything).Return(int64(10), nil)
 	mockPacRepo.On("ListUltimosPacientes", mock.Anything).Return([]domain.Paciente{}, []bool{}, nil)

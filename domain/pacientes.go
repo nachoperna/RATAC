@@ -6,6 +6,7 @@ type Paciente struct {
 	Protocolo                   string                      `json:"Protocolo"`
 	Fecha                       string                      `json:"fecha"`
 	Solicitante                 string                      `json:"Solicitante"`
+	Email_Lab                   string                      `json:"Email_Lab"`
 	Tecnica                     string                      `json:"Técnica"`
 	Familia                     *string                      `json:"Familia"`
 	Especie                     *string                      `json:"Especie"`

@@ -18,12 +18,14 @@ import (
 type AdminHandler struct {
 	adminService *application.AdminService
 	pacienteService *application.PacienteService
+	authService *application.AuthService
 }
 
-func NewAdminHandler(adminService *application.AdminService, pacienteService *application.PacienteService) *AdminHandler {
+func NewAdminHandler(adminService *application.AdminService, pacienteService *application.PacienteService, authService *application.AuthService) *AdminHandler {
 	return &AdminHandler{
 		adminService: adminService,
 		pacienteService: pacienteService,
+		authService: authService,
 	}
 }
 
@@ -54,6 +56,16 @@ func (h *AdminHandler) ProcesarDocumento(w http.ResponseWriter, r *http.Request)
 	archivos := r.MultipartForm.File["archivos"]
 	var pacientes []domain.Paciente
 
+	token, err := r.Cookie(NOMBRE_TOKEN)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	email, err := h.authService.GetEmail(r.Context(), token.Value)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	for _, archivo := range archivos {
 		contenido, err := archivo.Open() // abrimos el archivo
 		if err != nil {
@@ -61,7 +73,7 @@ func (h *AdminHandler) ProcesarDocumento(w http.ResponseWriter, r *http.Request)
 			return
 		}
 		defer contenido.Close() // cerramos el archivo luego de usarlo
-		paciente, err := h.adminService.ConvertirDocumento(contenido, archivo.Filename, r.Context())
+		paciente, err := h.adminService.ConvertirDocumento(contenido, archivo.Filename, email, r.Context())
 		if err != nil {
 			nombre, _, _ := strings.Cut(filepath.Base(archivo.Filename), ".")
 			_ = h.adminService.BorrarTemporal(nombre, nil)
@@ -159,7 +171,13 @@ func (h *AdminHandler) AltaDiagnostico(w http.ResponseWriter, r *http.Request)  
 }
 
 func (h *AdminHandler) ShowAdminPanel(w http.ResponseWriter, r *http.Request) {
-	pacientes, total, err := h.adminService.GetUltimosDiagnosticosCargados(r.Context(), 0)
+	token, err := r.Cookie(NOMBRE_TOKEN)
+	if err != nil {
+		// renderizar templ de error
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	pacientes, total, err := h.adminService.GetUltimosDiagnosticosCargados(r.Context(), 0, token.Value)
 	if err != nil {
 		// renderizar templ de error
 		w.WriteHeader(http.StatusInternalServerError)
@@ -167,6 +185,8 @@ func (h *AdminHandler) ShowAdminPanel(w http.ResponseWriter, r *http.Request) {
 	}
 	var tabla_diagnosticos templ.Component = views.TablaUltimosDiagnosticos(pacientes, 0, total, true)
 	var paginacion templ.Component = views.ResultadosRestantes(int8(len(pacientes)), 0, total)
+	var header templ.Component = views.HeaderLinks(true, "")
+
 	tmp_aux := template.New("panel_administrador.html").Funcs(template.FuncMap{ "render": renderTempl })
 	tmp, err := tmp_aux.ParseFiles("./infrastructure/UI/static/panel_administrador.html")
 	if err != nil {
@@ -178,6 +198,7 @@ func (h *AdminHandler) ShowAdminPanel(w http.ResponseWriter, r *http.Request) {
 	datos := map[string]any{
 		"TablaDiagnosticos": tabla_diagnosticos,
 		"Paginacion": paginacion,
+		"Header": header,
 	}
 	tmp.Execute(w, datos)
 }
@@ -189,7 +210,13 @@ func (h *AdminHandler) DiagnosticosByUser(w http.ResponseWriter, r *http.Request
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	pacientes, total, err := h.adminService.GetUltimosDiagnosticosCargados(r.Context(), offset)
+	token, err := r.Cookie(NOMBRE_TOKEN)
+	if err != nil {
+		// renderizar templ de error
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	pacientes, total, err := h.adminService.GetUltimosDiagnosticosCargados(r.Context(), offset, token.Value)
 	if err != nil {
 		// renderizar templ de error
 		w.WriteHeader(http.StatusInternalServerError)

@@ -65,7 +65,8 @@ def test_reordenar_datos_datosDesordenadosYVacios_retornaDiccionarioOrdenadoYNul
     # Verificamos que el orden sea el que exige el frontend/BD
     claves = list(resultado.keys())
     assert claves[0] == "Protocolo"
-    assert claves[5] == "Especie"
+    assert claves[3] == "Email_Lab"
+    assert claves[6] == "Especie"
     
     # Verificamos la limpieza de vacíos a None
     assert resultado["Raza"] is None

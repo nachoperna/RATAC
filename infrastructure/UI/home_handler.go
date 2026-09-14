@@ -16,16 +16,19 @@ type HomeHandler struct {
 	pacienteService *application.PacienteService
 	DescripcionMicroscopicaService *application.DescripcionMicroscopicaService
 	DiagnosticoService *application.DiagnosticoService
+	authService *application.AuthService
 }
 
 func NewHomeHandler(
 	pacienteService *application.PacienteService, 
 	DescripcionMicroscopicaService *application.DescripcionMicroscopicaService,
-	DiagnosticoService *application.DiagnosticoService) *HomeHandler {
+	DiagnosticoService *application.DiagnosticoService,
+	authService *application.AuthService) *HomeHandler {
 	return &HomeHandler{
 		pacienteService: pacienteService,
 		DescripcionMicroscopicaService: DescripcionMicroscopicaService,
 		DiagnosticoService: DiagnosticoService,
+		authService: authService,
 	}
 }
 
@@ -56,12 +59,20 @@ func (h *HomeHandler) ShowHome(w http.ResponseWriter, r *http.Request) {
 	if pacientes != nil {
 		casos = views.UltimosCasos(pacientes, tienen_diagnosticos)
 	}
+
+	token, err := r.Cookie("token_sesion")
+	sesion := false
+	if err == nil {
+		sesion, _ = h.authService.Validacion(r.Context(), token.Value)
+	}
+	var header templ.Component = views.HeaderLinks(sesion, "")
+
 	tmp_aux := template.New("index.html").Funcs(template.FuncMap{ "render": renderTempl })
 	tmp, err := tmp_aux.ParseFiles("./infrastructure/UI/static/index.html")
 	if err != nil {
-		fmt.Printf("Error al parsear el template: %v", err) // Esto saldrá en tu consola
+		fmt.Printf("Error al parsear el template: %v", err)
 		http.Error(w, "No se pudo cargar la página", http.StatusInternalServerError)
-		return // Importante: salir de la función
+		return
 	}
 
 	datos := map[string]any{
@@ -69,6 +80,7 @@ func (h *HomeHandler) ShowHome(w http.ResponseWriter, r *http.Request) {
 		"cant_imgs": cant_imgs,
 		"cant_diagnosticos": cant_diagnosticos,
 		"UltimosCasos": casos,
+		"Header": header,
 	}
 	tmp.Execute(w, datos)
 }

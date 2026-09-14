@@ -1,0 +1,159 @@
+:root {
+      --navy: #1a1a6e;
+      --navy-mid: #2d2d8f;
+      --navy-light: #383896;
+      --lavender: #e8e4f5;
+      --bg-page: #f7f6fb;
+      --bg-card: #ffffff;
+      --text-main: #111128;
+      --text-muted: #6b6b8a;
+      --border-light: #ddd8ee;
+
+      /* Colores de advertencia sutiles */
+      --danger: #d9534f;
+      --danger-bg: #fdf2f2;
+}
+
+* {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+}
+
+body {
+      font-family: 'Source Serif 4', Georgia, serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background-image: url("img/PATTERN CANGREJOS2.svg");
+      background-blend-mode: darken;
+}
+
+.restricted-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      padding: 48px 40px;
+      max-width: 460px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 10px 40px rgba(26, 26, 110, 0.04);
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 0.6s ease-out 0.2s forwards;
+}
+
+.icon-container {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 24px auto;
+      background-color: var(--danger-bg);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--danger);
+      border: 1px dashed rgba(217, 83, 79, 0.3);
+}
+
+.restricted-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      color: var(--navy);
+      margin-bottom: 16px;
+      font-weight: 600;
+}
+
+.restricted-message {
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+}
+
+.restricted-message strong {
+      color: var(--text-main);
+      font-weight: 600;
+}
+
+.actions-group {
+      display: flex;
+      gap: 12px;
+      flex-direction: row;
+}
+
+.btn {
+      flex: 1;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 14px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+}
+
+.btn-outline {
+      background-color: transparent;
+      border: 1px solid var(--border-light);
+      color: var(--text-muted);
+}
+
+.btn-outline:hover {
+      border-color: var(--navy);
+      color: var(--navy);
+      background-color: var(--bg-page);
+}
+
+.btn-primary {
+      background-color: var(--navy);
+      color: white;
+      border: 1px solid var(--navy);
+      box-shadow: 0 4px 15px rgba(26, 26, 110, 0.15);
+}
+
+.btn-primary:hover {
+      background-color: var(--navy-light);
+      border-color: var(--navy-light);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(26, 26, 110, 0.25);
+}
+
+@keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 480px) {
+      .actions-group {
+            flex-direction: column-reverse;
+      }
+      .restricted-card {
+            padding: 40px 24px;
+      }
+}
+
+/* Indicador de carga HTMX (Opcional, si tienes peticiones que tardan) */
+.htmx-indicator {
+      display: none;
+      opacity: 0;
+      transition: opacity 200ms ease-in;
+}
+.htmx-request .htmx-indicator {
+      display: inline-block;
+}
+.htmx-request.htmx-indicator {
+      display: inline-block;
+}

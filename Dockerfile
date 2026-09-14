@@ -1,5 +1,5 @@
 # ETAPA 1: Builder (Imagen pesada con todas las herramientas)
-FROM golang:1.25-bookworm AS builder
+FROM golang:1.26-bookworm AS builder
 
 # Instalar herramientas de generación
 RUN go install github.com/a-h/templ/cmd/templ@v0.3.1020

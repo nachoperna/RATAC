@@ -1,5 +1,6 @@
 # Variable para acortar los comandos de ejecución en Docker
 DB_URL = postgres://admin:password@db:5432/RATAC_DB?sslmode=disable
+DB_URL_TEST = postgres://admin:password@db_test:5432/RATAC_DB_TEST?sslmode=disable
 
 MIGRATE_DOCKER = docker run --rm -v "$(PWD)/$(MIGRATIONS_DIR):/migrations:z" --network ratac_default migrate/migrate
 
@@ -22,7 +23,7 @@ up-dbtest:
 	docker compose up -d db_test
 
 down-dbtest:
-	docker compose down db_test
+	docker compose down -v db_test
 
 up-appdocker:
 	docker compose up -d app
@@ -45,6 +46,9 @@ ddocker:
 # Uso: make migrate-create name=nombre_migracion
 migrate-up:
 	$(MIGRATE_DOCKER) -path=/migrations -database "$(DB_URL)" up
+
+migrate-up-test:
+	$(MIGRATE_DOCKER) -path=/migrations -database "$(DB_URL_TEST)" up
 
 migrate-down:
 	$(MIGRATE_DOCKER) -path=/migrations -database "$(DB_URL)" down

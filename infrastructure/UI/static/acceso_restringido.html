@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title id="ratac-title">RATAC — Acceso Restringido</title>
+      <link rel="icon" type="image/svg" href="/static/img/RATAC ISOLOGO FULL COLOR.svg">
+      <link rel="stylesheet" href="../static/index.css">
+      <link rel="stylesheet" href="../static/results.css">
+      <link rel="stylesheet" href="../static/paciente.css">
+      <link rel="stylesheet" href="../static/acceso_restringido.css">
+      <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+      <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+<body>
+      <header>
+            <a class="logo" href="/">
+                  <img src="../static/img/RATAC LOGO FULL COLOR HORIZONTAL.svg" alt="RATAC" style="height:38px; width:auto; display:block;">
+            </a>
+      </header>
+      <main class="restricted-card">
+            
+            <!-- Icono de Candado / Restricción -->
+            <div class="icon-container">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                  <circle cx="12" cy="16" r="1"></circle>
+                  </svg>
+            </div>
+
+            <h1 class="restricted-title">Acceso Restringido</h1>
+            
+            <p class="restricted-message">
+                  Parece que no tenés permisos asociados para visitar esta sección. <br><br>
+                  <strong>¿Eres un laboratorio asociado a RATAC?</strong>
+            </p>
+
+            <!-- Botones con soporte HTMX -->
+            <!-- NOTA: Usa hx-get, hx-post o hx-push-url según tu enrutamiento de backend -->
+            <div class="actions-group">
+                  <a class="btn btn-outline" href="/" > Volver al Inicio </a>
+                  
+                  <a class="btn btn-primary" href="/ingreso/formulario" > Ingresar </a>
+            </div>
+
+      </main>
+</body>
+</html>
