@@ -234,14 +234,14 @@ func mapearCamposAPaciente(info InformacionDiagnostico) domain.Paciente {
 		Fecha:                   f["f-fecha"],
 		Solicitante:             f["f-solicitante"],
 		Tecnica:                 f["f-tecnica"],
-		Familia:                 strPointer(f["f-familia"]),
-		Especie:                 strPointer(f["f-especie"]),
-		Raza:                    strPointer(f["f-raza"]),
-		Edad:                    strPointer(f["f-edad"]),
+		Familia:                 new(f["f-familia"]),
+		Especie:                 new(f["f-especie"]),
+		Raza:                    new(f["f-raza"]),
+		Edad:                    new(f["f-edad"]),
 		NombrePaciente:          f["f-paciente"],
 		ReferenciasMastocitomas: ref,
-		Antecedentes:            strPointer(f["f-antecedentes"]),
-		DescripcionMacroscopica: strPointer(f["f-macroscopica"]),
+		Antecedentes:            new(f["f-antecedentes"]),
+		DescripcionMacroscopica: new(f["f-macroscopica"]),
 		Descripciones_microscopicas: mapearDescMicros(info.DescMicros),
 	}
 }
@@ -273,4 +273,3 @@ func rutaCorrectaImagenes(imagenes []string) []string {
 	}
 	return aux
 }
-func strPointer(s string) *string { return &s }

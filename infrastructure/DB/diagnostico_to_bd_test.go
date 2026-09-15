@@ -18,32 +18,32 @@ var queries *sqlc.Queries
 var ctx context.Context
 const email_lab = "mail@mail.com"
 
-func strPointer(s string) *string { return &s }
+func new(s string) *string { return &s }
 
 func TestTransformarDatos_ValoresValidos_ParseoExitoso(t *testing.T)  {
 	fecha := "07-06-2001"
-	edad := strPointer("25")
+	edad := new("25")
 	_, _, err := TransformarDatos(fecha, edad)
 	assert.NoError(t, err)
 }
 
 func TestTransformarDatos_FechaInvalida_ParseoFallido(t *testing.T)  {
 	fecha := "Esto-no-es-una-fecha"
-	edad := strPointer("25")
+	edad := new("25")
 	_, _, err := TransformarDatos(fecha, edad)
 	assert.EqualError(t, err, "Error al parsear fecha")
 }
 
 func TestTransformarDatos_EdadInvalida_ParseoFallido(t *testing.T)  {
 	fecha := "07-06-2001"
-	edad := strPointer("EstoNoEsUnaEdad")
+	edad := new("EstoNoEsUnaEdad")
 	_, _, err := TransformarDatos(fecha, edad)
 	assert.EqualError(t, err, "Error al convertir edad")
 }
 
 func TestInsertarPaciente_DatosValidos_AltaPacienteDB(t *testing.T)  {
 	fecha := "07-06-2001"
-	edad := strPointer("10")
+	edad := new("10")
 	protocolo := "PROT-001"
 	paciente := domain.Paciente{
 		Protocolo: protocolo,
@@ -51,14 +51,14 @@ func TestInsertarPaciente_DatosValidos_AltaPacienteDB(t *testing.T)  {
 		Solicitante: "Veterinaria",
 		Email_Lab: email_lab,
 		Tecnica: "HE",
-		Familia: strPointer("Perna"),
-		Especie: strPointer("Canino"),
-		Raza: strPointer("Doberman"),
+		Familia: new("Perna"),
+		Especie: new("Canino"),
+		Raza: new("Doberman"),
 		Edad: edad,
-		NombrePaciente: *strPointer("Nacho"),
+		NombrePaciente: *new("Nacho"),
 		ReferenciasMastocitomas: false,
-		Antecedentes: strPointer("Test de antecedentes."),
-		DescripcionMacroscopica: strPointer("Test de descripcion macroscopica."),
+		Antecedentes: new("Test de antecedentes."),
+		DescripcionMacroscopica: new("Test de descripcion macroscopica."),
 		Descripciones_microscopicas: nil,
 	}
 	
@@ -75,7 +75,7 @@ func TestInsertarPaciente_DatosValidos_AltaPacienteDB(t *testing.T)  {
 
 func TestInsertarPaciente_DatosInvalidos_SinAltaDB(t *testing.T)  {
 	fecha := "07-06-2001"
-	edad := strPointer("10")
+	edad := new("10")
 	paciente := domain.Paciente{
 		Protocolo: "TestValidacionProtocoloMayorDeCincuentaCaracteresParaPruebas",
 	}
