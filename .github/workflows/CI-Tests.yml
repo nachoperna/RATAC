@@ -55,10 +55,10 @@ jobs:
       - name: Checkout del repositorio
         uses: actions/checkout@v4
 
-      - name: Configurar Go 1.25
+      - name: Configurar Go 1.26
         uses: actions/setup-go@v5
         with:
-          go-version: '1.25'
+          go-version: '1.26'
           cache: true # Activa caché de go.sum y build
 
       - name: Instalar herramientas de generación
@@ -71,17 +71,11 @@ jobs:
           templ generate
           sqlc generate
       
-      - name: Levantar PostgreSQL para test
-        run: |
-          until PGPASSWORD=password pg_isready -h localhost -p 5433 -U admin; do
-            sleep 1
-          done
-
       - name: Aplicar schema y migrations
         run: |
-          PGPASSWORD=password psql -h localhost -p 5433 -U admin -d RATAC_DB_TEST \
-            -f ./DB/schema/schema.sql \
-            -f ./DB/migrations/002_foreign_keys.up.sql
+          CONTAINER_ID=$(docker ps -q -f ancestor=postgres:17-alpine)
+          docker exec -i $CONTAINER_ID psql -v ON_ERROR_STOP=1 -U admin -d RATAC_DB_TEST < ./DB/schema/schema.sql
+          docker exec -i $CONTAINER_ID psql -v ON_ERROR_STOP=1 -U admin -d RATAC_DB_TEST < ./DB/migrations/002_foreign_keys.up.sql
 
       - name: Ejecutar Test Unitarios (Go)
         env:
