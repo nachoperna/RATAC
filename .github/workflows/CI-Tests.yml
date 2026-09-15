@@ -83,6 +83,7 @@ jobs:
             -f ./DB/schema/schema.sql \
             -f ./DB/migrations/002_foreign_keys.up.sql
 
+      - name: Ejecutar Test Unitarios (Go)
         env:
           TEST_DB_URL: postgres://admin:password@localhost:5433/RATAC_DB_TEST?sslmode=disable
         # Usamos -race para detectar condiciones de carrera (crucial en concurrencia)
