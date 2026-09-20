@@ -1,0 +1,32 @@
+package views
+
+import "RATAC/domain"
+
+templ Solicitudes(solicitudes []domain.Solicitud ) {
+      for _, solicitud := range solicitudes {
+            <article class="request-card">
+                  <div class="request-header">
+                        <div>
+                              <h3 class="lab-name">{solicitud.Nombre}</h3>
+                              <span class="lab-location">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                    {solicitud.Ciudad}
+                              </span>
+                        </div>
+                        <span class="request-date">XX-XX-XX</span>
+                  </div>
+
+                  <div class="vet-list">
+                  <strong>Veterinarios:</strong> 
+                  for _, vet := range solicitud.Veterinarios {
+                        {vet.Nombre},
+                  }
+            </div>
+
+                  <div class="request-actions">
+                        <button class="btn btn-outline">Rechazar</button>
+                        <button class="btn btn-primary">Aceptar</button>
+                  </div>
+            </article>
+      }
+}

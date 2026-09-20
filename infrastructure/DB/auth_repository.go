@@ -4,6 +4,7 @@ import (
 	sqlc "RATAC/DB/sqlc"
 	"context"
 	"database/sql"
+	"strconv"
 	"time"
 
 	"github.com/google/uuid"
@@ -23,25 +24,34 @@ func NewAuthRepository(queries *sqlc.Queries, db *sql.DB) *AuthRepository {
 	}
 }
 
-func (r *AuthRepository) RegistrarUsuario(ctx context.Context, email, contraseña, rol, ciudad_origen, nombre_lab string) (string, time.Time, error)  {
+func (r *AuthRepository) RegistrarSolicitud(ctx context.Context, email, contraseña, ciudad_origen, nombre_lab string, matriculas, veterinarios []string) error  {
 	hash, err := bcrypt.GenerateFromPassword([]byte(contraseña), bcrypt.DefaultCost)
 	if err != nil {
-		return "", time.Time{}, err
+		return err
 	}
 
-	usuario, err := r.queries.CreateUsuario(ctx, sqlc.CreateUsuarioParams{
+	_, err = r.queries.CreateSolicitud(ctx, sqlc.CreateSolicitudParams{
 		Email: email,
-		ContraseñaHash: string(hash),
-		Rol: sqlc.Roles(rol),
 		CiudadOrigen: ciudad_origen,
 		NombreLab: nombre_lab,
-	})
+		ContraseñaHash: string(hash),
+	})	
 	if err != nil {
-		return "", time.Time{}, err
+		return err
 	}
 
-	token, expiracion, err := r.NuevaSesion(ctx, usuario.ID)
-	return token, expiracion, err
+	for i, matricula := range matriculas {
+		aux, err := strconv.ParseInt(matricula, 10, 32)
+		if err != nil {
+			return err
+		}
+		err = r.queries.SetVetinarios(ctx, sqlc.SetVetinariosParams{
+			Matricula: int32(aux),
+			Nombre: veterinarios[i],
+			EmailLab: email,
+		})
+	}
+	return nil
 }
 
 func (r *AuthRepository) Login(ctx context.Context, email, contraseña string) (string, time.Time, error)  {

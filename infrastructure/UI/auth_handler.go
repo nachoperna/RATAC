@@ -2,6 +2,7 @@ package ui
 
 import (
 	"RATAC/application"
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -69,27 +70,17 @@ func (h *AuthHandler) Registrarse (w http.ResponseWriter, r *http.Request) {
 	}
 	email := r.FormValue("email")
 	nombre_lab := r.FormValue("nombre-lab")
-	contraseña := "contraseña-auto-generada" // Luego el laboratorio debera cambiarla
-	// veterinarios := r.Form["nombre-vet"]
-	// matriculas := r.Form["matricula-vet"]
+	contraseña := fmt.Sprintf("%s-RATAC-2026", nombre_lab) // Luego el laboratorio debera cambiarla
+	veterinarios := r.Form["nombre-vet"]
+	matriculas := r.Form["matricula-vet"]
 	ciudad_origen := r.FormValue("ciudad-origen")
-	rol := "laboratorio"
 
-	token, expiracion, err := h.AuthService.Registrarse(r.Context(), email, contraseña, rol, ciudad_origen, nombre_lab)
+	err = h.AuthService.Registrarse(r.Context(), email, contraseña, ciudad_origen, nombre_lab, matriculas, veterinarios)
 	if err != nil {
 		// renderizar templ de error
 		http.Error(w, "Error al iniciar seison" + err.Error(), http.StatusBadRequest)
 		return 
 	}
-	http.SetCookie(w, &http.Cookie{
-		Name: NOMBRE_TOKEN,
-		Value: token,
-		Expires: expiracion,
-		HttpOnly: true,
-		SameSite: http.SameSiteStrictMode,
-		Path: "/",
-	})
-	w.Header().Set("HX-Redirect", "/admin/panel?login_reciente=true")
 	w.WriteHeader(http.StatusOK)
 }
 

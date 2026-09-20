@@ -183,6 +183,17 @@ func (h *AdminHandler) ShowAdminPanel(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	// SE DEBE HACER PETICION A LA BD PARA OBTENER ROL REAL CON EL TOKEN
+	solicitudes, autorizado, err := h.adminService.GetSolicitudes(r.Context(), "admin")
+	if err != nil {
+		// renderizar templ de error
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	var lista_solicitudes templ.Component
+	if autorizado {
+		lista_solicitudes = views.Solicitudes(solicitudes)
+	}
 	var tabla_diagnosticos templ.Component = views.TablaUltimosDiagnosticos(pacientes, 0, total, true)
 	var paginacion templ.Component = views.ResultadosRestantes(int8(len(pacientes)), 0, total)
 	var header templ.Component = views.HeaderLinks(true, "")
@@ -199,6 +210,7 @@ func (h *AdminHandler) ShowAdminPanel(w http.ResponseWriter, r *http.Request) {
 		"TablaDiagnosticos": tabla_diagnosticos,
 		"Paginacion": paginacion,
 		"Header": header,
+		"Solicitudes": lista_solicitudes,
 	}
 	tmp.Execute(w, datos)
 }

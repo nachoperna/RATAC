@@ -35,7 +35,7 @@ func (r *AdminRepository) PacienteYaRegistrado(ctx context.Context, protocolo st
 	return true
 }
 
-func (r  *AdminRepository) GetUltimosDiagnosticosCargados(ctx context.Context, offset int8, token string) ([]domain.Paciente, int16, error) {
+func (r *AdminRepository) GetUltimosDiagnosticosCargados(ctx context.Context, offset int8, token string) ([]domain.Paciente, int16, error) {
 	pacientes_rows, err := r.queries.ListPacientesByLab(ctx, sqlc.ListPacientesByLabParams{
 		Offset: int32(offset),
 		Token: token,
@@ -53,4 +53,36 @@ func (r  *AdminRepository) GetUltimosDiagnosticosCargados(ctx context.Context, o
 		pacientes = append(pacientes, paciente)
 	}
 	return pacientes, total, nil
+}
+
+func (r *AdminRepository) GetSolicitudes(ctx context.Context) ([]domain.Solicitud, error) {
+	var arr_solicitudes []domain.Solicitud
+	solicitudes, err := r.queries.GetSolicitudes(ctx)
+	if err != nil {
+		return nil, err
+	}
+	for _, solicitud := range solicitudes {
+		veterinarios, err := r.queries.GetVeterinarios(ctx, solicitud.Email)
+		if err != nil {
+			return nil, err
+		}
+		arr_solicitudes = append(arr_solicitudes, solicitudORM(solicitud, veterinarios))
+	}
+	return arr_solicitudes, nil
+}
+
+func solicitudORM(soli sqlc.GetSolicitudesRow, vet []sqlc.GetVeterinariosRow) domain.Solicitud {
+	var vetes []domain.Veterinarios
+	for _, v := range vet {
+		vetes = append(vetes, domain.Veterinarios{
+			Matricula: v.Matricula,
+			Nombre: v.Nombre,
+		})
+	}
+	return domain.Solicitud{
+		Email: soli.Email,
+		Nombre: soli.NombreLab,
+		Ciudad: soli.CiudadOrigen,
+		Veterinarios: vetes,
+	}
 }

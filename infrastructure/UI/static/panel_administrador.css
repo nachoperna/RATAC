@@ -346,17 +346,6 @@ tr:hover td {
       display: inline-block;
 }
 
-.request-message {
-      background: #fafbfc;
-      border: 1px dashed var(--border-light);
-      padding: 10px 12px;
-      border-radius: 6px;
-      font-size: 12.5px;
-      color: var(--text-muted);
-      font-style: italic;
-      line-height: 1.4;
-}
-
 .request-actions {
       display: grid;
       grid-template-columns: 1fr 1fr;

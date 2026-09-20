@@ -178,3 +178,14 @@ func (s  *AdminService) GetUltimosDiagnosticosCargados(ctx context.Context, offs
 	}
 	return diagnosticos, total, nil
 }
+
+func (s  *AdminService) GetSolicitudes(ctx context.Context, rol string) ([]domain.Solicitud, bool, error) {
+	if rol != "admin"{
+		return nil, false, nil
+	}
+	solicitudes, err := s.adminRepo.GetSolicitudes(ctx)
+	if err != nil {
+		return nil, true, err
+	}
+	return solicitudes, true, nil
+}
