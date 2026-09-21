@@ -70,6 +70,7 @@ func main() {
 	http.HandleFunc("/diagnosticos/baja/{protocolo}", authHandler.LoggerChecker(pacienteHandler.BorrarPaciente))
 	http.HandleFunc("/diagnosticos", authHandler.LoggerChecker(adminHandler.DiagnosticosByUser))
 	http.HandleFunc("/admin/panel", authHandler.LoggerChecker(adminHandler.ShowAdminPanel))
+	http.HandleFunc("/admin/solicitudes/aceptar/{email}", authHandler.LoggerChecker(adminHandler.SolicitudAprobada))
 
 	http.HandleFunc("/registrarse", authHandler.Registrarse)
 	http.HandleFunc("/login", authHandler.Login)

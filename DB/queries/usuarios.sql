@@ -15,3 +15,6 @@ SELECT * FROM Usuarios WHERE email = $1;
 
 -- name: UsuarioLogueado :exec
 UPDATE Usuarios SET activo = true WHERE email = $1;
+
+-- name: CambiarRol :exec
+UPDATE Usuarios set rol = $2::roles WHERE email = $1;

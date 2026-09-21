@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -236,6 +237,25 @@ func (h *AdminHandler) DiagnosticosByUser(w http.ResponseWriter, r *http.Request
 	}
 	w.WriteHeader(http.StatusOK)
 	views.TablaUltimosDiagnosticos(pacientes, offset, total, false).Render(r.Context(), w)
+}
+
+func (h *AdminHandler) SolicitudAprobada (w http.ResponseWriter, r *http.Request)  {
+	email := r.PathValue("email")
+	nombre, _, err := h.adminService.SolicitudAprobada(r.Context(), email)
+	if err != nil {
+		// renderizar templ de error
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+	contraseña := nombre + os.Getenv("CONTRA_AUTOGENERADA")
+	err = enviarMail(nombre, email, contraseña)
+	if err != nil {
+		// renderizar templ de error
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
 }
 
 func mapearCamposAPaciente(info InformacionDiagnostico) domain.Paciente {

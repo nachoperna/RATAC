@@ -86,3 +86,18 @@ func solicitudORM(soli sqlc.GetSolicitudesRow, vet []sqlc.GetVeterinariosRow) do
 		Veterinarios: vetes,
 	}
 }
+
+func (r *AdminRepository) SolicitudAprobada (ctx context.Context, email string) (string, string, error) {
+	err := r.queries.CambiarRol(ctx, sqlc.CambiarRolParams{
+		Email: email,
+		Column2: sqlc.RolesLaboratorio,
+	})
+	if err != nil {
+		return "", "", err
+	}
+	usuario, err := r.queries.GetUsuario(ctx, email)
+	if err != nil {
+		return "", "", err
+	}
+	return usuario.NombreLab, usuario.ContraseñaHash, nil
+}
