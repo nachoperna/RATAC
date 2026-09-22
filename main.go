@@ -72,8 +72,11 @@ func main() {
 	http.HandleFunc("/admin/panel", authHandler.LoggerChecker(adminHandler.ShowAdminPanel))
 	http.HandleFunc("/admin/solicitudes/aceptar/{email}", authHandler.LoggerChecker(adminHandler.SolicitudAprobada))
 
+	// http.HandleFunc("/registrarse", authHandler.NoActionOk)
+	// http.HandleFunc("/registrarse", authHandler.NoActionErr)
 	http.HandleFunc("/registrarse", authHandler.Registrarse)
 	http.HandleFunc("/login", authHandler.Login)
+	// http.HandleFunc("/login", authHandler.NoActionOk)
 	http.HandleFunc("/logout", authHandler.Logout)
 	http.HandleFunc("/activo", authHandler.LoggerChecker(authHandler.SesionActiva))
 	

@@ -61,6 +61,15 @@ func (h *AuthHandler) ifCargaFallida (r *http.Request)  {
 	}
 }
 
+func (h *AuthHandler) NoActionOk (w http.ResponseWriter, r *http.Request) {
+	time.Sleep(3 * time.Second)
+	w.WriteHeader(http.StatusOK)
+}
+func (h *AuthHandler) NoActionErr (w http.ResponseWriter, r *http.Request) {
+	time.Sleep(3 * time.Second)
+	w.WriteHeader(http.StatusBadRequest)
+}
+
 func (h *AuthHandler) Registrarse (w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {

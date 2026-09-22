@@ -31,11 +31,11 @@ function addVetRow() {
       row.innerHTML = `
             <div class="vet-input-group">
                   <label class="form-label">Nombre y Apellido</label>
-                  <input type="text" class="form-control" placeholder="Dr/Dra. Nombre" required>
+                  <input type="text" name="nombre-vet" class="form-control" placeholder="Dr/Dra. Nombre" required>
             </div>
             <div class="vet-input-group">
                   <label class="form-label">Matrícula (MP/MN)</label>
-                  <input type="text" class="form-control" placeholder="N° de Matrícula" required>
+                  <input type="text" name="matricula-vet" class="form-control" placeholder="N° de Matrícula" required>
             </div>
             <button type="button" class="btn-remove-vet" title="Eliminar veterinario" onclick="removeVetRow(this)">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"></path></svg>
@@ -184,11 +184,44 @@ searchInput.addEventListener('input', () => {
 document.body.addEventListener('htmx:configRequest', function(evt) {
       // Solo modificamos la petición si va dirigida a Georef
       if (evt.detail.path.startsWith("https://apis.datos.gob.ar")) {
-      // Eliminamos las cabeceras que causan el bloqueo CORS en APIs públicas
-      delete evt.detail.headers['HX-Request'];
-      delete evt.detail.headers['HX-Target'];
-      delete evt.detail.headers['HX-Current-URL'];
-      delete evt.detail.headers['HX-Trigger'];
-      delete evt.detail.headers['HX-Trigger-Name'];
+            // Eliminamos las cabeceras que causan el bloqueo CORS en APIs públicas
+            delete evt.detail.headers['HX-Request'];
+            delete evt.detail.headers['HX-Target'];
+            delete evt.detail.headers['HX-Current-URL'];
+            delete evt.detail.headers['HX-Trigger'];
+            delete evt.detail.headers['HX-Trigger-Name'];
       }
-});
+})
+
+function selectModal(evt) {
+      // Comprobamos que sea el formulario correcto y que el status sea 200 OK
+      if (evt.detail.successful) {
+            solicitudExitosa(evt);
+      } else {
+            solicitudErronea();
+      }
+      // Limpiar el formulario
+      evt.detail.elt.reset(); 
+}
+
+function solicitudExitosa(evt) {
+      // Obtener el email que el usuario ingresó para mostrarlo en el modal
+      const email = evt.target.querySelector('input[name="email"]').value;
+      document.getElementById('modal-email-target').textContent = email || 'tu correo';
+
+      // Mostrar el modal
+      document.getElementById('success-modal').classList.add('active');
+}
+
+function solicitudErronea() {
+      // Mostrar el modal
+      document.getElementById('error-modal').classList.add('active');
+}
+
+// Función para cerrar el modal
+function closeSuccessModal() {
+      document.getElementById('success-modal').classList.remove('active');
+}
+function closeErrorModal() {
+      document.getElementById('error-modal').classList.remove('active');
+};;
