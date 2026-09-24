@@ -90,6 +90,7 @@ func (h *AuthHandler) Registrarse (w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error al iniciar seison" + err.Error(), http.StatusBadRequest)
 		return 
 	}
+	go enviarMailSolicitud(nombre_lab, email, ciudad_origen, veterinarios, matriculas)
 	w.WriteHeader(http.StatusOK)
 }
 

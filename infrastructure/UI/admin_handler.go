@@ -249,13 +249,14 @@ func (h *AdminHandler) SolicitudAprobada (w http.ResponseWriter, r *http.Request
 		return
 	}
 	contraseña := nombre + os.Getenv("CONTRA_AUTOGENERADA")
-	err = enviarMail(nombre, email, contraseña)
+	err = enviarMailSolicitudAprobada(nombre, email, contraseña)
 	if err != nil {
 		// renderizar templ de error
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
 		return
 	}
+	w.WriteHeader(http.StatusOK)
 }
 
 func mapearCamposAPaciente(info InformacionDiagnostico) domain.Paciente {
