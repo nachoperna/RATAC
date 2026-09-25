@@ -91,31 +91,54 @@
                   </div>
             </div>
       </main>
-
-    
-    <!-- Modal: Eliminar Fila -->
-      <div id="delete-modal" class="modal-overlay">
+      <!-- Modal de Aceptación -->
+      <div id="accept-modal" class="modal-overlay">
             <div class="modal-content">
-                  <h3 class="modal-title">Eliminar registro</h3>
-                  <p class="modal-body" id="delete-modal-text">¿Está seguro que desea eliminar el protocolo de la base de datos? Esta acción no se puede deshacer.</p>
+                  <div class="modal-icon icon-success" style="background-color: var(--success-light); color: var(--success);">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                  </div>
+                  <h3 class="modal-title">Confirmar Aceptación</h3>
+                  <p class="modal-body">¿Está seguro que desea aceptar al laboratorio <strong id="accept-lab-name"></strong> como colaborador?</p>
                   <div class="modal-actions-row">
-                        <button class="btn btn-outline" onclick="closeModals(this)">Cancelar</button>
-                        <button class="btn btn-danger">Sí, Eliminar</button>
+                        <button class="btn btn-outline" onclick="closeModals()">Cancelar</button>
+                        <button class="btn btn-success" id="btn-confirm" 
+                              hx-get="/admin/solicitudes/aceptar"
+                              hx-vals='js:{email: email}'
+                              hx-disabled-elt=".modal-overlay.active .btn-outline"
+                              hx-on::after-request="processAction()"
+                              >
+                              <span class="text-pre-request">Sí, Aceptar</span>
+                              <span class="loading-request">
+                                    <div class="spinner"></div>
+                                    Aceptando solicitud ...
+                              </span>
+                        </button>
                   </div>
             </div>
       </div>
 
-    <!-- Modal: Aceptar/Rechazar Solicitud -->
-      <div id="request-modal" class="modal-overlay">
+      <!-- Modal de Rechazo -->
+      <div id="reject-modal" class="modal-overlay">
             <div class="modal-content">
-                  <h3 class="modal-title" id="request-modal-title">Acción</h3>
-                  <p class="modal-body" id="request-modal-text">Escriba un mensaje para notificar al laboratorio de su decisión (opcional).</p>
-                  
-                  <textarea class="modal-input" placeholder="Escriba su mensaje aquí..."></textarea>
-                  
+                  <div class="modal-icon icon-warning" style="background-color: #fdf2f2; color: #d9534f;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                  </div>
+                  <h3 class="modal-title" style="color: #d9534f;">Confirmar Rechazo</h3>
+                  <p class="modal-body">¿Está seguro que desea rechazar al laboratorio <strong id="reject-lab-name"></strong> como colaborador?</p>
                   <div class="modal-actions-row">
-                  <button class="btn btn-outline" onclick="closeModals()">Cancelar</button>
-                  <button class="btn btn-primary" id="btn-confirm-request" onclick="submitRequest()">Confirmar</button>
+                        <button class="btn btn-outline" onclick="closeModals()">Cancelar</button>
+                        <button class="btn btn-danger"
+                              hx-get="/admin/solicitudes/rechazar"
+                              hx-vals='js:{email: email}'
+                              hx-disabled-elt=".modal-overlay.active .btn-outline"
+                              hx-on::after-request="processAction()"
+                              >
+                              <span class="text-pre-request">Sí, Rechazar</span>
+                              <span class="loading-request">
+                                    <div class="spinner"></div>
+                                    Rechazando solicitud ...
+                              </span>
+                        </button>
                   </div>
             </div>
       </div>

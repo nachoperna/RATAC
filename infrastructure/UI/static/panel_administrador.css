@@ -404,75 +404,51 @@ tr:hover td {
 }
 
 .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(17, 17, 40, 0.5);
-      backdrop-filter: blur(4px);
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s ease;
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(17, 17, 40, 0.5); backdrop-filter: blur(4px);
+      z-index: 1000; display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
 }
 
-.modal-overlay.active {
-      opacity: 1;
-      pointer-events: auto;
-}
+.modal-overlay.active { opacity: 1; pointer-events: auto; }
 
 .modal-content {
-      background: var(--bg-card);
-      border-radius: 12px;
-      padding: 32px;
-      width: 90%;
-      max-width: 440px;
+      background: var(--bg-card); border-radius: 12px; padding: 32px;
+      width: 90%; max-width: 440px; text-align: center;
       box-shadow: 0 10px 40px rgba(26, 26, 110, 0.1);
-      transform: translateY(20px);
-      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transform: translateY(20px) scale(0.95); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       border: 1px solid var(--border-light);
 }
 
-.modal-overlay.active .modal-content {
-      transform: translateY(0);
-}
+.modal-overlay.active .modal-content { transform: translateY(0) scale(1); }
 
-.modal-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 24px;
-      color: var(--navy);
-      margin-bottom: 12px;
-      font-weight: 600;
-}
+/* Íconos grandes para el modal */
+.modal-icon { width: 64px; height: 64px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px auto; }
+.icon-success { background-color: var(--success-light); color: var(--success); }
+.icon-warning { background-color: #fff8e1; color: #f57f17; } /* Naranja suave para confirmar acción riesgosa */
 
-.modal-body {
-      font-size: 15px;
-      color: var(--text-muted);
-      margin-bottom: 24px;
-}
-
-.modal-input {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid var(--border-light);
-      border-radius: 6px;
-      font-family: 'Source Serif 4', serif;
-      font-size: 14px;
-      resize: vertical;
-      min-height: 80px;
-      margin-bottom: 24px;
-      outline: none;
-}
-
-.modal-input:focus {
-      border-color: var(--navy);
-}
+.modal-title { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--navy); margin-bottom: 12px; font-weight: 600; }
+.modal-body { font-size: 15px; color: var(--text-muted); margin-bottom: 32px; line-height: 1.6; }
+.modal-body strong { color: var(--navy); font-weight: 600; }
 
 .modal-actions-row {
       display: flex;
       justify-content: flex-end;
       gap: 12px;
+      width: 100%;
+}
+
+.modal-actions-row .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      white-space: nowrap; /* Evita que "Aceptando solicitud..." se parta en 2 líneas */
+      flex: 1 1 0px;
+      min-width: 0;
+      transition: flex 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
+            background-color 0.2s ease, 
+            opacity 0.2s ease;
 }
 
 .btn-danger {
@@ -482,6 +458,57 @@ tr:hover td {
 .btn-danger:hover {
       background: #c9302c;
 }
+
+.btn-success { background: var(--success); color: white; }
+.btn-success:hover { background: #145931; }
+
+.spinner {
+      height: 16px;
+      width: 16px;
+      border: 1px solid grey;
+      border-top: 2px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      flex-shrink: 0;
+}
+
+.loading-request{
+      display: none;
+      align-items: center;
+      gap: 10px;
+}
+
+.btn-danger.htmx-request, .btn-success.htmx-request {
+      flex: 2 1 0px;
+      min-width: 0;
+      pointer-events: none; /* Evita clics adicionales */
+      opacity: 0.85; /* Da un aspecto ligeramente atenuado */
+      /* Previene el efecto hover (translate) mientras carga */
+      transform: none;
+}
+
+.btn-danger.htmx-request:hvoer, .btn-success.htmx-request:hover {
+      cursor: wait;
+}
+
+.btn-danger.htmx-request .text-pre-request,
+.btn-success.htmx-request .text-pre-request{
+      display: none;
+}
+
+.btn-danger.htmx-request .loading-request,
+.btn-success.htmx-request .loading-request{
+      display: flex;
+}
+
+.modal-actions-row:has(.btn-success.htmx-request) .btn-outline,
+.modal-actions-row:has(.btn-danger.htmx-request) .btn-outline {
+      pointer-events: none;
+      opacity: .5;
+      cursor: not-allowed;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
 
 /* Responsividad */
 @media (max-width: 1024px) {
