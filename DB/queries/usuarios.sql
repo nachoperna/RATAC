@@ -18,3 +18,7 @@ UPDATE Usuarios SET activo = true WHERE email = $1;
 
 -- name: CambiarRol :exec
 UPDATE Usuarios set rol = $2::roles WHERE email = $1;
+
+-- name: EliminarUsuario :one
+DELETE FROM Usuarios WHERE email = $1
+RETURNING nombre_lab;

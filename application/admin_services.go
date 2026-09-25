@@ -193,3 +193,7 @@ func (s *AdminService) GetSolicitudes(ctx context.Context, rol string) ([]domain
 func (s *AdminService) SolicitudAprobada (ctx context.Context, email string) (string, string, error) {
 	return s.adminRepo.SolicitudAprobada(ctx, email)
 }
+
+func (s *AdminService) SolicitudRechazada (ctx context.Context, email string) (string, string, error) {
+	return s.adminRepo.SolicitudAprobada(ctx, email)
+}

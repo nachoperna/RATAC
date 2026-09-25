@@ -240,7 +240,7 @@ func (h *AdminHandler) DiagnosticosByUser(w http.ResponseWriter, r *http.Request
 }
 
 func (h *AdminHandler) SolicitudAprobada (w http.ResponseWriter, r *http.Request)  {
-	email := r.PathValue("email")
+	email := r.URL.Query().Get("email")
 	nombre, _, err := h.adminService.SolicitudAprobada(r.Context(), email)
 	if err != nil {
 		// renderizar templ de error
@@ -250,6 +250,25 @@ func (h *AdminHandler) SolicitudAprobada (w http.ResponseWriter, r *http.Request
 	}
 	contraseña := nombre + os.Getenv("CONTRA_AUTOGENERADA")
 	err = enviarMailSolicitudAprobada(nombre, email, contraseña)
+	if err != nil {
+		// renderizar templ de error
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+}
+
+func (h *AdminHandler) SolicitudRechazada (w http.ResponseWriter, r *http.Request)  {
+	email := r.URL.Query().Get("email")
+	nombre, _, err := h.adminService.SolicitudRechazada(r.Context(), email)
+	if err != nil {
+		// renderizar templ de error
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+	err = enviarMailSolicitudRechazada(nombre, email)
 	if err != nil {
 		// renderizar templ de error
 		w.WriteHeader(http.StatusInternalServerError)

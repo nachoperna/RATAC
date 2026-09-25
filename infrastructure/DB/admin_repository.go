@@ -101,3 +101,7 @@ func (r *AdminRepository) SolicitudAprobada (ctx context.Context, email string) 
 	}
 	return usuario.NombreLab, usuario.ContraseñaHash, nil
 }
+
+func (r *AdminRepository) SolicitudRechazada (ctx context.Context, email string) (string, error) {
+	return r.queries.EliminarUsuario(ctx, email)
+}

@@ -1,7 +1,6 @@
 package views
 
 import "RATAC/domain"
-import "fmt"
 
 templ Solicitudes(solicitudes []domain.Solicitud ) {
       for _, solicitud := range solicitudes {
@@ -24,11 +23,17 @@ templ Solicitudes(solicitudes []domain.Solicitud ) {
                         }
                   </div>
                   <div class="request-actions">
-                        <button class="btn btn-outline">Rechazar</button>
+                        <button class="btn btn-outline"
+                              data-email_lab={ solicitud.Email }
+                              data-nombre_lab={ solicitud.Nombre }
+                              onclick="openRejectModal(this)"
+                              >Rechazar
+                        </button>
                         <button 
                               class="btn btn-primary"
-                              hx-get={fmt.Sprintf("/admin/solicitudes/aceptar/%s", solicitud.Email)}
-                              hx-swap="none"
+                              data-email_lab={ solicitud.Email }
+                              data-nombre_lab={ solicitud.Nombre }
+                              onclick="openAcceptModal(this)"
                               >Aceptar
                         </button>
                   </div>

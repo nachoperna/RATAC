@@ -39,6 +39,31 @@ func enviarMailSolicitudAprobada (nombre, email, contraseña string) error {
 	return err
 }
 
+func enviarMailSolicitudRechazada (nombre, email string) error {
+	m := gomail.NewMessage()
+
+	setHeader(m, os.Getenv("FROM_MAIL"), email, "RATAC - Solicitud Rechazada")
+	incluirImagenes(m)
+
+	var html bytes.Buffer
+	tmp, err := template.ParseFiles("./infrastructure/UI/static/email_solicitud_rechazada.html")
+	if err != nil {
+		return fmt.Errorf("error al parsear template de mail: %w", err)
+	}
+	tmp.Execute(&html, struct{
+		Nombre string
+	}{
+		Nombre: nombre,
+	})
+
+	m.SetBody("text/html", html.String())
+
+	port, _ := strconv.Atoi(os.Getenv("PUERTO_MAIL"))
+	d := gomail.NewDialer(os.Getenv("HOST_MAIL"), port, os.Getenv("FROM_MAIL"), os.Getenv("CLAVE_ACCESO"))
+	err = d.DialAndSend(m) 
+	return err
+}
+
 func enviarMailSolicitud (nombre, email, ciudad_origen string, veterinarios, matriculas []string) error {
 	m := gomail.NewMessage()
 

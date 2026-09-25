@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitud Rechazada - RATAC</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@500;600&family=Playfair+Display:wght@600;700&family=Source+Serif+4:ital,wght@0,400;0,600&display=swap');
+    </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f7f6fb; font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif; color: #111128; -webkit-font-smoothing: antialiased;">
+
+    <!-- Contenedor principal 100% ancho -->
+    <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color: #f7f6fb; width: 100%; margin: 0; padding: 40px 0;">
+        <tr>
+            <td align="center" style="padding: 20px;">
+                
+                <!-- Tarjeta central -->
+                <table width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color: #ffffff; max-width: 600px; width: 100%; border: 1px solid #e8dcdb; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(26, 26, 110, 0.03);">
+                    
+                    <!-- Header (Logo) -->
+                    <tr>
+                        <td align="center" style="padding: 40px 40px 20px 40px; border-bottom: 1px solid #fbf7f7;">
+                            <img src="cid:ratac_logo" alt="RATAC" width="180" style="display: block; width: 180px; max-width: 100%; height: auto;">
+                        </td>
+                    </tr>
+
+                    <!-- Cuerpo del Mensaje -->
+                    <tr>
+                        <td style="padding: 40px 40px 30px 40px;">
+
+                            <!-- Título principal en tono rojizo -->
+                            <h1 style="margin: 0 0 24px 0; font-family: 'Playfair Display', Georgia, 'Times New Roman', serif; font-size: 26px; font-weight: 600; color: #d9534f; line-height: 1.3;">
+                                Solicitud rechazada
+                            </h1>
+
+                            <!-- Cuadro de Notificación con acento rojo suave -->
+                            <table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin-bottom: 10px;">
+                                <tr>
+                                    <td valign="top" style="background-color: #fdf6f6; border-left: 4px solid #d9534f; border-radius: 0 8px 8px 0; padding: 22px 24px;">
+                                        <p style="margin: 0 0 14px 0; font-family: 'Source Serif 4', Georgia, serif; font-size: 15.5px; line-height: 1.65; color: #2d1818;">
+                                                Lo sentimos, la solicitud del laboratorio {{.Nombre}} para colaborar en RATAC ha sido rechazada por el administrador.
+                                        </p>
+                                        <p style="margin: 0; font-family: 'Source Serif 4', Georgia, serif; font-size: 14.5px; line-height: 1.65; color: #6b5050;">
+                                            Si cree que es un error o tiene alguna duda comuníquese a este mismo mail.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+
+                        </td>
+                    </tr>
+
+                    <!-- Footer institucional -->
+                    <tr>
+                        <td style="background-color: #fafbfc; border-top: 1px solid #ddd8ee; padding: 24px 40px; text-align: left;">
+                            <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td align="left" style="font-family: 'DM Mono', Consolas, Courier, monospace; font-size: 11px; color: #6b6b8a; text-transform: uppercase; letter-spacing: 0.05em; line-height: 1.6;">
+                                        Facultad de Ciencias Veterinarias · UNICEN<br>
+                                        Registro Argentino de Tumores en Animales de Compañía
+                                    </td>
+                                    <td align="right" style="font-family: 'DM Mono', Consolas, Courier, monospace; font-size: 11px; color: #1a1a6e; font-weight: 600;">
+                                        &copy; 2026 RATAC
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                </table>
+                
+                <!-- Espaciador inferior -->
+                <div style="height: 40px;">&nbsp;</div>
+
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>

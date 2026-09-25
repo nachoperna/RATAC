@@ -23,4 +23,5 @@ type AdminRepository interface{
 	GetUltimosDiagnosticosCargados(ctx context.Context, offset int8, token string) ([]Paciente, int16, error)
 	GetSolicitudes(ctx context.Context) ([]Solicitud, error)
 	SolicitudAprobada (ctx context.Context, email string) (string, string, error)
+	SolicitudRechazada (ctx context.Context, email string) (string, error)
 }
