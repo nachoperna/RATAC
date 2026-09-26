@@ -261,7 +261,7 @@ func (h *AdminHandler) SolicitudAprobada (w http.ResponseWriter, r *http.Request
 
 func (h *AdminHandler) SolicitudRechazada (w http.ResponseWriter, r *http.Request)  {
 	email := r.URL.Query().Get("email")
-	nombre, _, err := h.adminService.SolicitudRechazada(r.Context(), email)
+	nombre, err := h.adminService.SolicitudRechazada(r.Context(), email)
 	if err != nil {
 		// renderizar templ de error
 		w.WriteHeader(http.StatusInternalServerError)

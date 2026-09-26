@@ -194,6 +194,6 @@ func (s *AdminService) SolicitudAprobada (ctx context.Context, email string) (st
 	return s.adminRepo.SolicitudAprobada(ctx, email)
 }
 
-func (s *AdminService) SolicitudRechazada (ctx context.Context, email string) (string, string, error) {
-	return s.adminRepo.SolicitudAprobada(ctx, email)
+func (s *AdminService) SolicitudRechazada (ctx context.Context, email string) (string, error) {
+	return s.adminRepo.SolicitudRechazada(ctx, email)
 }
