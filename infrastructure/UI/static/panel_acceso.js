@@ -222,6 +222,3 @@ function solicitudErronea() {
 function closeSuccessModal() {
       document.getElementById('success-modal').classList.remove('active');
 }
-function closeErrorModal() {
-      document.getElementById('error-modal').classList.remove('active');
-};;

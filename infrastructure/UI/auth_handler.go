@@ -2,7 +2,6 @@ package ui
 
 import (
 	"RATAC/application"
-	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -79,7 +78,7 @@ func (h *AuthHandler) Registrarse (w http.ResponseWriter, r *http.Request) {
 	}
 	email := r.FormValue("email")
 	nombre_lab := r.FormValue("nombre-lab")
-	contraseña := fmt.Sprintf("%s-RATAC-2026", nombre_lab) // Luego el laboratorio debera cambiarla
+	contraseña := nombre_lab + os.Getenv("CONTRA_AUTOGENERADA") // Luego el laboratorio debera cambiarla
 	veterinarios := r.Form["nombre-vet"]
 	matriculas := r.Form["matricula-vet"]
 	ciudad_origen := r.FormValue("ciudad-origen")

@@ -79,7 +79,7 @@ func (h *AdminHandler) ProcesarDocumento(w http.ResponseWriter, r *http.Request)
 			nombre, _, _ := strings.Cut(filepath.Base(archivo.Filename), ".")
 			_ = h.adminService.BorrarTemporal(nombre, nil)
 			w.WriteHeader(http.StatusOK)
-			views.ErrorCargaDiagnostico("", "El diagnóstico subido ya se encuentra cargado en el sistema.").Render(r.Context(), w)
+			views.ErrorTemplate("Error en el archivo", "El diagnóstico subido ya se encuentra cargado en el sistema.").Render(r.Context(), w)
 			return
 		} else {
 			pacientes = append(pacientes, *paciente)
@@ -243,17 +243,13 @@ func (h *AdminHandler) SolicitudAprobada (w http.ResponseWriter, r *http.Request
 	email := r.URL.Query().Get("email")
 	nombre, _, err := h.adminService.SolicitudAprobada(r.Context(), email)
 	if err != nil {
-		// renderizar templ de error
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
+		views.ErrorTemplate("Error en solicitud", "Hubo un error en el servidor al intentar aprobar la solicitud. Inténtelo nuevamente más tarde o contácte a soporte.").Render(r.Context(), w)
 		return
 	}
 	contraseña := nombre + os.Getenv("CONTRA_AUTOGENERADA")
 	err = enviarMailSolicitudAprobada(nombre, email, contraseña)
 	if err != nil {
-		// renderizar templ de error
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
+		views.ErrorTemplate("Error en solicitud", "Hubo un error al intentar enviar el mail de aprobación al laboratorio. Inténtelo nuevamente más tarde o contácte a soporte.").Render(r.Context(), w)
 		return
 	}
 	w.WriteHeader(http.StatusOK)

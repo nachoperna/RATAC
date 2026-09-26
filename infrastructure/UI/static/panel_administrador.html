@@ -105,7 +105,8 @@
                               hx-get="/admin/solicitudes/aceptar"
                               hx-vals='js:{email: email}'
                               hx-disabled-elt=".modal-overlay.active .btn-outline"
-                              hx-on::after-request="processAction()"
+                              hx-on::after-request="closeModals(); if (!document.getElementById('error')?.dataset.error) processAction()"
+                              hx-swap="none"
                               >
                               <span class="text-pre-request">Sí, Aceptar</span>
                               <span class="loading-request">
@@ -131,7 +132,8 @@
                               hx-get="/admin/solicitudes/rechazar"
                               hx-vals='js:{email: email}'
                               hx-disabled-elt=".modal-overlay.active .btn-outline"
-                              hx-on::after-request="processAction()"
+                              hx-on::after-request="closeModals(); if (!document.getElementById('error')?.dataset.error) processAction()"
+                              hx-swap="none"
                               >
                               <span class="text-pre-request">Sí, Rechazar</span>
                               <span class="loading-request">
@@ -142,5 +144,7 @@
                   </div>
             </div>
       </div>
+      <!-- Overlay de Error HTML -->
+      <div id="error" class="error-overlay"> </div>
 </body>
 </html>
