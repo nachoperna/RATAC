@@ -44,7 +44,7 @@ CREATE TABLE Grado_oncologico (
       CONSTRAINT Grado_oncologico_pk PRIMARY KEY (id,Descripciones_microscopicas_Pacientes_Protocolo,Descripciones_microscopicas_Descripcion)
 );
 
-CREATE TYPE roles AS ENUM ('admin', 'laboratorio');
+CREATE TYPE roles AS ENUM ('admin', 'laboratorio', 'solicitante');
 
 -- Table: Usuarios
 CREATE TABLE Usuarios (
@@ -57,6 +57,13 @@ CREATE TABLE Usuarios (
       activo BOOLEAN,
       fecha_creacion TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
       fecha_modificacion TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Table: Veterinarios
+CREATE TABLE Veterinarios (
+      matricula INT PRIMARY KEY,
+      nombre VARCHAR(255) NOT NULL,
+      email_lab VARCHAR(255) NOT NULL REFERENCES Usuarios(email) ON DELETE CASCADE
 );
 
 -- Table: Sesiones

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -78,7 +79,7 @@ func (h *AdminHandler) ProcesarDocumento(w http.ResponseWriter, r *http.Request)
 			nombre, _, _ := strings.Cut(filepath.Base(archivo.Filename), ".")
 			_ = h.adminService.BorrarTemporal(nombre, nil)
 			w.WriteHeader(http.StatusOK)
-			views.ErrorCargaDiagnostico("", "El diagnóstico subido ya se encuentra cargado en el sistema.").Render(r.Context(), w)
+			views.ErrorTemplate("Error en el archivo", "El diagnóstico subido ya se encuentra cargado en el sistema.").Render(r.Context(), w)
 			return
 		} else {
 			pacientes = append(pacientes, *paciente)
@@ -183,6 +184,17 @@ func (h *AdminHandler) ShowAdminPanel(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	// SE DEBE HACER PETICION A LA BD PARA OBTENER ROL REAL CON EL TOKEN
+	solicitudes, autorizado, err := h.adminService.GetSolicitudes(r.Context(), "admin")
+	if err != nil {
+		// renderizar templ de error
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	var lista_solicitudes templ.Component
+	if autorizado {
+		lista_solicitudes = views.Solicitudes(solicitudes)
+	}
 	var tabla_diagnosticos templ.Component = views.TablaUltimosDiagnosticos(pacientes, 0, total, true)
 	var paginacion templ.Component = views.ResultadosRestantes(int8(len(pacientes)), 0, total)
 	var header templ.Component = views.HeaderLinks(true, "")
@@ -199,6 +211,7 @@ func (h *AdminHandler) ShowAdminPanel(w http.ResponseWriter, r *http.Request) {
 		"TablaDiagnosticos": tabla_diagnosticos,
 		"Paginacion": paginacion,
 		"Header": header,
+		"Solicitudes": lista_solicitudes,
 	}
 	tmp.Execute(w, datos)
 }
@@ -224,6 +237,41 @@ func (h *AdminHandler) DiagnosticosByUser(w http.ResponseWriter, r *http.Request
 	}
 	w.WriteHeader(http.StatusOK)
 	views.TablaUltimosDiagnosticos(pacientes, offset, total, false).Render(r.Context(), w)
+}
+
+func (h *AdminHandler) SolicitudAprobada (w http.ResponseWriter, r *http.Request)  {
+	email := r.URL.Query().Get("email")
+	nombre, _, err := h.adminService.SolicitudAprobada(r.Context(), email)
+	if err != nil {
+		views.ErrorTemplate("Error en solicitud", "Hubo un error en el servidor al intentar aprobar la solicitud. Inténtelo nuevamente más tarde o contácte a soporte.").Render(r.Context(), w)
+		return
+	}
+	contraseña := nombre + os.Getenv("CONTRA_AUTOGENERADA")
+	err = enviarMailSolicitudAprobada(nombre, email, contraseña)
+	if err != nil {
+		views.ErrorTemplate("Error en solicitud", "Hubo un error al intentar enviar el mail de aprobación al laboratorio. Inténtelo nuevamente más tarde o contácte a soporte.").Render(r.Context(), w)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+}
+
+func (h *AdminHandler) SolicitudRechazada (w http.ResponseWriter, r *http.Request)  {
+	email := r.URL.Query().Get("email")
+	nombre, err := h.adminService.SolicitudRechazada(r.Context(), email)
+	if err != nil {
+		// renderizar templ de error
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+	err = enviarMailSolicitudRechazada(nombre, email)
+	if err != nil {
+		// renderizar templ de error
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+		return
+	}
+	w.WriteHeader(http.StatusOK)
 }
 
 func mapearCamposAPaciente(info InformacionDiagnostico) domain.Paciente {

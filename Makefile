@@ -115,4 +115,7 @@ on_test: up-dbtest wait up-appdocker wait
 off: ddocker
 	-sudo fuser -k 8080/tcp 2>/dev/null || true
 
+pipeline-cicd:
+	act push --rm
+
 .PHONY: run udocker dvdocker ddocker procesarjsons sql-directo logs server bdocker wait clean-images emptyJSONS dependencias test test-go test-python on off

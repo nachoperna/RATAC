@@ -38,6 +38,8 @@ services:
       - db
     environment:
       DATABASE_URL: postgres://admin:password@db:5432/RATAC_DB?sslmode=disable
+    env_file:
+      - .env
     volumes:
       - .:/app # Esto sincroniza tus archivos locales con el contenedor
     command: >

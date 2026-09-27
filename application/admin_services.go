@@ -171,10 +171,29 @@ func (s *AdminService) GuardarImagenes(imagenes []*multipart.FileHeader) error {
 	return nil
 }
 
-func (s  *AdminService) GetUltimosDiagnosticosCargados(ctx context.Context, offset int8, token string) ([]domain.Paciente, int16, error) {
+func (s *AdminService) GetUltimosDiagnosticosCargados(ctx context.Context, offset int8, token string) ([]domain.Paciente, int16, error) {
 	diagnosticos, total, err := s.adminRepo.GetUltimosDiagnosticosCargados(ctx, offset, token)
 	if err != nil {
 		return nil, 0, err
 	}
 	return diagnosticos, total, nil
+}
+
+func (s *AdminService) GetSolicitudes(ctx context.Context, rol string) ([]domain.Solicitud, bool, error) {
+	if rol != "admin"{
+		return nil, false, nil
+	}
+	solicitudes, err := s.adminRepo.GetSolicitudes(ctx)
+	if err != nil {
+		return nil, true, err
+	}
+	return solicitudes, true, nil
+}
+
+func (s *AdminService) SolicitudAprobada (ctx context.Context, email string) (string, string, error) {
+	return s.adminRepo.SolicitudAprobada(ctx, email)
+}
+
+func (s *AdminService) SolicitudRechazada (ctx context.Context, email string) (string, error) {
+	return s.adminRepo.SolicitudRechazada(ctx, email)
 }

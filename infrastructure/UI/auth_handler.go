@@ -60,6 +60,15 @@ func (h *AuthHandler) ifCargaFallida (r *http.Request)  {
 	}
 }
 
+func (h *AuthHandler) NoActionOk (w http.ResponseWriter, r *http.Request) {
+	time.Sleep(3 * time.Second)
+	w.WriteHeader(http.StatusOK)
+}
+func (h *AuthHandler) NoActionErr (w http.ResponseWriter, r *http.Request) {
+	time.Sleep(3 * time.Second)
+	w.WriteHeader(http.StatusBadRequest)
+}
+
 func (h *AuthHandler) Registrarse (w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
@@ -69,27 +78,18 @@ func (h *AuthHandler) Registrarse (w http.ResponseWriter, r *http.Request) {
 	}
 	email := r.FormValue("email")
 	nombre_lab := r.FormValue("nombre-lab")
-	contraseña := "contraseña-auto-generada" // Luego el laboratorio debera cambiarla
-	// veterinarios := r.Form["nombre-vet"]
-	// matriculas := r.Form["matricula-vet"]
+	contraseña := nombre_lab + os.Getenv("CONTRA_AUTOGENERADA") // Luego el laboratorio debera cambiarla
+	veterinarios := r.Form["nombre-vet"]
+	matriculas := r.Form["matricula-vet"]
 	ciudad_origen := r.FormValue("ciudad-origen")
-	rol := "laboratorio"
 
-	token, expiracion, err := h.AuthService.Registrarse(r.Context(), email, contraseña, rol, ciudad_origen, nombre_lab)
+	err = h.AuthService.Registrarse(r.Context(), email, contraseña, ciudad_origen, nombre_lab, matriculas, veterinarios)
 	if err != nil {
 		// renderizar templ de error
 		http.Error(w, "Error al iniciar seison" + err.Error(), http.StatusBadRequest)
 		return 
 	}
-	http.SetCookie(w, &http.Cookie{
-		Name: NOMBRE_TOKEN,
-		Value: token,
-		Expires: expiracion,
-		HttpOnly: true,
-		SameSite: http.SameSiteStrictMode,
-		Path: "/",
-	})
-	w.Header().Set("HX-Redirect", "/admin/panel?login_reciente=true")
+	go enviarMailSolicitud(nombre_lab, email, ciudad_origen, veterinarios, matriculas)
 	w.WriteHeader(http.StatusOK)
 }
 
