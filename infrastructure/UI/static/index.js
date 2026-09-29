@@ -135,11 +135,13 @@ document.addEventListener('htmx:beforeRequest', function () {
       if (aviso) aviso.classList.remove('active');
 });
 
-// htmx descarta el cuerpo de las respuestas de error. El servidor responde 422 con
+// htmx descarta el cuerpo de las respuestas de error. El servidor responde 400 con
 // el aviso ya redirigido a #error-inline (HX-Retarget solo se aplica en errores),
 // asi que en ese caso se habilita el swap para que el mensaje llegue a la pantalla.
 document.addEventListener('htmx:beforeSwap', function (e) {
-      if (e.detail.xhr && e.detail.xhr.status === 422) {
+      const esAviso = e.detail.xhr && e.detail.xhr.responseText &&
+            e.detail.xhr.responseText.includes('id="error-inline"');
+      if (esAviso) {
             e.detail.shouldSwap = true;
             e.detail.isError = false;
       }

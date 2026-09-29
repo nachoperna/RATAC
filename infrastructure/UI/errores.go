@@ -83,10 +83,11 @@ func errorInline(w http.ResponseWriter, r *http.Request, mensaje string, detalle
 	if detalle != nil {
 		log.Printf("[%s] %v", contexto, detalle)
 	}
-	// Si el pedido no viene de htmx (por ejemplo una recarga con F5 sobre la URL de
-	// una busqueda) devolver solo el fragmento del aviso mostraria una pagina rota:
-	// se vuelve al inicio.
-	if r.Header.Get("HX-Request") != "true" {
+	// Una recarga con F5 sobre la URL de una busqueda es un GET sin htmx: devolver
+	// solo el fragmento del aviso mostraria una pagina rota, asi que se vuelve al
+	// inicio. El resto de los metodos (un POST con el cuerpo mal formado, por
+	// ejemplo) son llamadas invalidas y reciben el error, no una redireccion.
+	if r.Header.Get("HX-Request") != "true" && r.Method == http.MethodGet {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
@@ -106,10 +107,10 @@ func errorInline(w http.ResponseWriter, r *http.Request, mensaje string, detalle
 	// del pedido que fallo; al recargar con F5 el navegador pide esa ruta y recibe
 	// el fragmento del aviso suelto, sin la pagina.
 	w.Header().Set("HX-Push-Url", "false")
-	// Se responde 422 y no 200: htmx solo aplica HX-Retarget en respuestas de
-	// error, y sin el swap iria al destino original (la grilla de resultados).
-	// El fragmento igual se muestra porque index.js habilita el swap de las
-	// respuestas de error en htmx:beforeSwap.
-	w.WriteHeader(http.StatusUnprocessableEntity)
+	// Se responde con un estado de error y no 200: htmx solo aplica HX-Retarget en
+	// respuestas de error, y sin el swap iria al destino original (la grilla de
+	// resultados). El fragmento igual se muestra porque index.js habilita el swap
+	// de estas respuestas en htmx:beforeSwap.
+	w.WriteHeader(http.StatusBadRequest)
 	views.ErrorInline(mensaje).Render(r.Context(), w)
 }
