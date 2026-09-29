@@ -498,5 +498,38 @@ input[type="text"]:focus {
       header.navbar { padding: 20px; }
       .form-container { padding: 30px 20px; }
       .vet-row { flex-direction: column; }
-      .btn-remove-vet { width: 100%; margin-top: 0; height: 40px;}
+      .btn-remove-vet { width: 100%; margin-top: 0; height: 40px;}        /* Responsividad */
+        @media (max-width: 600px) {
+            .auth-tabs { flex-direction: column; }
+            .tab-btn { border-bottom: none; border-left: 2px solid transparent; text-align: left; padding: 14px 20px;}
+            .tab-btn.active { border-bottom: none; border-left-color: var(--navy); }
+            header.navbar { padding: 20px; }
+            .form-container { padding: 30px 20px; }
+            .vet-row { flex-direction: column; }
+            .btn-remove-vet { width: 100%; margin-top: 0; height: 40px;}
+        }
+
+/* Aviso de credenciales invalidas dentro del formulario de acceso */
+.login-error {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding: 10px 12px;
+    border: 1px solid #f0c2c2;
+    border-left: 3px solid #d32f2f;
+    border-radius: 4px;
+    background-color: #fdf4f4;
+    color: #a52222;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.login-error.active {
+    display: flex;
+}
+
+.login-error svg {
+    flex-shrink: 0;
 }

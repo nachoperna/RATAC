@@ -11,6 +11,11 @@ templ ShowResultados(pacientes []domain.Paciente, resultados_total int16, offset
                         <span>{len(pacientes)}</span> de <strong class="highlight">{resultados_total}</strong> RESULTADOS MOSTRADOS
                   </div>
             </div>
+            <!-- Aviso de error, arriba de los resultados: es donde esta mirando el
+                 usuario cuando falla el paginado. Lo reemplaza el servidor via
+                 hx-swap-oob (ver views/error_inline.templ). -->
+            <div id="error-inline" class="error-inline"></div>
+
             <div id="cards-grid">
                   @generateCards(pacientes)
             </div>

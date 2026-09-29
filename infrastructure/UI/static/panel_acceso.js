@@ -197,11 +197,12 @@ function selectModal(evt) {
       // Comprobamos que sea el formulario correcto y que el status sea 200 OK
       if (evt.detail.successful) {
             solicitudExitosa(evt);
+            // Solo se limpia el formulario cuando la solicitud salio bien: si fallo,
+            // el usuario pierde todo lo que habia cargado y tiene que escribirlo de nuevo.
+            evt.detail.elt.reset();
       } else {
-            solicitudErronea();
+            solicitudErronea(evt);
       }
-      // Limpiar el formulario
-      evt.detail.elt.reset(); 
 }
 
 function solicitudExitosa(evt) {
@@ -213,7 +214,15 @@ function solicitudExitosa(evt) {
       document.getElementById('success-modal').classList.add('active');
 }
 
-function solicitudErronea() {
+function solicitudErronea(evt) {
+      // El servidor manda el motivo concreto (correo repetido, campos incompletos).
+      // Si no llega ninguno se deja el texto por defecto del modal.
+      const cuerpo = document.getElementById('modal-error-body');
+      const motivo = evt && evt.detail && evt.detail.xhr ? (evt.detail.xhr.responseText || '').trim() : '';
+      if (cuerpo && motivo && motivo.length < 300 && !motivo.includes('<')) {
+            cuerpo.textContent = motivo;
+      }
+
       // Mostrar el modal
       document.getElementById('error-modal').classList.add('active');
 }
