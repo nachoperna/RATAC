@@ -422,6 +422,11 @@ textarea.form-control {
       animation: spin 1s linear infinite;
 }
 
+/* Falta completar un dato: no es un fallo, se usa el color de la marca.
+   El resto de los estilos del overlay viven ahora en views/error.templ */
+.error-icon-aviso {
+      color: var(--navy);
+}
 
 @keyframes spin {
       0% { transform: rotate(0deg); }

@@ -170,12 +170,19 @@ function submitData() {
             btn.style.opacity = '1';
  
             setTimeout(() => {
-                  const confirmBox = confirm("Los datos han sido validados y guardados exitosamente.");
-                  resetPage();
-                  btn.innerHTML = 'Confirmar y Subir al Servidor';
-                  btn.classList.add('btn-primary');
-                  btn.classList.remove('btn-success');
-                  btn.style.pointerEvents = 'auto';
+                  // El formulario se limpia recien al cerrar el aviso, para que el
+                  // usuario lo lea antes de que la pantalla cambie.
+                  mostrarAviso(
+                        'El diagnóstico fue validado y guardado correctamente.',
+                        'Diagnóstico guardado',
+                        () => {
+                              resetPage();
+                              btn.innerHTML = 'Confirmar y Subir al Servidor';
+                              btn.classList.add('btn-primary');
+                              btn.classList.remove('btn-success');
+                              btn.style.pointerEvents = 'auto';
+                        }
+                  );
             }, 1000);
       }, 1500);
 }
@@ -233,14 +240,27 @@ function hayDatos(){
 function validacionDatosMinimos(e){
       if (!hayDatos()){
             e.preventDefault();
-            alert('Se necesita información de diagnóstico para enviar al servidor');
+            mostrarError('Cargue un documento o complete al menos el número de protocolo antes de continuar.', 'Faltan datos del diagnóstico', 'aviso');
       }
 }
 
 function validacionYFormData(evt) {
       if (!hayDatos()) {
             evt.preventDefault();
-            alert('Se necesita información de diagnóstico');
+            mostrarError('Cargue un documento o complete al menos el número de protocolo antes de continuar.', 'Faltan datos del diagnóstico', 'aviso');
+            return;
+      }
+      // El protocolo identifica al diagnostico y es unico en la base. Hay documentos
+      // que no lo traen adentro (queda vacio al extraer), asi que se pide completarlo
+      // antes de enviar: sin el, la carga falla recien al insertar.
+      const protocolo = document.getElementById('f-protocolo');
+      if (protocolo && protocolo.value.trim() === '') {
+            evt.preventDefault();
+            mostrarError('El documento no incluye el número de protocolo. Complételo en el formulario antes de confirmar la carga.', 'Falta el número de protocolo', 'aviso');
+            protocolo.focus();
+            if (protocolo.scrollIntoView) {
+                  protocolo.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
             return;
       }
       evt.preventDefault(); // cancela el request de htmx
@@ -264,16 +284,86 @@ function validacionYFormData(evt) {
       imagenes_subidas.forEach(e => formData.append('imagenes', e.file));
 
       fetch('/diagnosticos/alta/carga', { method: 'POST', body: formData })
-            .then(r => {
-                  if (r.ok) submitData(); 
-                  else if (r.status === 401){
-                        alert('Alerta: Se venció su sesión en RATAC. Deberá ingresar nuevamente.');
-                        window.location.href = '/ingreso/formulario';
-                  } 
-            }
-      );
+            .then(async r => {
+                  if (r.ok) {
+                        submitData();
+                        return;
+                  }
+                  if (r.status === 401) {
+                        mostrarError('Se venció su sesión en RATAC. Deberá ingresar nuevamente.');
+                        setTimeout(() => { window.location.href = '/ingreso/formulario'; }, 2500);
+                        return;
+                  }
+                  // Cualquier otro fallo: antes no se avisaba nada y el usuario
+                  // creia que el diagnostico se habia guardado.
+                  const mensaje = await r.text().catch(() => '');
+                  mostrarError(mensaje.trim() || 'No se pudo guardar el diagnóstico. No se registró ningún cambio, puede intentarlo nuevamente.');
+            })
+            .catch(err => {
+                  // Falla de red: el request nunca llego al servidor
+                  console.error('Error de red al subir el diagnóstico:', err);
+                  mostrarError('No se pudo contactar al servidor. Verifique su conexión e inténtelo nuevamente.');
+            });
 }
 
 function closeError() {
       document.getElementById('error').classList.remove('active');
+}
+
+// El aviso tambien se cierra con Escape o clickeando fuera del recuadro
+document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      const overlay = document.getElementById('error');
+      if (overlay && overlay.classList.contains('active')) closeError();
+});
+
+document.addEventListener('click', (e) => {
+      const overlay = document.getElementById('error');
+      if (overlay && overlay.classList.contains('active') && e.target === overlay) closeError();
+});
+
+// Muestra un aviso reutilizando el overlay que ya usa el servidor
+// (views/error_carga.templ). Sirve para los avisos que detecta el navegador,
+// donde no hay una respuesta del servidor para insertar.
+//
+// tipo: 'error' (algo fallo) o 'aviso' (falta completar datos). Cambia solo el
+// icono y su color; un dato faltante no deberia verse tan grave como un fallo.
+function mostrarError(mensaje, titulo, tipo) {
+      const overlay = document.getElementById('error');
+      if (!overlay) {
+            alert(mensaje); // ultimo recurso: la pantalla no tiene el contenedor
+            return;
+      }
+
+      const esAviso = tipo === 'aviso';
+      const icono = esAviso
+            ? `<circle cx="12" cy="12" r="10"></circle>
+               <line x1="12" y1="16" x2="12" y2="12"></line>
+               <line x1="12" y1="8" x2="12.01" y2="8"></line>`
+            : `<circle cx="12" cy="12" r="10"></circle>
+               <line x1="12" y1="8" x2="12" y2="12"></line>
+               <line x1="12" y1="16" x2="12.01" y2="16"></line>`;
+
+      overlay.innerHTML = `
+            <div class="error-content">
+                  <div class="error-icon ${esAviso ? 'error-icon-aviso' : ''}">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                              ${icono}
+                        </svg>
+                  </div>
+                  <h3 class="error-title" id="error-title"></h3>
+                  <p class="error-message" id="error-message"></p>
+                  <div class="error-actions">
+                        <button class="btn btn-primary" onclick="closeError()">Aceptar</button>
+                  </div>
+            </div>`;
+      // Se asigna como texto (no como HTML) para que el mensaje del servidor
+      // no pueda inyectar marcado en la pagina.
+      overlay.querySelector('#error-title').textContent = titulo || 'No se pudo completar la operación';
+      overlay.querySelector('#error-message').textContent = mensaje;
+      overlay.classList.add('active');
+
+      // El foco va al boton para poder cerrar con Enter o Espacio
+      const boton = overlay.querySelector('.error-actions .btn');
+      if (boton) boton.focus();
 }

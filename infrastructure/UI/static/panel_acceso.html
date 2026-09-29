@@ -76,6 +76,8 @@
                                                 <a href="#" onclick="toggleChangePasswordMode(false)" style="font-family: 'DM Mono', monospace; font-size: 11px; color: #d9534f; text-decoration: underline;">Cancelar cambio</a>
                                           </div>
                                     </div>
+                                    <!-- Aviso de credenciales invalidas; lo reemplaza el servidor via hx-swap-oob -->
+                                    <div id="login-error" class="login-error"></div>
                                     <button type="submit" class="btn-submit" id="btn-login-submit">
                                           <span class="text-pre-request">Iniciar Sesión</span>
                                           <span class="loading-request">
@@ -198,7 +200,7 @@
                   
                   <h3 class="modal-title title-error">Error en la Solicitud</h3>
                   
-                  <p class="modal-body">
+                  <p class="modal-body" id="modal-error-body">
                         Parece que hubo un error con tu solicitud. Por favor, complétala nuevamente o inténtalo más tarde.
                   </p>
                   

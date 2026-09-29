@@ -281,7 +281,9 @@ def procesar_raza_edad_pdf(val, datos):
 def extraer_cabecera_regex_pdf(lineas_buffer):
     texto = " ".join(lineas_buffer)
     datos = {}
-    m = re.search(r"Protocolo\s*:?\s*(\S+)", texto, re.I)
+    # El protocolo tiene digitos (ej. 3793-021). Sin exigirlos, un protocolo vacio
+    # hacia que se capturara la etiqueta siguiente de la cabecera ("Fecha").
+    m = re.search(r"Protocolo\s*:?\s*([^\s:]*\d[^\s:]*)", texto, re.I)
     if m: datos["Protocolo"] = m.group(1)
     m = re.search(r"Fecha\s*:?\s*([\d-]+)", texto, re.I)
     if m: datos["Fecha"] = m.group(1)
@@ -300,6 +302,9 @@ def extraer_cabecera_regex_pdf(lineas_buffer):
     m = re.search(r"Paciente\s*:?\s*(\S+)", texto, re.I)
     if m: datos["Paciente"] = m.group(1)
     datos["Referencias mastocitomas"] = bool(re.search(r"referencia graduaci[oó]n mastocitomas", texto, re.I))
+    # Sin el email del laboratorio el insert viola la foreign key contra usuarios.email.
+    # Esta rama (cabecera por regex) no lo completaba, a diferencia de la de tabla.
+    datos["Email_Lab"] = EMAIL_LABORATORIO
     return datos
 
 def procesarTablaGrado_pdf(tabla_filas):

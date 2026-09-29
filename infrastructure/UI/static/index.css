@@ -802,3 +802,186 @@ display: inline-block;
 .htmx-request#cards-grid {
 opacity: 0.6;
 }
+
+/* ===== Dialogo de confirmacion =====
+   Reemplaza el confirm() del navegador, que no se puede estilar y se ve ajeno
+   al resto del sistema. Lo usa htmx via htmx:confirm (ver confirmacion.js). */
+.confirm-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(17, 17, 40, .45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s ease;
+}
+
+.confirm-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+}
+
+.confirm-content {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 32px 40px;
+      max-width: 440px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 10px 40px rgba(26, 26, 110, .18);
+      border: 1px solid var(--border);
+      transform: translateY(16px) scale(.97);
+      transition: transform .25s cubic-bezier(.175, .885, .32, 1.275);
+}
+
+.confirm-overlay.active .confirm-content {
+      transform: translateY(0) scale(1);
+}
+
+.confirm-icon {
+      color: var(--navy);
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: center;
+}
+
+/* Una baja no se puede deshacer: el icono lo anticipa antes de leer el texto */
+.confirm-icon.confirm-icon-peligro {
+      color: #d9534f;
+}
+
+.confirm-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      color: var(--navy);
+      margin-bottom: 12px;
+      font-weight: 500;
+}
+
+.confirm-message {
+      font-size: 15px;
+      color: var(--muted);
+      margin-bottom: 28px;
+      line-height: 1.5;
+}
+
+.confirm-actions {
+      display: flex;
+      gap: 12px;
+}
+
+.confirm-actions button {
+      flex: 1;
+      padding: 12px 20px;
+      border-radius: 6px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background .2s ease, color .2s ease;
+}
+
+.confirm-cancelar {
+      background: var(--white);
+      color: var(--muted);
+      border: 1px solid var(--gray-border);
+}
+
+.confirm-cancelar:hover {
+      background: var(--bg);
+      color: var(--ink);
+}
+
+.confirm-aceptar {
+      background: var(--navy);
+      color: var(--white);
+      border: 1px solid var(--navy);
+}
+
+.confirm-aceptar:hover {
+      background: var(--navy-mid);
+}
+
+.confirm-aceptar.confirm-aceptar-peligro {
+      background: #d9534f;
+      border-color: #d9534f;
+}
+
+.confirm-aceptar.confirm-aceptar-peligro:hover {
+      background: #c9302c;
+}
+
+@media (max-width: 480px) {
+      .confirm-actions {
+            flex-direction: column-reverse;
+      }
+}
+
+/* Variante de exito: un aviso de que todo salio bien, con un solo boton.
+   No usa el dialogo de confirmacion porque no hay nada que decidir. */
+.confirm-icon.confirm-icon-exito {
+      color: #2e7d32;
+}
+
+.confirm-actions.confirm-actions-unico .confirm-aceptar {
+      background: #2e7d32;
+      border-color: #2e7d32;
+}
+
+.confirm-actions.confirm-actions-unico .confirm-aceptar:hover {
+      background: #27692b;
+}
+
+/* ===== Aviso de error dentro de la pantalla =====
+   Aparece debajo de la barra de busqueda, donde el usuario acaba de hacer clic.
+   Lo inserta el servidor con hx-swap-oob (ver views/error_inline.templ). */
+.error-inline {
+      display: none;
+      /* En el flujo de la pagina, no fijo: el aviso pertenece a la barra de
+         busqueda que esta arriba, no a un rincon de la pantalla. */
+      align-items: center;
+      gap: 10px;
+      margin: 12px 0 0;
+      padding: 12px 16px;
+      border: 1px solid #f0c2c2;
+      border-left: 3px solid #d32f2f;
+      border-radius: 6px;
+      background-color: #fdf4f4;
+      color: #a52222;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      line-height: 1.45;
+}
+
+.error-inline.active {
+      display: flex;
+      animation: errorInlineIn .25s ease;
+}
+
+.error-inline svg {
+      flex-shrink: 0;
+}
+
+@keyframes errorInlineIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+}
+
+.error-inline-cerrar {
+      background: none;
+      border: none;
+      color: inherit;
+      cursor: pointer;
+      padding: 2px;
+      margin-left: 4px;
+      opacity: .6;
+      display: flex;
+}
+
+.error-inline-cerrar:hover {
+      opacity: 1;
+}

@@ -127,3 +127,22 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       });
 });
+
+// Oculta el aviso de error de la busqueda anterior al lanzar una nueva, para que
+// se note que hubo un reintento y no quede un mensaje viejo en pantalla.
+document.addEventListener('htmx:beforeRequest', function () {
+      const aviso = document.getElementById('error-inline');
+      if (aviso) aviso.classList.remove('active');
+});
+
+// htmx descarta el cuerpo de las respuestas de error. El servidor responde 400 con
+// el aviso ya redirigido a #error-inline (HX-Retarget solo se aplica en errores),
+// asi que en ese caso se habilita el swap para que el mensaje llegue a la pantalla.
+document.addEventListener('htmx:beforeSwap', function (e) {
+      const esAviso = e.detail.xhr && e.detail.xhr.responseText &&
+            e.detail.xhr.responseText.includes('id="error-inline"');
+      if (esAviso) {
+            e.detail.shouldSwap = true;
+            e.detail.isError = false;
+      }
+});

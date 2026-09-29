@@ -1,0 +1,38 @@
+package views
+
+// ErrorInline es el aviso de error que se muestra dentro de la pantalla, sin
+// interrumpir al usuario. El servidor redirige el swap a #error-inline con
+// HX-Retarget, asi que el fragmento reemplaza ese contenedor directamente: no
+// lleva hx-swap-oob, porque htmx lo sacaria del cuerpo y el swap quedaria vacio.
+// El mensaje debe ser entendible por el usuario: nunca se le pasa el texto
+// crudo de un error interno (err.Error()) porque expone detalles del sistema.
+templ ErrorInline(mensaje string) {
+      <div id="error-inline" class="error-inline active">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            if mensaje != "" {
+                  <span>{ mensaje }</span>
+            } else {
+                  <span>No se pudo completar la operación. Inténtelo nuevamente.</span>
+            }
+            <button type="button" class="error-inline-cerrar" aria-label="Cerrar aviso"
+                  onclick="this.parentElement.classList.remove('active')">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <path d="M18 6L6 18M6 6l12 12"></path>
+                  </svg>
+            </button>
+            <script>
+                  // El aviso queda visible hasta que el usuario lo cierra o vuelve a
+                  // buscar: esta junto a la barra de busqueda, no es una notificacion
+                  // flotante que estorbe. Al reintentar se limpia solo.
+                  (function () {
+                        const aviso = document.getElementById('error-inline');
+                        if (!aviso) return;
+                        aviso.scrollIntoView && aviso.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                  })();
+            </script>
+      </div>
+}
