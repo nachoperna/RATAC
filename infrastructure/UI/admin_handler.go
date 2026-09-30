@@ -105,8 +105,6 @@ func (h *AdminHandler) BorrarTemporal(w http.ResponseWriter, r *http.Request) {
 	nombre, _, _ := strings.Cut(filepath.Base(archivo), ".")
 	err := h.adminService.BorrarTemporal(nombre, imagenes)
 	if err != nil {
-		// Limpiar el formulario es una accion secundaria: se deja constancia en
-		// el log pero no se corta el flujo del usuario con un aviso.
 		log.Printf("[BorrarTemporal: limpiar formulario] %v", err)
 	}
 	w.WriteHeader(http.StatusOK)
@@ -270,7 +268,7 @@ func (h *AdminHandler) SolicitudAprobada (w http.ResponseWriter, r *http.Request
 	w.WriteHeader(http.StatusOK)
 }
 
-func (h *AdminHandler) SolicitudRechazada (w http.ResponseWriter, r *http.Request)  {
+func (h *AdminHandler) SolicitudRechazada (w http.ResponseWriter, r *http.Request) {
 	email := r.URL.Query().Get("email")
 	nombre, err := h.adminService.SolicitudRechazada(r.Context(), email)
 	if err != nil {
@@ -289,10 +287,8 @@ func (h *AdminHandler) SolicitudRechazada (w http.ResponseWriter, r *http.Reques
 	w.WriteHeader(http.StatusOK)
 }
 
-// email_lab no viene del formulario (no es un campo editable) sino de la sesion
-// del laboratorio que esta cargando. Sin el, el insert viola la foreign key
-// paciente_laboratorio contra usuarios.email.
-func mapearCamposAPaciente(info InformacionDiagnostico, email string) domain.Paciente {	f := info.Categorias
+func mapearCamposAPaciente(info InformacionDiagnostico, email string) domain.Paciente {	
+	f := info.Categorias
 	ref, _ := strconv.ParseBool(f["f-mastocitomas"])
 	return domain.Paciente{
 		Protocolo:                   f["f-protocolo"],

@@ -4,7 +4,7 @@ import "RATAC/domain"
 import "fmt"
 import "strconv"
 
-templ ShowResultados(pacientes []domain.Paciente, resultados_total int16, offset int8, filtros_avanzados bool) {
+templ ShowResultados(pacientes []domain.Paciente, resultados_total int32, offset int16, filtros_avanzados bool) {
       <div class="container">
             <div class="results-card">
                   <div class="results-info" id="results-info">
@@ -26,7 +26,7 @@ templ ShowResultados(pacientes []domain.Paciente, resultados_total int16, offset
       </div>
 }
 
-templ ListPacientes(pacientes []domain.Paciente, resultados_total int16, offset int8, filtros_avanzados bool) {
+templ ListPacientes(pacientes []domain.Paciente, resultados_total int32, offset int16, filtros_avanzados bool) {
       @resultadosMostrados(len(pacientes), resultados_total, offset)
       
       @generateCards(pacientes)
@@ -89,8 +89,8 @@ templ generateCards(pacientes []domain.Paciente) {
       }
 }
 
-templ botonMostrarMas(resultados_total int16, offset int8, filtros_avanzados bool) {
-      if (resultados_total - int16(offset) > domain.LIMIT_RESULTADOS_PACIENTE){
+templ botonMostrarMas(resultados_total int32, offset int16, filtros_avanzados bool) {
+      if (resultados_total - int32(offset) > domain.LIMIT_RESULTADOS_PACIENTE){
             if (filtros_avanzados){
                   <button 
                         class="btn-mostrar-mas"
@@ -116,9 +116,9 @@ templ botonMostrarMas(resultados_total int16, offset int8, filtros_avanzados boo
       }
 }
 
-templ resultadosMostrados(cant_pacientes int, resultados_total int16, offset int8) {
+templ resultadosMostrados(cant_pacientes int, resultados_total int32, offset int16) {
       <div class="results-info" id="results-info" hx-swap-oob="true">
-            <span>{offset + int8(cant_pacientes)}</span> de <strong class="highlight">{resultados_total}</strong> RESULTADOS MOSTRADOS
+            <span>{offset + int16(cant_pacientes)}</span> de <strong class="highlight">{resultados_total}</strong> RESULTADOS MOSTRADOS
       </div>     
 }
 

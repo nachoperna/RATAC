@@ -20,7 +20,7 @@ type Veterinarios struct {
 type AdminRepository interface{
 	MapeoDocumento(contenido bytes.Buffer) (*Paciente, error)
 	PacienteYaRegistrado(ctx context.Context, protocolo string) bool
-	GetUltimosDiagnosticosCargados(ctx context.Context, offset int8, token string) ([]Paciente, int16, error)
+	GetUltimosDiagnosticosCargados(ctx context.Context, offset int16, token string) ([]Paciente, int32, error)
 	GetSolicitudes(ctx context.Context) ([]Solicitud, error)
 	SolicitudAprobada (ctx context.Context, email string) (string, string, error)
 	SolicitudRechazada (ctx context.Context, email string) (string, error)

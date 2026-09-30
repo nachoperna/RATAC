@@ -80,7 +80,8 @@ func responderRegistroFallido(w http.ResponseWriter, mensaje string, detalle err
 	}
 	// Un correo ya registrado consulta la base y tarda mas que un rechazo por
 	// campos vacios; sin este piso la diferencia delata que correos tienen cuenta.
-	if restante := DURACION_MINIMA_LOGIN - time.Since(inicio); restante > 0 {
+	restante := DURACION_MINIMA_LOGIN - time.Since(inicio)
+	if restante > 0 {
 		time.Sleep(restante)
 	}
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
@@ -101,13 +102,6 @@ func (h *AuthHandler) Registrarse(w http.ResponseWriter, r *http.Request) {
 	veterinarios := r.Form["nombre-vet"]
 	matriculas := r.Form["matricula-vet"]
 	ciudad_origen := strings.TrimSpace(r.FormValue("ciudad-origen"))
-
-	// La ciudad se completa desde un campo oculto que llena el autocompletado, asi
-	// que puede llegar vacia aunque el navegador de el formulario por valido.
-	if email == "" || nombre_lab == "" || ciudad_origen == "" {
-		responderRegistroFallido(w, MSJ_ERROR_REGISTRO_CAMPOS, nil, "", inicio)
-		return
-	}
 
 	err = h.AuthService.Registrarse(r.Context(), email, contraseña, ciudad_origen, nombre_lab, matriculas, veterinarios)
 	if err != nil {

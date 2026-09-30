@@ -45,9 +45,9 @@ type PacienteRepository interface {
 	// UpdatePaciente(paciente *Paciente) error
 	DeletePaciente(ctx context.Context, protocolo string) error
 	ListUltimosPacientes(ctx context.Context) ([]Paciente, []bool, error)
-	ListPacientes(ctx context.Context, offset int8) ([]Paciente, int16, error)
+	ListPacientes(ctx context.Context, offset int16) ([]Paciente, int32, error)
 	CountPacientes(ctx context.Context) (int64, error)
-	GetPacienteByNombre(ctx context.Context, nombre string, offset int8) ([]Paciente, int16, error)
-	GetPacienteByFiltro(ctx context.Context, filtros []Filtro, offset int8) ([]Paciente, int16, error)
+	GetPacienteByNombre(ctx context.Context, nombre string, offset int16) ([]Paciente, int32, error)
+	GetPacienteByFiltro(ctx context.Context, filtros []Filtro, offset int16) ([]Paciente, int32, error)
 	GetAllFromPaciente(ctx context.Context, protocolo string) (*Paciente, error)
 }

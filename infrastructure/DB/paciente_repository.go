@@ -65,7 +65,7 @@ func getValueOrNil(campo sql.NullString) *string{
 	return nil
 }
 
-func (r *PacienteRepository) ListPacientes(ctx context.Context, offset int8) ([]domain.Paciente, int16, error) {
+func (r *PacienteRepository) ListPacientes(ctx context.Context, offset int16) ([]domain.Paciente, int32, error) {
 	bd_pacientes, err := r.queries.ListPacientes(ctx, int32(offset))
 	if err != nil {
 		return nil, 0, err
@@ -76,7 +76,7 @@ func (r *PacienteRepository) ListPacientes(ctx context.Context, offset int8) ([]
 		paciente := pacienteORM(p)
 		pacientes = append(pacientes, paciente)
 	}
-	return pacientes, int16(bd_pacientes[0].Total), nil
+	return pacientes, int32(bd_pacientes[0].Total), nil
 }
 
 func pacienteORM(p sqlc.ListPacientesRow) domain.Paciente {
@@ -148,7 +148,7 @@ func (r *PacienteRepository) CountPacientes(ctx context.Context) (int64, error) 
 	return r.queries.CountPacientes(ctx)
 }
 
-func (r *PacienteRepository) GetPacienteByNombre(ctx context.Context, nombre string, offset int8) ([]domain.Paciente, int16, error) {
+func (r *PacienteRepository) GetPacienteByNombre(ctx context.Context, nombre string, offset int16) ([]domain.Paciente, int32, error) {
 	bd_pacientes, err := r.queries.GetPacienteByNombre(ctx, sqlc.GetPacienteByNombreParams{
 		Column1: nombre,
 		Offset: int32(offset),
@@ -158,9 +158,9 @@ func (r *PacienteRepository) GetPacienteByNombre(ctx context.Context, nombre str
 	}
 
 	var pacientes []domain.Paciente
-	var resultados_total int16
+	var resultados_total int32
 	if len(bd_pacientes) > 0{
-		resultados_total = int16(bd_pacientes[0].Total)
+		resultados_total = int32(bd_pacientes[0].Total)
 	}
 	for _, p := range bd_pacientes {
 		pacientes = append(pacientes, domain.Paciente{
@@ -178,7 +178,7 @@ func (r *PacienteRepository) GetPacienteByNombre(ctx context.Context, nombre str
 	return pacientes, resultados_total, nil
 }
 
-func (r *PacienteRepository) GetPacienteByFiltro(ctx context.Context, filtros []domain.Filtro, offset int8) ([]domain.Paciente, int16, error){
+func (r *PacienteRepository) GetPacienteByFiltro(ctx context.Context, filtros []domain.Filtro, offset int16) ([]domain.Paciente, int32, error){
 	sqlQuery, args, _ := getQueryByFiltro(filtros, offset)
 
 	// 5. Ejecutar la consulta en PostgreSQL
@@ -190,7 +190,7 @@ func (r *PacienteRepository) GetPacienteByFiltro(ctx context.Context, filtros []
 	defer rows.Close()
 
 	var pacientes []domain.Paciente
-	var resultados_total int16 
+	var resultados_total int32 
 	set_resultado := false
 
 	// 6. Leer los resultados (Ejemplo genérico)
@@ -214,7 +214,7 @@ func (r *PacienteRepository) GetPacienteByFiltro(ctx context.Context, filtros []
 	return pacientes, resultados_total, nil
 }
 
-func getQueryByFiltro(filtros []domain.Filtro, offset int8) (string, []any, error){
+func getQueryByFiltro(filtros []domain.Filtro, offset int16) (string, []any, error){
 	// 1. CRÍTICO PARA POSTGRESQL: Configurar el formato del dólar ($1, $2)
 	psql := squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 	

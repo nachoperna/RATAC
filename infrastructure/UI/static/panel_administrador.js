@@ -46,3 +46,9 @@ function closeModals() {
 function habilitarAnterior() {
       document.getElementById('btn-anterior').disabled = false;
 }
+
+function confirmDelete(btn){
+      const tr = btn.closest('tr');
+      tr.style.transition='opacity 0.3s ease'; tr.style.opacity='0';
+      setTimeout(()=>tr.remove(),300);
+}

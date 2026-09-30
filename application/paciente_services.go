@@ -68,7 +68,7 @@ func (s *PacienteService) InsertarDiagnostico(ctx context.Context, nombre_archiv
 	return err
 }
 
-func (s *PacienteService) ListPacientes(ctx context.Context, offset int8) ([]domain.Paciente, int16, error) {
+func (s *PacienteService) ListPacientes(ctx context.Context, offset int16) ([]domain.Paciente, int32, error) {
 	return s.pacienteRepo.ListPacientes(ctx, offset)
 }
 
@@ -80,11 +80,11 @@ func (s *PacienteService) CountPacientes(ctx context.Context) (int64, error) {
 	return s.pacienteRepo.CountPacientes(ctx)
 }
 
-func (s *PacienteService) GetPacienteByNombre(ctx context.Context, nombre string, offset int8) ([]domain.Paciente, int16, error) {
+func (s *PacienteService) GetPacienteByNombre(ctx context.Context, nombre string, offset int16) ([]domain.Paciente, int32, error) {
 	return s.pacienteRepo.GetPacienteByNombre(ctx, nombre, offset)
 }
 
-func (s *PacienteService) GetPacienteByFiltro(ctx context.Context, filtros []domain.Filtro, offset int8) ([]domain.Paciente, int16, error) {
+func (s *PacienteService) GetPacienteByFiltro(ctx context.Context, filtros []domain.Filtro, offset int16) ([]domain.Paciente, int32, error) {
 	return s.pacienteRepo.GetPacienteByFiltro(ctx, filtros, offset)
 }
 
@@ -102,11 +102,9 @@ func (s *PacienteService) DeletePaciente(ctx context.Context, protocolo string) 
 	if err != nil {
 		log.Printf("[DeletePaciente %s] buscar JSON: %v", protocolo, err)
 	}
-
-	for _, j := range jsons {
-		if err := os.Remove(j); err != nil {
-			log.Printf("[DeletePaciente %s] borrar %s: %v", protocolo, j, err)
-		}
+	err = os.Remove(jsons[0])
+	if err != nil {
+		log.Printf("[DeletePaciente %s] borrar %s: %v", protocolo, jsons[0], err)
 	}
 
 	imgs, err := filepath.Glob(fmt.Sprintf("IMAGENES/*%s*", protocolo))
@@ -114,7 +112,8 @@ func (s *PacienteService) DeletePaciente(ctx context.Context, protocolo string) 
 		log.Printf("[DeletePaciente %s] buscar imagenes: %v", protocolo, err)
 	}
 	for _, img := range imgs {
-		if err := os.Remove(img); err != nil {
+		err := os.Remove(img)
+		if err != nil {
 			log.Printf("[DeletePaciente %s] borrar %s: %v", protocolo, img, err)
 		}
 	}

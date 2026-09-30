@@ -34,12 +34,6 @@ func (h *PacienteHandler) ListPacientes(w http.ResponseWriter, r *http.Request) 
 		errorInline(w, r, MSJ_ERROR_BUSQUEDA, err, "ListPacientes: consultar pacientes")
 		return
 	}
-	// Con offset > 0 el usuario toco "Mostrar mas": el swap es beforeend, asi que
-	// renderizar la lista vacia agregaria un cartel debajo de las tarjetas.
-	if len(pacientes) == 0 && offset > 0 {
-		errorInline(w, r, MSJ_SIN_MAS_RESULTADOS, nil, "")
-		return
-	}
 	w.WriteHeader(http.StatusOK)
 	if offset == 0 {
 		render(w, r, views.ShowResultados(pacientes, resultados_total, offset, false), true)
@@ -89,37 +83,28 @@ func (h *PacienteHandler) ListPacientesByFiltro(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	// El offset llega del cliente: se acota antes de convertirlo, porque un valor
-	// mayor a 127 desborda el int8 y rompe la consulta.
 	offsetPedido := req.Offset
 	if offsetPedido < 0 {
 		offsetPedido = 0
 	}
-	if offsetPedido > math.MaxInt8 {
-		offsetPedido = math.MaxInt8
+	if offsetPedido > math.MaxInt16 {
+		offsetPedido = math.MaxInt16
 	}
 
-	pacientes, resultados_total, err := h.pacienteService.GetPacienteByFiltro(r.Context(), req.Filtros, int8(offsetPedido))
+	pacientes, resultados_total, err := h.pacienteService.GetPacienteByFiltro(r.Context(), req.Filtros, int16(offsetPedido))
 	if err != nil {
 		errorInline(w, r, MSJ_ERROR_BUSQUEDA, err, "ListPacientesByFiltro: consultar pacientes")
 		return
 	}
 	if len(pacientes) == 0 {
-		// Con offset > 0 el usuario toco "Mostrar mas": ya hay resultados en
-		// pantalla y renderizar SinResultados los ensuciaria, porque el swap es
-		// beforeend y el cartel se agregaria debajo de las tarjetas.
-		if offsetPedido > 0 {
-			errorInline(w, r, MSJ_SIN_MAS_RESULTADOS, nil, "")
-			return
-		}
 		w.WriteHeader(http.StatusOK)
 		render(w, r, views.SinResultados(), true)
 	} else {
 		w.WriteHeader(http.StatusOK)
 		if offsetPedido == 0 {
-			render(w, r, views.ShowResultados(pacientes, resultados_total, int8(offsetPedido), true), true)
+			render(w, r, views.ShowResultados(pacientes, resultados_total, int16(offsetPedido), true), true)
 		} else {
-			render(w, r, views.ListPacientes(pacientes, resultados_total, int8(offsetPedido), true), true)
+			render(w, r, views.ListPacientes(pacientes, resultados_total, int16(offsetPedido), true), true)
 		}
 	}
 }
@@ -163,7 +148,7 @@ func (h *PacienteHandler) BorrarPaciente(w http.ResponseWriter, r *http.Request)
 	w.WriteHeader(http.StatusOK)
 }
 
-func getOffset(offset string) (int8, error) {
+func getOffset(offset string) (int16, error) {
 	if offset == "" {
 		return 0, nil
 	}
@@ -171,14 +156,11 @@ func getOffset(offset string) (int8, error) {
 	if err != nil {
 		return 0, err
 	}
-	// El offset viaja como int8 en toda la cadena: por encima de 127 desborda a
-	// negativo y la conversion a uint64 del OFFSET de SQL da un numero enorme,
-	// con lo que la consulta devuelve cualquier cosa. Se acota al maximo.
 	if ioffset < 0 {
 		ioffset = 0
 	}
-	if ioffset > math.MaxInt8 {
-		ioffset = math.MaxInt8
+	if ioffset > math.MaxInt16 {
+		ioffset = math.MaxInt16
 	}
-	return int8(ioffset), nil
+	return int16(ioffset), nil
 }

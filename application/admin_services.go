@@ -167,7 +167,7 @@ func (s *AdminService) GuardarImagenes(imagenes []*multipart.FileHeader) error {
 	return nil
 }
 
-func (s *AdminService) GetUltimosDiagnosticosCargados(ctx context.Context, offset int8, token string) ([]domain.Paciente, int16, error) {
+func (s *AdminService) GetUltimosDiagnosticosCargados(ctx context.Context, offset int16, token string) ([]domain.Paciente, int32, error) {
 	diagnosticos, total, err := s.adminRepo.GetUltimosDiagnosticosCargados(ctx, offset, token)
 	if err != nil {
 		return nil, 0, err
