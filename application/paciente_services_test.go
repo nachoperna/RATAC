@@ -19,9 +19,9 @@ func TestListPacientes_ejecucionExitosa_retornaLista(t *testing.T) {
 		{Protocolo: "CAN-001", NombrePaciente: "Fido"},
 		{Protocolo: "FEL-002", NombrePaciente: "Michi"},
 	}
-	var cant int16 = 2
+	var cant int32 = 2
 
-	mockRepo.On("ListPacientes", mock.Anything, int8(0)).Return(esperado, cant, nil)
+	mockRepo.On("ListPacientes", mock.Anything, int16(0)).Return(esperado, cant, nil)
 
 	resultado, total, err := service.ListPacientes(context.Background(), 0)
 
@@ -66,9 +66,9 @@ func TestGetPacienteByNombre_parametrosValidos_retornaPacientesYTotal(t *testing
 	service := application.NewPacienteService(mockRepo)
 
 	nombreBuscado := "Luna"
-	var offset int8 = 0
+	var offset int16 = 0
 	esperadoLista := []domain.Paciente{{NombrePaciente: "Luna"}}
-	var esperadoTotal int16 = 1
+	var esperadoTotal int32 = 1
 
 	// Notar que acá retornamos 3 valores: la lista, el total y el error (nil)
 	mockRepo.On("GetPacienteByNombre", mock.Anything, nombreBuscado, offset).Return(esperadoLista, esperadoTotal, nil)
@@ -88,9 +88,9 @@ func TestGetPacienteByFiltro_parametrosValidos_retornaPacientesYTotal(t *testing
 	filtros := []domain.Filtro{
 		{Campo: "Especie", Operador: "=", Valores: []string{"Canino"}},
 	}
-	var offset int8 = 10
+	var offset int16 = 10
 	esperadoLista := []domain.Paciente{{Protocolo: "CAN-010"}}
-	var esperadoTotal int16 = 45
+	var esperadoTotal int32 = 45
 
 	mockRepo.On("GetPacienteByFiltro", mock.Anything, filtros, offset).Return(esperadoLista, esperadoTotal, nil)
 

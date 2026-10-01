@@ -29,10 +29,10 @@ func (m *MockPacienteRepository) ListUltimosPacientes(ctx context.Context) ([]do
 	return pacientes, estados, args.Error(2)
 }
 
-func (m *MockPacienteRepository) ListPacientes(ctx context.Context, offset int8) ([]domain.Paciente, int16, error) {
+func (m *MockPacienteRepository) ListPacientes(ctx context.Context, offset int16) ([]domain.Paciente, int32, error) {
 	args := m.Called(ctx, offset)
 	if args.Get(0) != nil {
-		return args.Get(0).([]domain.Paciente), args.Get(1).(int16), args.Error(2)
+		return args.Get(0).([]domain.Paciente), args.Get(1).(int32), args.Error(2)
 	}
 	return nil, 0, args.Error(2)
 }
@@ -42,22 +42,22 @@ func (m *MockPacienteRepository) CountPacientes(ctx context.Context) (int64, err
 	return args.Get(0).(int64), args.Error(1)
 }
 
-func (m *MockPacienteRepository) GetPacienteByNombre(ctx context.Context, nombre string, offset int8) ([]domain.Paciente, int16, error) {
+func (m *MockPacienteRepository) GetPacienteByNombre(ctx context.Context, nombre string, offset int16) ([]domain.Paciente, int32, error) {
 	args := m.Called(ctx, nombre, offset)
 	var pacientes []domain.Paciente
 	if args.Get(0) != nil {
 		pacientes = args.Get(0).([]domain.Paciente)
 	}
-	return pacientes, args.Get(1).(int16), args.Error(2)
+	return pacientes, args.Get(1).(int32), args.Error(2)
 }
 
-func (m *MockPacienteRepository) GetPacienteByFiltro(ctx context.Context, filtros []domain.Filtro, offset int8) ([]domain.Paciente, int16, error) {
+func (m *MockPacienteRepository) GetPacienteByFiltro(ctx context.Context, filtros []domain.Filtro, offset int16) ([]domain.Paciente, int32, error) {
 	args := m.Called(ctx, filtros, offset)
 	var pacientes []domain.Paciente
 	if args.Get(0) != nil {
 		pacientes = args.Get(0).([]domain.Paciente)
 	}
-	return pacientes, args.Get(1).(int16), args.Error(2)
+	return pacientes, args.Get(1).(int32), args.Error(2)
 }
 
 func (m *MockPacienteRepository) GetAllFromPaciente(ctx context.Context, protocolo string) (*domain.Paciente, error) {

@@ -19,7 +19,7 @@ func TestListPacientes_ejecucionExitosa_renderizaTemplate(t *testing.T) {
 	service := application.NewPacienteService(mockRepo)
 	handler := ui.NewPacienteHandler(service)
 
-	mockRepo.On("ListPacientes", mock.Anything, int8(0)).Return([]domain.Paciente{}, int16(0), nil)
+	mockRepo.On("ListPacientes", mock.Anything, int16(0)).Return([]domain.Paciente{}, int32(0), nil)
 
 	req := httptest.NewRequest(http.MethodGet, "/pacientes", nil)
 	rec := httptest.NewRecorder()
@@ -36,7 +36,7 @@ func TestListPacientesBy_conParametro_llamaAlServicio(t *testing.T) {
 	handler := ui.NewPacienteHandler(service)
 
 	esperado := []domain.Paciente{{NombrePaciente: "Fido"}}
-	mockRepo.On("GetPacienteByNombre", mock.Anything, "Fido", int8(0)).Return(esperado, int16(1), nil)
+	mockRepo.On("GetPacienteByNombre", mock.Anything, "Fido", int16(0)).Return(esperado, int32(1), nil)
 
 	req := httptest.NewRequest(http.MethodGet, "/pacientes/nombre?paciente=Fido", nil)
 	rec := httptest.NewRecorder()
@@ -53,7 +53,7 @@ func TestListPacientesByFiltro_jsonValido_llamaAlServicio(t *testing.T) {
 	handler := ui.NewPacienteHandler(service)
 
 	esperado := []domain.Paciente{{Protocolo: "FEL-002"}}
-	mockRepo.On("GetPacienteByFiltro", mock.Anything, mock.AnythingOfType("[]domain.Filtro"), int8(0)).Return(esperado, int16(1), nil)
+	mockRepo.On("GetPacienteByFiltro", mock.Anything, mock.AnythingOfType("[]domain.Filtro"), int16(0)).Return(esperado, int32(1), nil)
 
 	jsonBody := []byte(`{"filtros": [{"campo": "Especie", "operador": "=", "valores": ["Felino"]}], "offset": 0}`)
 	req := httptest.NewRequest(http.MethodPost, "/pacientes/", bytes.NewBuffer(jsonBody))
@@ -91,7 +91,7 @@ func TestAPIPacientes_ejecucionExitosa_retornaJSON(t *testing.T) {
 		{Protocolo: "CAN-001"},
 		{Protocolo: "CAN-002"},
 	}
-	mockRepo.On("ListPacientes", mock.Anything, int8(0)).Return(esperado, int16(len(esperado)), nil)
+	mockRepo.On("ListPacientes", mock.Anything, int16(0)).Return(esperado, int32(len(esperado)), nil)
 
 	req := httptest.NewRequest(http.MethodGet, "/apipacientes", nil)
 	rec := httptest.NewRecorder()
