@@ -17,6 +17,16 @@ CREATE TABLE Pacientes (
       CONSTRAINT Pacientes_pk PRIMARY KEY (id,Protocolo)
 );
 
+-- Table: Diagnosticos
+CREATE TABLE Diagnosticos(
+      id serial NOT NULL,
+      diagnostico text NOT NULL,
+      grado INT NULL,
+      protocolo varchar(50) NOT NULL,
+      CONSTRAINT Diagnosticos_pk PRIMARY KEY (id),
+      CONSTRAINT Diagnosticos_unicos UNIQUE NULLS NOT DISTINCT (protocolo, diagnostico, grado)
+);
+
 -- Table: Descripciones_microscopicas
 CREATE TABLE Descripciones_microscopicas (
       Descripcion text NOT NULL,

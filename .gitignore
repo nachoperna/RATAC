@@ -25,3 +25,4 @@ coverage.xml
 cover/
 ArchivosTemporales/
 .env
+ProcesadoJsons/diagnosticos_extraidos.json

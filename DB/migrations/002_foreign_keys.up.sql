@@ -9,6 +9,15 @@ ALTER TABLE Pacientes ADD CONSTRAINT Paciente_Laboratorio
       INITIALLY IMMEDIATE
 ;
 
+-- Reference: Diagnosticos_Pacientes
+ALTER TABLE Diagnosticos ADD CONSTRAINT Diagnosticos_Pacientes
+      FOREIGN KEY (protocolo)
+      REFERENCES Pacientes (Protocolo)
+      ON DELETE CASCADE
+      NOT DEFERRABLE
+      INITIALLY IMMEDIATE
+;
+
 -- Reference: Descripciones_microscopicas_Pacientes (table: Descripciones_microscopicas)
 ALTER TABLE Descripciones_microscopicas ADD CONSTRAINT Descripciones_microscopicas_Pacientes
       FOREIGN KEY (Pacientes_Protocolo)

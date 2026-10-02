@@ -1,4 +1,5 @@
 ALTER TABLE Descripciones_microscopicas DROP CONSTRAINT IF EXISTS Descripciones_microscopicas_Pacientes;
 ALTER TABLE Imagenes DROP CONSTRAINT IF EXISTS Imagenes_Descripciones_microscopicas;
 ALTER TABLE Grado_oncologico DROP CONSTRAINT IF EXISTS Grado_oncologico_Descripciones_microscopicas;
+ALTER TABLE Diagnosticos DROP CONSTRAINT IF EXISTS Diagnosticos_Pacientes;
 ALTER TABLE Pacientes DROP CONSTRAINT IF EXISTS Pacientes_Protocolo_unique;
