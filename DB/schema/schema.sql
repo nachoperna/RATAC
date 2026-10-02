@@ -23,8 +23,7 @@ CREATE TABLE Diagnosticos(
       diagnostico text NOT NULL,
       grado INT NULL,
       protocolo varchar(50) NOT NULL,
-      CONSTRAINT Diagnosticos_pk PRIMARY KEY (id),
-      CONSTRAINT Diagnosticos_unicos UNIQUE NULLS NOT DISTINCT (protocolo, diagnostico, grado)
+      CONSTRAINT Diagnosticos_pk PRIMARY KEY (id)
 );
 
 -- Table: Descripciones_microscopicas

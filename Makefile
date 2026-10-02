@@ -68,7 +68,9 @@ clean-images:
 procesarjsons: udocker wait up-appdocker wait
 	$(DOCKER_EXEC) ./ProcesadoJsons/eliminar_duplicados.sh
 	$(DOCKER_EXEC) python3 ./ProcesadoJsons/diag_to_json.py
-	$(DOCKER_EXEC) go run ./ProcesadoJsons/json_to_bd.go 
+	$(DOCKER_EXEC) python3 ./ProcesadoJsons/buscador_de_diagnosticos.py
+	$(DOCKER_EXEC) go run ./ProcesadoJsons/json_to_bd.go
+	rm -f ProcesadoJsons/diagnosticos_extraidos.json
 	$(MAKE) down-appdocker
 
 # Ejecución local (por si querés probar algo fuera de Docker, requiere dependencias locales)
