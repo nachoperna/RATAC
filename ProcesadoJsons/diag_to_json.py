@@ -128,7 +128,7 @@ def matcheaCategoria(linea, seccion_actual, nueva_desc_micro, nombre_tabla_actua
 
 def cargarDescMicro(descripciones_micro, bloque_actual):
     # no se puede hacer un simple append(bloque_actual) porque las variables son mutables entonces tener que hacer un copy de cada estructura
-    if bloque_actual['Diagnostico']['Descripcion'] in ("", "."):
+    if seccionVacia(bloque_actual['Diagnostico']['Descripcion']):
         bloque_actual['Diagnostico']['Descripcion'] = None
     descripciones_micro.append(bloque_actual.copy())
     return {   # reiniciamos la estructura
@@ -139,6 +139,9 @@ def cargarDescMicro(descripciones_micro, bloque_actual):
         },
         "Tabla de Grado": []
     }
+
+def seccionVacia(seccion):
+    return seccion in ("", ".", " ")
 
 def resultados(datos_paciente, secciones):
     resultado = {}  # donde juntamos todas las estructuras para luego formar el json con dump()
@@ -243,7 +246,10 @@ def procesar_docx(archivo):
 
     # agregamos el ultimo contenido de descripcion microscopica del documento
     if bloque_actual["Descripcion"]:
-        descripciones_micro.append(bloque_actual.copy())
+        if seccionVacia(bloque_actual["Descripcion"]):
+            descripciones_micro = None
+        else:
+            cargarDescMicro(descripciones_micro, bloque_actual)
 
     secciones[DESCRIPCION_MICROSCOPICA] = descripciones_micro
 
@@ -266,6 +272,8 @@ def reordenar_datos_pdf(datos):
     return resultado
 
 def limpiar_diagnostico_pdf(desc):
+    if seccionVacia(desc):
+        return None
     desc = re.sub(r"(?i)(Laura Denzoin|Médica Veterinaria|\bM\.?P\.?\b|Doctora en|Profesora Adjunta|Patología General|FCV-UNCPBA|Tandil\s*-|cov\.diagnostico|Dra\.?\s+Laura|Sof[íi]a Mart[íi]nez).*$", "", desc)
     return re.sub(r'\s+', ' ', desc).strip()
 
@@ -483,9 +491,12 @@ def procesar_pdf(ruta):
                             bloque_actual["Tabla de Grado"] = procesarTablaGrado_pdf(tabla_filas)
 
     if bloque_actual["Descripcion"]:
-        bloque_actual["Descripcion"] = re.sub(r'\s+', ' ', bloque_actual["Descripcion"]).strip()
-        bloque_actual["Diagnostico"]["Descripcion"] = limpiar_diagnostico_pdf(bloque_actual["Diagnostico"]["Descripcion"])
-        descripciones_micro.append(bloque_actual.copy())
+        if seccionVacia(bloque_actual["Descripcion"]):
+            descripciones_micro = None
+        else:
+            bloque_actual["Descripcion"] = re.sub(r'\s+', ' ', bloque_actual["Descripcion"]).strip()
+            bloque_actual["Diagnostico"]["Descripcion"] = limpiar_diagnostico_pdf(bloque_actual["Diagnostico"]["Descripcion"])
+            descripciones_micro.append(bloque_actual.copy())
     secciones[DESCRIPCION_MICROSCOPICA] = descripciones_micro
     return resultados(datos_paciente, secciones)
 
