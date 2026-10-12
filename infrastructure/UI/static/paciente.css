@@ -100,6 +100,41 @@
       color: var(--text-muted);
 }
 
+/* =========================================
+      BOTÓN EDITAR DIAGNÓSTICO (NUEVO)
+========================================= */
+.btn-edit-patient {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background-color: var(--bg-card);
+      color: var(--navy);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+      box-shadow: 0 2px 6px rgba(26, 26, 110, 0.04);
+}
+
+.btn-edit-patient:hover {
+      background-color: var(--navy);
+      color: var(--white);
+      border-color: var(--navy);
+}
+
+.btn-edit-patient svg {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+}
+
 .patient-name {
       font-size: 40px;
       margin: 0 0 25px 0; /* Mayor margen inferior porque ya no hay subtítulo */

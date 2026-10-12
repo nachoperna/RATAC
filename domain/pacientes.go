@@ -49,5 +49,5 @@ type PacienteRepository interface {
 	CountPacientes(ctx context.Context) (int64, error)
 	GetPacienteByNombre(ctx context.Context, nombre string, offset int16) ([]Paciente, int32, error)
 	GetPacienteByFiltro(ctx context.Context, filtros []Filtro, offset int16) ([]Paciente, int32, error)
-	GetAllFromPaciente(ctx context.Context, protocolo string) (*Paciente, error)
+	GetAllFromPaciente(ctx context.Context, protocolo, token string) (*Paciente, bool, error)
 }

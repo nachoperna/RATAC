@@ -90,13 +90,20 @@ func (s *AdminService) ConvertirDocumento(archivo multipart.File, nombre, email 
 
 func (s *AdminService) BorrarTemporal(archivo string, imagenes []string) error {
 	err := os.Remove(fmt.Sprintf("JSONS/TEMP_%s.json", archivo))
+	if err != nil && !os.IsNotExist(err) {
+		return err
+	}
+	err = s.BorrarImagenesHuerfanas(imagenes)
 	if err != nil {
 		return err
 	}
+	return nil
+}
 
+func (s *AdminService) BorrarImagenesHuerfanas(imagenes []string) error {
 	for _, img := range imagenes {
 		err := os.Remove(strings.TrimPrefix(img, "/"))
-		if err != nil {
+		if err != nil && !os.IsNotExist(err){
 			return err
 		}
 	}
@@ -165,6 +172,11 @@ func (s *AdminService) GuardarImagenes(imagenes []*multipart.FileHeader) error {
 		}
 	}
 	return nil
+}
+
+func (s *AdminService) BorrarJson(nombre string) (string, error) {
+	jsons, _ := filepath.Glob(fmt.Sprintf("JSONS/*%s*.json", nombre))
+	return jsons[0], os.Remove(jsons[0])
 }
 
 func (s *AdminService) GetUltimosDiagnosticosCargados(ctx context.Context, offset int16, token string) ([]domain.Paciente, int32, error) {

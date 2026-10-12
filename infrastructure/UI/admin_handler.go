@@ -287,6 +287,119 @@ func (h *AdminHandler) SolicitudRechazada (w http.ResponseWriter, r *http.Reques
 	w.WriteHeader(http.StatusOK)
 }
 
+func (h *AdminHandler) EditarDiagnostico(w http.ResponseWriter, r *http.Request)  {
+	protocolo := r.PathValue("protocolo")
+	paciente, _, err := h.pacienteService.GetAllFromPaciente(r.Context(), protocolo, "")
+	if err != nil || paciente == nil {
+		// renderizar templ de error
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	var desc_micro templ.Component = views.InformacionExtraida_DescMicros(*paciente)
+
+	tmp_aux := template.New("editar_diagnostico.html").Funcs(template.FuncMap{"render": renderTempl})
+	tmp, err := tmp_aux.ParseFiles("./infrastructure/UI/static/editar_diagnostico.html")
+	if err != nil {
+		fmt.Printf("Error al parsear el template: %v", err)
+		http.Error(w, "No se pudo cargar la página", http.StatusInternalServerError)
+		return
+	}
+
+	datos := map[string]any{
+		"Protocolo": paciente.Protocolo,
+		"Fecha": paciente.Fecha,
+		"NombrePaciente": paciente.NombrePaciente,
+		"Familia": getValueOrEmpty(paciente.Familia),
+		"Especie": getValueOrEmpty(paciente.Especie),
+		"Raza": getValueOrEmpty(paciente.Raza),
+		"Edad": getValueOrEmpty(paciente.Edad),
+		"Solicitante": paciente.Solicitante,
+		"Tecnica": paciente.Tecnica,
+		"ReferenciasMastocitomas": paciente.ReferenciasMastocitomas,
+		"Antecedentes": getValueOrEmpty(paciente.Antecedentes),
+		"DescripcionMacroscopica": getValueOrEmpty(paciente.DescripcionMacroscopica),
+		"DescMicro":  desc_micro,
+	}
+	tmp.Execute(w, datos)
+}
+
+func (h *AdminHandler) ConfirmarEdicion(w http.ResponseWriter, r *http.Request) {
+	r.ParseMultipartForm(32 << 20)
+
+	cambios, err := strconv.ParseBool(r.FormValue("cambios"))
+	if err != nil {
+		errorAlUsuario(w, http.StatusBadRequest, MSJ_ERROR_GENERICO, err, "EdicionDiagnostico: campo cambios invalido")
+		return
+	}
+	var info_diagnostico InformacionDiagnostico
+	err = json.Unmarshal([]byte(r.FormValue("campos")), &info_diagnostico)
+	if err != nil {
+		errorAlUsuario(w, http.StatusInternalServerError, MSJ_ERROR_GUARDAR, err, "EdicionDiagnostico: JSON de campos invalido")
+		return
+	}
+	protocolo := info_diagnostico.Categorias["f-protocolo"]
+	if cambios {
+		nombre_json, err := h.adminService.BorrarJson(protocolo)
+		nombre_base, _, _ := strings.Cut(filepath.Base(nombre_json), ".")
+		if err != nil {
+			errorAlUsuario(w, http.StatusInternalServerError, MSJ_ERROR_GENERICO, err, "EdicionDiagnostico: error borrar json")
+			return
+		}
+		huerfanas, err := h.adminService.GetImagenesHuerfanas(info_diagnostico.Imagenes, nombre_base)
+		if err != nil {
+			errorAlUsuario(w, http.StatusInternalServerError, MSJ_ERROR_GUARDAR, err, "EdicionDiagnostico: obtener imagenes huerfanas")
+			return
+		}
+		err = h.adminService.BorrarImagenesHuerfanas(huerfanas)
+		if err != nil {
+			errorAlUsuario(w, http.StatusInternalServerError, MSJ_ERROR_GENERICO, err, "EdicionDiagnostico: error borrar paciente bd")
+			return
+		}
+		err = h.pacienteService.DeletePaciente(r.Context(), protocolo)
+		if err != nil {
+			errorAlUsuario(w, http.StatusInternalServerError, MSJ_ERROR_GENERICO, err, "EdicionDiagnostico: error borrar paciente bd")
+			return
+		}
+
+		token, err := r.Cookie(NOMBRE_TOKEN)
+		if err != nil {
+			errorAlUsuario(w, http.StatusUnauthorized, MSJ_ERROR_SESION, err, "EdicionDiagnostico: sin cookie de sesion")
+			return
+		}
+		email, err := h.authService.GetEmail(r.Context(), token.Value)
+		if err != nil {
+			errorAlUsuario(w, http.StatusUnauthorized, MSJ_ERROR_SESION, err, "EdicionDiagnostico: token invalido")
+			return
+		}
+		paciente := mapearCamposAPaciente(info_diagnostico, email)
+		err = h.adminService.GenerarJson(nombre_base, paciente)
+		if err != nil {
+			errorAlUsuario(w, http.StatusInternalServerError, MSJ_ERROR_GUARDAR, err, "EdicionDiagnostico: generar JSON")
+			return
+		}
+		imagenes := r.MultipartForm.File["imagenes"]
+		err = h.adminService.GuardarImagenes(imagenes)
+		if err != nil {
+			errorAlUsuario(w, http.StatusInternalServerError, MSJ_ERROR_GUARDAR, err, "EdicionDiagnostico: guardar imagenes")
+			return
+		}
+		err = h.pacienteService.InsertarDiagnostico(r.Context(), protocolo)
+		if err != nil {
+			errorAlUsuario(w, http.StatusBadRequest, mensajeInsercion(err), err, "EdicionDiagnostico: insertar en BD")
+			return
+		}
+	}
+	w.WriteHeader(http.StatusOK)
+	// Render con opcion de redireccion a la pagina completa del diagnostico
+}
+
+func getValueOrEmpty(campo *string) string {
+	if campo != nil {
+		return *campo
+	}
+	return ""
+}
+
 func mapearCamposAPaciente(info InformacionDiagnostico, email string) domain.Paciente {	
 	f := info.Categorias
 	ref, _ := strconv.ParseBool(f["f-mastocitomas"])

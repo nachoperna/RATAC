@@ -43,7 +43,11 @@ func NewPacienteService(pacienteRepo domain.PacienteRepository) *PacienteService
 	}
 }
 func (s *PacienteService) InsertarDiagnostico(ctx context.Context, nombre_archivo string) error {
-	archivo, err := os.Open(fmt.Sprintf("JSONS/%s.json", nombre_archivo))
+	jsons, err := filepath.Glob(fmt.Sprintf("JSONS/*%s*.json", nombre_archivo))
+	if err != nil {
+		return err
+	}
+	archivo, err := os.Open(jsons[0])
 	if err != nil {
 		return err
 	}
@@ -88,11 +92,11 @@ func (s *PacienteService) GetPacienteByFiltro(ctx context.Context, filtros []dom
 	return s.pacienteRepo.GetPacienteByFiltro(ctx, filtros, offset)
 }
 
-func (s *PacienteService) GetAllFromPaciente(ctx context.Context, protocolo string) (*domain.Paciente, error) {
-	return s.pacienteRepo.GetAllFromPaciente(ctx, protocolo)
+func (s *PacienteService) GetAllFromPaciente(ctx context.Context, protocolo, token string) (*domain.Paciente, bool, error) {
+	return s.pacienteRepo.GetAllFromPaciente(ctx, protocolo, token)
 }
 
-func (s *PacienteService) DeletePaciente(ctx context.Context, protocolo string) error {
+func (s *PacienteService) DeletePacienteYArchivos(ctx context.Context, protocolo string) error {
 	err := s.pacienteRepo.DeletePaciente(ctx, protocolo)
 	if err != nil {
 		return err
@@ -116,6 +120,14 @@ func (s *PacienteService) DeletePaciente(ctx context.Context, protocolo string) 
 		if err != nil {
 			log.Printf("[DeletePaciente %s] borrar %s: %v", protocolo, img, err)
 		}
+	}
+	return nil
+}
+
+func (s *PacienteService) DeletePaciente(ctx context.Context, protocolo string) error {
+	err := s.pacienteRepo.DeletePaciente(ctx, protocolo)
+	if err != nil {
+		return err
 	}
 	return nil
 }

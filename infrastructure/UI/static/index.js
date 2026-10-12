@@ -115,17 +115,19 @@ document.addEventListener('DOMContentLoaded', function() {
       // Si encontramos un #ratac-title dentro del body es porque accedimos a un diagnostico desde el panel de admin, y le cambiamos el title
       const t = document.querySelector("body #ratac-title");
       if (t) document.title = t.textContent;
-      document.querySelector('.filtros').addEventListener('change', function(e) {
-      if (e.target.classList.contains('filtro-selector')) {
-            const es_edad = e.target.value === 'Edad';
-            const operador_select = e.target.closest('.filtro-header').querySelector('.operador');
-            Array.from(operador_select.options).forEach(option => {
-                  if (option.value !== 'igual') {
-                        option.classList.toggle('hidden', !es_edad);
+      if (document.querySelector('.filtros')){
+            document.querySelector('.filtros').addEventListener('change', function(e) {
+                  if (e.target.classList.contains('filtro-selector')) {
+                        const es_edad = e.target.value === 'Edad';
+                        const operador_select = e.target.closest('.filtro-header').querySelector('.operador');
+                        Array.from(operador_select.options).forEach(option => {
+                              if (option.value !== 'igual') {
+                                    option.classList.toggle('hidden', !es_edad);
+                              }
+                        });
                   }
             });
       }
-      });
 });
 
 // Oculta el aviso de error de la busqueda anterior al lanzar una nueva, para que

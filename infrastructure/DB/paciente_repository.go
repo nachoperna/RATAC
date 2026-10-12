@@ -304,10 +304,10 @@ func getOperadorSQL(operador, campo, valor string) (squirrel.Sqlizer, error){
 	return nil, errors.New("No se pudo obtener operador squirrel")
 }
 
-func (r *PacienteRepository) GetAllFromPaciente(ctx context.Context, protocolo string) (*domain.Paciente, error) {
+func (r *PacienteRepository) GetAllFromPaciente(ctx context.Context, protocolo, token string) (*domain.Paciente, bool, error) {
 	datos_paciente, err := r.queries.GetPaciente(ctx, protocolo)
 	if err != nil{
-		return nil, err
+		return nil, false, err
 		// Generar error
 	}
 
@@ -315,7 +315,7 @@ func (r *PacienteRepository) GetAllFromPaciente(ctx context.Context, protocolo s
 	
 	descripciones_micro, err := r.queries.GetDescripcionByPaciente(ctx, protocolo)
 	if err != nil{
-		return nil, err
+		return nil, false, err
 		// Generar error
 	}
 	var descripciones_micro_repo []domain.Descripcion_microscopicas
@@ -325,7 +325,7 @@ func (r *PacienteRepository) GetAllFromPaciente(ctx context.Context, protocolo s
 			DescripcionesMicroscopicasDescripcion: desc.Descripcion,
 		})
 		if err != nil { // Aca se deberia retornar simplemente el repositorio sin las imagenes cargadas
-			return nil, nil
+			return nil, false, nil
 		}
 		var img_rutas []string
 		for _, imagen := range imagenes {
@@ -343,7 +343,12 @@ func (r *PacienteRepository) GetAllFromPaciente(ctx context.Context, protocolo s
 		descripciones_micro_repo = append(descripciones_micro_repo, descripcion_micro)
 	}
 	paciente_repo.Descripciones_microscopicas = descripciones_micro_repo
-	return &paciente_repo, nil
+	
+	email_lab, _ := r.queries.GetEmail(ctx, token)
+	if email_lab == paciente_repo.Email_Lab {
+		return &paciente_repo, true, nil
+	}
+	return &paciente_repo, false, nil
 }
 
 func setDatosBasePaciente(datos sqlc.Paciente) domain.Paciente {
@@ -351,6 +356,7 @@ func setDatosBasePaciente(datos sqlc.Paciente) domain.Paciente {
 		Protocolo: datos.Protocolo,
 		Fecha: datos.Fecha.Format("02-01-2006"),
 		Solicitante: datos.Solicitante,
+		Email_Lab: datos.EmailLab,
 		Tecnica: datos.Tecnica,
 		Familia: getValueOrNil(datos.Familia),
 		Especie: getValueOrNil(datos.Especie),

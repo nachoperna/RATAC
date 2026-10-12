@@ -190,7 +190,7 @@
                                           id="btn-submit" 
                                           hx-post="/diagnosticos/alta/carga"
                                           hx-encoding="multipart/form-data"
-                                          hx-on:htmx:before-request="validacionYFormData(event)"
+                                          hx-on:htmx:before-request="validacionYFormData(event, false)"
                                           >Confirmar y Subir al Servidor
                                     </button>
                               </div>

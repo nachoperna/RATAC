@@ -9,24 +9,26 @@ let nombre_archivo;
 let estado_post_carga;
 let estado_pre_envio;
 
-['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-      dropZone.addEventListener(eventName, preventDefaults, false);
-});
+if (dropZone && fileInput){
+      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+      });
 
-function preventDefaults(e) {
-      e.preventDefault();
+      function preventDefaults(e) {
+            e.preventDefault();
+      }
+
+      ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+      });
+
+      ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+      });
+
+      dropZone.addEventListener('drop', handleDrop, false);
+      dropZone.addEventListener('click', () => fileInput.click());
 }
-
-['dragenter', 'dragover'].forEach(eventName => {
-      dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
-});
-
-['dragleave', 'drop'].forEach(eventName => {
-      dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
-});
-
-dropZone.addEventListener('drop', handleDrop, false);
-dropZone.addEventListener('click', () => fileInput.click());
 
 function handleDrop(e) {
       let dt = e.dataTransfer;
@@ -140,13 +142,15 @@ function addEmptyMicroCard() {
 }
 
 function resetPage() {
-      // Resetear dropzone a estado inicial
-      dropIcon.innerHTML = '📄';
-      dropText.innerHTML = 'Arrastra tu documento aquí o haz clic para explorar';
-      dropSubtext.innerHTML = 'Soporta .PDF, .DOCX';
-      dropZone.style.borderColor = 'var(--lavender-mid)';
-      dropZone.style.backgroundColor = '#fafbfc';
-      fileInput.value = ''; 
+      if (dropZone && fileInput) {
+            // Resetear dropzone a estado inicial
+            dropIcon.innerHTML = '📄';
+            dropText.innerHTML = 'Arrastra tu documento aquí o haz clic para explorar';
+            dropSubtext.innerHTML = 'Soporta .PDF, .DOCX';
+            dropZone.style.borderColor = 'var(--lavender-mid)';
+            dropZone.style.backgroundColor = '#fafbfc';
+            fileInput.value = ''; 
+      }
 
       // Limpiar formulario
       document.querySelectorAll('#form-section input[type="text"], #form-section textarea').forEach(el => el.value = '');
@@ -181,6 +185,34 @@ function submitData() {
                               btn.classList.add('btn-primary');
                               btn.classList.remove('btn-success');
                               btn.style.pointerEvents = 'auto';
+                        }
+                  );
+            }, 1000);
+      }, 1500);
+}
+
+function submitEdicion(destino) {
+      const btn = document.getElementById('btn-submit');
+      btn.innerHTML = 'Guardando...';
+      btn.style.opacity = '0.8';
+      btn.style.pointerEvents = 'none';
+
+      setTimeout(() => {
+            btn.innerHTML = '✓ ¡Cambios Guardados!';
+            btn.classList.add('btn-success');
+            btn.classList.remove('btn-primary');
+            btn.style.opacity = '1';
+
+            setTimeout(() => {
+                  mostrarAviso(
+                        'El diagnóstico fue actualizado correctamente.',
+                        'Edición guardada',
+                        () => {
+                              window.location.replace(destino)
+                              // Si el navegador bloquea el close (pestaña no abierta
+                              // por script), la página sigue viva y el timeout redirige.
+                              // Si el close prospera, la descarga mata los timers.
+                              setTimeout(() => { window.location.href = "/"; }, 200);
                         }
                   );
             }, 1000);
@@ -232,8 +264,10 @@ function hayCambios() {
 }
 
 function hayDatos(){
-      const archivo_subido = document.getElementById('file-input').files.length > 0;
-      const protocolo_valor = document.getElementById('f-protocolo').value.trim() !== '';
+      const input = document.getElementById('file-input');
+      const archivo_subido = (input?.files?.length ?? 0) > 0;
+      const protocolo_el = document.getElementById('f-protocolo');
+      const protocolo_valor = (protocolo_el?.value ?? '').trim() !== '';
       return archivo_subido || protocolo_valor;
 }
 
@@ -244,7 +278,7 @@ function validacionDatosMinimos(e){
       }
 }
 
-function validacionYFormData(evt) {
+function validacionYFormData(evt, es_edicion) {
       if (!hayDatos()) {
             evt.preventDefault();
             mostrarError('Cargue un documento o complete al menos el número de protocolo antes de continuar.', 'Faltan datos del diagnóstico', 'aviso');
@@ -282,11 +316,13 @@ function validacionYFormData(evt) {
       formData.append('cambios', String(hayCambios()));
       formData.append('campos', JSON.stringify(estado)); // usar estado, no capturarEstado()
       imagenes_subidas.forEach(e => formData.append('imagenes', e.file));
-
-      fetch('/diagnosticos/alta/carga', { method: 'POST', body: formData })
+      
+      ruta = !es_edicion ? '/diagnosticos/alta/carga' : `/diagnosticos/editar/${protocolo.value.trim()}/confirmar`;
+      fetch(ruta, { method: 'POST', body: formData })
             .then(async r => {
                   if (r.ok) {
-                        submitData();
+                        if (es_edicion) submitEdicion(`/paciente/protocolo/${protocolo.value.trim()}`);
+                        else submitData();
                         return;
                   }
                   if (r.status === 401) {
@@ -308,6 +344,14 @@ function validacionYFormData(evt) {
 
 function closeError() {
       document.getElementById('error').classList.remove('active');
+      // El foco va al boton para poder cerrar con Enter o Espacio
+      const protocolo = document.getElementById('f-protocolo');
+      if (protocolo){
+            protocolo.focus({preventScroll:true});
+            if (protocolo.scrollIntoView) {
+                  protocolo.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+      } 
 }
 
 // El aviso tambien se cierra con Escape o clickeando fuera del recuadro
@@ -363,7 +407,41 @@ function mostrarError(mensaje, titulo, tipo) {
       overlay.querySelector('#error-message').textContent = mensaje;
       overlay.classList.add('active');
 
-      // El foco va al boton para poder cerrar con Enter o Espacio
-      const boton = overlay.querySelector('.error-actions .btn');
-      if (boton) boton.focus();
+}
+
+function limpiarEdicion() {
+      if (!estado_post_carga) return; // sin baseline no hay nada que restaurar
+      // 1. Campos simples: restaurar value / checked desde el snapshot
+      Object.entries(estado_post_carga.fields).forEach(([id, valor]) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            if (id === 'f-mastocitomas') el.checked = (valor === 'true');
+            else el.value = valor;
+      });
+      // 2. Micro-cards: reconstruir texto + thumbnails desde el snapshot
+      const cont = document.getElementById('micro-container');
+      if (cont) {
+            cont.innerHTML = '';
+            estado_post_carga.microCards.forEach((c, i) => {
+                  addMicroCard(c.descripcion, c.diagnostico, i);
+                  const imgBox = cont.children[cont.children.length - 1]
+                        ?.querySelector('.image-preview-container');
+                  (c.imagenes || []).forEach(src => {
+                        if (!imgBox) return;
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'image-thumbnail-wrapper';
+                        wrapper.innerHTML = `
+                              <img src="${src}" class="image-thumbnail" alt="Miniatura">
+                              <button type="button" class="image-remove-btn" title="Eliminar imagen" onclick="this.parentElement.remove()">×</button>`;
+                        imgBox.appendChild(wrapper);
+                  });
+            });
+            // 3. Descartar archivos nuevos no guardados, liberando sus blob URLs
+            // (el baseline de edición se captura al load, así que el snapshot
+            //  no contiene blobs de sesión: revocar es seguro)
+            imagenes_subidas.forEach(e => { try { URL.revokeObjectURL(e.url); } catch (_) {} });
+            imagenes_subidas.length = 0;
+            if (!cont.children.length) addEmptyMicroCard();
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
 }

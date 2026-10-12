@@ -12,10 +12,14 @@ import (
 
 type PacienteHandler struct {
 	pacienteService *application.PacienteService
+	pageHandler *PageHandler
 }
 
-func NewPacienteHandler(pacienteService *application.PacienteService) *PacienteHandler {
-	return &PacienteHandler{pacienteService: pacienteService}
+func NewPacienteHandler(pacienteService *application.PacienteService, pageHandler *PageHandler) *PacienteHandler {
+	return &PacienteHandler{
+		pacienteService: pacienteService,
+		pageHandler: pageHandler,
+	}
 }
 
 type PayloadRequest struct {
@@ -36,9 +40,9 @@ func (h *PacienteHandler) ListPacientes(w http.ResponseWriter, r *http.Request) 
 	}
 	w.WriteHeader(http.StatusOK)
 	if offset == 0 {
-		render(w, r, views.ShowResultados(pacientes, resultados_total, offset, false), true)
+		h.pageHandler.Render(w, r, views.ShowResultados(pacientes, resultados_total, offset, false), true)
 	} else {
-		render(w, r, views.ListPacientes(pacientes, resultados_total, offset, false), true)
+		h.pageHandler.Render(w, r, views.ListPacientes(pacientes, resultados_total, offset, false), true)
 	}
 }
 
@@ -58,12 +62,12 @@ func (h *PacienteHandler) ListPacientesBy(w http.ResponseWriter, r *http.Request
 		}
 		w.WriteHeader(http.StatusOK)
 		if len(pacientes) == 0 {
-			render(w, r, views.SinResultados(), true)
+			h.pageHandler.Render(w, r, views.SinResultados(), true)
 		} else {
 			if offset == 0 {
-				render(w, r, views.ShowResultados(pacientes, resultados_total, offset, false), true)
+				h.pageHandler.Render(w, r, views.ShowResultados(pacientes, resultados_total, offset, false), true)
 			} else {
-				render(w, r, views.ListPacientes(pacientes, resultados_total, offset, false), true)
+				h.pageHandler.Render(w, r, views.ListPacientes(pacientes, resultados_total, offset, false), true)
 			}
 		}
 	} else {
@@ -98,13 +102,13 @@ func (h *PacienteHandler) ListPacientesByFiltro(w http.ResponseWriter, r *http.R
 	}
 	if len(pacientes) == 0 {
 		w.WriteHeader(http.StatusOK)
-		render(w, r, views.SinResultados(), true)
+		h.pageHandler.Render(w, r, views.SinResultados(), true)
 	} else {
 		w.WriteHeader(http.StatusOK)
 		if offsetPedido == 0 {
-			render(w, r, views.ShowResultados(pacientes, resultados_total, int16(offsetPedido), true), true)
+			h.pageHandler.Render(w, r, views.ShowResultados(pacientes, resultados_total, int16(offsetPedido), true), true)
 		} else {
-			render(w, r, views.ListPacientes(pacientes, resultados_total, int16(offsetPedido), true), true)
+			h.pageHandler.Render(w, r, views.ListPacientes(pacientes, resultados_total, int16(offsetPedido), true), true)
 		}
 	}
 }
@@ -128,19 +132,31 @@ func (h *PacienteHandler) APIPacientes(w http.ResponseWriter, r *http.Request) {
 
 func (h *PacienteHandler) ShowFullPaciente(w http.ResponseWriter, r *http.Request) {
 	protocolo := r.PathValue("protocolo")
-	paciente, err := h.pacienteService.GetAllFromPaciente(r.Context(), protocolo)
+	token, err := r.Cookie(NOMBRE_TOKEN)
+	if err != nil && err != http.ErrNoCookie {
+		// renderizar templ de error
+		http.Error(w, "Error al cargar paciente", http.StatusInternalServerError)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	valor_token := ""
+	if token != nil {
+		valor_token = token.Value
+	}
+
+	paciente, es_dueño, err := h.pacienteService.GetAllFromPaciente(r.Context(), protocolo, valor_token)
 	if err != nil || paciente == nil {
 		// renderizar templ de error
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	render(w, r, views.ShowPaciente(*paciente), false)
+	h.pageHandler.Render(w, r, views.ShowPaciente(*paciente, es_dueño), false)
 }
 
 func (h *PacienteHandler) BorrarPaciente(w http.ResponseWriter, r *http.Request) {
 	protocolo := r.PathValue("protocolo")
-	err := h.pacienteService.DeletePaciente(r.Context(), protocolo)
+	err := h.pacienteService.DeletePacienteYArchivos(r.Context(), protocolo)
 	if err != nil {
 		errorAlUsuario(w, http.StatusInternalServerError, MSJ_ERROR_ELIMINAR, err, "BorrarPaciente: "+protocolo)
 		return
