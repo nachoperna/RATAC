@@ -33,9 +33,6 @@ func main() {
 
 	queries := sqlc.New(db)
 
-	var pacienteRepo domain.PacienteRepository = dbrepo.NewPacienteRepository(queries, db)
-	pacienteServices := application.NewPacienteService(pacienteRepo)
-	pacienteHandler := ui.NewPacienteHandler(pacienteServices)
 	
 	var desc_microRepo domain.Descripcion_microscopicasRepository = dbrepo.NewDescripcion_microscopicasRepository(queries)
 	desc_microServices := application.NewDescripcionMicroscopicaService(desc_microRepo)
@@ -48,6 +45,12 @@ func main() {
 	authService := application.NewAuthService(dbrepo.NewAuthRepository(queries, db))
 	adminService := application.NewAdminService(dbrepo.NewAdminRepository(queries))
 	authHandler := ui.NewAuthHandler(authService, adminService)
+	pageHandler := ui.NewPageHandler(authHandler)
+
+	var pacienteRepo domain.PacienteRepository = dbrepo.NewPacienteRepository(queries, db)
+	pacienteServices := application.NewPacienteService(pacienteRepo)
+	pacienteHandler := ui.NewPacienteHandler(pacienteServices, pageHandler)
+
 	homeHandler := ui.NewHomeHandler(pacienteServices, desc_microServices, diagnosticoServices, authService)
 	adminHandler := ui.NewAdminHandler(adminService, pacienteServices, authService)
 
@@ -68,6 +71,8 @@ func main() {
 	http.HandleFunc("/diagnosticos/alta/borrar_temporal", authHandler.LoggerChecker(adminHandler.BorrarTemporal))
 	http.HandleFunc("/diagnosticos/alta/carga", authHandler.LoggerChecker(adminHandler.AltaDiagnostico))
 	http.HandleFunc("/diagnosticos/baja/{protocolo}", authHandler.LoggerChecker(pacienteHandler.BorrarPaciente))
+	http.HandleFunc("/diagnosticos/editar/{protocolo}", authHandler.LoggerChecker(adminHandler.EditarDiagnostico))
+	http.HandleFunc("/diagnosticos/editar/{protocolo}/confirmar", authHandler.LoggerChecker(adminHandler.ConfirmarEdicion))
 	http.HandleFunc("/diagnosticos", authHandler.LoggerChecker(adminHandler.DiagnosticosByUser))
 	http.HandleFunc("/admin/panel", authHandler.LoggerChecker(adminHandler.ShowAdminPanel))
 	http.HandleFunc("/admin/solicitudes/aceptar", authHandler.LoggerChecker(adminHandler.SolicitudAprobada))
@@ -80,7 +85,6 @@ func main() {
 	// http.HandleFunc("/registrarse", authHandler.NoActionOk)
 	// http.HandleFunc("/login", authHandler.NoActionOk)
 	http.HandleFunc("/logout", authHandler.Logout)
-	http.HandleFunc("/activo", authHandler.LoggerChecker(authHandler.SesionActiva))
 	
 	http.HandleFunc("/ingreso/formulario", func (w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./infrastructure/UI/static/panel_acceso.html")
