@@ -1,6 +1,6 @@
 package views
 
-templ Page(content templ.Component, list_pacientes_page bool) {
+templ Page(content templ.Component, list_pacientes_page, sesion_activa bool, rol string) {
       <!DOCTYPE html>
       <html lang="es">
       <head>
@@ -22,8 +22,7 @@ templ Page(content templ.Component, list_pacientes_page bool) {
                         <img src="/static/img/RATAC LOGO FULL COLOR HORIZONTAL.svg" alt="RATAC" style="height:38px; width:auto; display:block;">
                   </a>
                   <nav>
-                        <a class="nav-badge" href="/diagnosticos/alta">Cargar Diagnostico</a>
-                        <div class="nav-badge">Ingresar</div>
+                        @HeaderLinks(sesion_activa, rol)
                   </nav>
             </header>
       
