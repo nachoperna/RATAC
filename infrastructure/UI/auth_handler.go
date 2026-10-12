@@ -188,17 +188,14 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (h *AuthHandler) SesionActiva(w http.ResponseWriter, r *http.Request) {
+func (h *AuthHandler) SesionActiva(w http.ResponseWriter, r *http.Request) bool {
 	token, err := r.Cookie(NOMBRE_TOKEN)
 	if err != nil {
-		http.Error(w, "SESION TERMINADA", http.StatusBadRequest)
-		return
+		return false
 	}
 	activa, err := h.AuthService.Validacion(r.Context(), token.Value)
 	if err != nil || !activa {
-		http.Error(w, "SESION TERMINADA", http.StatusBadRequest)
-		return
+		return false
 	}
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("<h1> SESION ACTIVA </h1>"))
+	return activa
 }
