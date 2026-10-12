@@ -17,11 +17,12 @@ import (
 func TestListPacientes_ejecucionExitosa_renderizaTemplate(t *testing.T) {
 	mockRepo := new(mocks.MockPacienteRepository)
 	service := application.NewPacienteService(mockRepo)
-	handler := ui.NewPacienteHandler(service)
+	handler := ui.NewPacienteHandler(service, ui.NewPageHandler(nil))
 
 	mockRepo.On("ListPacientes", mock.Anything, int16(0)).Return([]domain.Paciente{}, int32(0), nil)
 
 	req := httptest.NewRequest(http.MethodGet, "/pacientes", nil)
+	req.Header.Set("HX-Request", "true")
 	rec := httptest.NewRecorder()
 
 	handler.ListPacientes(rec, req)
@@ -33,12 +34,14 @@ func TestListPacientes_ejecucionExitosa_renderizaTemplate(t *testing.T) {
 func TestListPacientesBy_conParametro_llamaAlServicio(t *testing.T) {
 	mockRepo := new(mocks.MockPacienteRepository)
 	service := application.NewPacienteService(mockRepo)
-	handler := ui.NewPacienteHandler(service)
+	handler := ui.NewPacienteHandler(service, ui.NewPageHandler(nil))
 
 	esperado := []domain.Paciente{{NombrePaciente: "Fido"}}
 	mockRepo.On("GetPacienteByNombre", mock.Anything, "Fido", int16(0)).Return(esperado, int32(1), nil)
 
 	req := httptest.NewRequest(http.MethodGet, "/pacientes/nombre?paciente=Fido", nil)
+	req.Header.Set("HX-Request", "true")
+
 	rec := httptest.NewRecorder()
 
 	handler.ListPacientesBy(rec, req)
@@ -50,14 +53,16 @@ func TestListPacientesBy_conParametro_llamaAlServicio(t *testing.T) {
 func TestListPacientesByFiltro_jsonValido_llamaAlServicio(t *testing.T) {
 	mockRepo := new(mocks.MockPacienteRepository)
 	service := application.NewPacienteService(mockRepo)
-	handler := ui.NewPacienteHandler(service)
+	handler := ui.NewPacienteHandler(service, ui.NewPageHandler(nil))
 
 	esperado := []domain.Paciente{{Protocolo: "FEL-002"}}
 	mockRepo.On("GetPacienteByFiltro", mock.Anything, mock.AnythingOfType("[]domain.Filtro"), int16(0)).Return(esperado, int32(1), nil)
 
 	jsonBody := []byte(`{"filtros": [{"campo": "Especie", "operador": "=", "valores": ["Felino"]}], "offset": 0}`)
 	req := httptest.NewRequest(http.MethodPost, "/pacientes/", bytes.NewBuffer(jsonBody))
-	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Content-Type", "application/json")	
+	req.Header.Set("HX-Request", "true")
+
 	rec := httptest.NewRecorder()
 
 	handler.ListPacientesByFiltro(rec, req)
@@ -69,7 +74,7 @@ func TestListPacientesByFiltro_jsonValido_llamaAlServicio(t *testing.T) {
 func TestListPacientesByFiltro_jsonInvalido_retornaBadRequest(t *testing.T) {
 	mockRepo := new(mocks.MockPacienteRepository)
 	service := application.NewPacienteService(mockRepo)
-	handler := ui.NewPacienteHandler(service)
+	handler := ui.NewPacienteHandler(service, nil)
 
 	jsonBody := []byte(`{"filtros": bad_json}`) // JSON roto
 	req := httptest.NewRequest(http.MethodPost, "/pacientes/", bytes.NewBuffer(jsonBody))
@@ -84,7 +89,7 @@ func TestListPacientesByFiltro_jsonInvalido_retornaBadRequest(t *testing.T) {
 func TestAPIPacientes_ejecucionExitosa_retornaJSON(t *testing.T) {
 	mockRepo := new(mocks.MockPacienteRepository)
 	service := application.NewPacienteService(mockRepo)
-	handler := ui.NewPacienteHandler(service)
+	handler := ui.NewPacienteHandler(service, nil)
 
 	// Le pasamos solo 2 pacientes para probar que el límite seguro (limite = 5) funciona bien
 	esperado := []domain.Paciente{
@@ -111,15 +116,16 @@ func TestAPIPacientes_ejecucionExitosa_retornaJSON(t *testing.T) {
 func TestShowFullPaciente_protocoloValido_renderizaTemplate(t *testing.T) {
 	mockRepo := new(mocks.MockPacienteRepository)
 	service := application.NewPacienteService(mockRepo)
-	handler := ui.NewPacienteHandler(service)
+	handler := ui.NewPacienteHandler(service, ui.NewPageHandler(nil))
 
 	protocolo := "CAN-010"
 	esperado := &domain.Paciente{Protocolo: protocolo}
-	mockRepo.On("GetAllFromPaciente", mock.Anything, protocolo).Return(esperado, nil)
+	mockRepo.On("GetAllFromPaciente", mock.Anything, protocolo, "").Return(esperado, false, nil)
 
 	req := httptest.NewRequest(http.MethodGet, "/paciente/protocolo/CAN-010", nil)
 	// Feature de Go 1.22: Inyectar el PathValue directamente en el request mockeado
 	req.SetPathValue("protocolo", protocolo)
+	req.Header.Set("HX-Request", "true")
 
 	rec := httptest.NewRecorder()
 

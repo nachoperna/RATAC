@@ -113,9 +113,9 @@ func TestGetAllFromPaciente_protocoloValido_retornaPacienteCompleto(t *testing.T
 		Especie:   &especie,
 	}
 
-	mockRepo.On("GetAllFromPaciente", mock.Anything, protocolo).Return(esperado, nil)
+	mockRepo.On("GetAllFromPaciente", mock.Anything, protocolo, "").Return(esperado, false, nil)
 
-	resultado, err := service.GetAllFromPaciente(context.Background(), protocolo)
+	resultado, _, err := service.GetAllFromPaciente(context.Background(), protocolo, "")
 
 	assert.NoError(t, err)
 	assert.Equal(t, esperado, resultado)

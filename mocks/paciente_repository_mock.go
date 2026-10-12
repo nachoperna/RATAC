@@ -60,12 +60,12 @@ func (m *MockPacienteRepository) GetPacienteByFiltro(ctx context.Context, filtro
 	return pacientes, args.Get(1).(int32), args.Error(2)
 }
 
-func (m *MockPacienteRepository) GetAllFromPaciente(ctx context.Context, protocolo string) (*domain.Paciente, error) {
-	args := m.Called(ctx, protocolo)
+func (m *MockPacienteRepository) GetAllFromPaciente(ctx context.Context, protocolo, token string) (*domain.Paciente, bool, error) {
+	args := m.Called(ctx, protocolo, "")
 	if args.Get(0) != nil {
-		return args.Get(0).(*domain.Paciente), args.Error(1)
+		return args.Get(0).(*domain.Paciente), false, args.Error(2)
 	}
-	return nil, args.Error(1)
+	return nil, false, args.Error(2)
 }
 
 func (m *MockPacienteRepository) DeletePaciente(ctx context.Context, protocolo string) error {
