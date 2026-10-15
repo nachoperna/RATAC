@@ -82,7 +82,7 @@ document.addEventListener('htmx:confirm', (evt) => {
 // Aviso de una accion que ya ocurrio (por ejemplo, un guardado exitoso).
 // A diferencia de la confirmacion no ofrece "Cancelar": no hay nada que
 // cancelar, el cambio ya esta hecho.
-function mostrarAviso(mensaje, titulo, alCerrar) {
+function mostrarAviso(mensaje, titulo, alCerrar, verDiagnostico, ruta_diagnostico) {
       const overlay = document.createElement('div');
       overlay.className = 'confirm-overlay';
       overlay.innerHTML = `
@@ -95,8 +95,9 @@ function mostrarAviso(mensaje, titulo, alCerrar) {
                   </div>
                   <h3 class="confirm-title"></h3>
                   <p class="confirm-message"></p>
-                  <div class="confirm-actions confirm-actions-unico">
+                  <div class="confirm-actions ${verDiagnostico ? '' : 'confirm-actions-unico'}">
                         <button type="button" class="confirm-aceptar">Aceptar</button>
+                        ${verDiagnostico ? `<button type="button" class="btn-primary" onclick="window.location.replace('${ruta_diagnostico}')">Ver Diagnostico</button>` : ''}
                   </div>
             </div>`;
 

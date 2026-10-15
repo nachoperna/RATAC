@@ -161,7 +161,7 @@ function resetPage() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function submitData() {
+function submitData(destino) {
       const btn = document.getElementById('btn-submit');
       btn.innerHTML = 'Subiendo...';
       btn.style.opacity = '0.8';
@@ -185,7 +185,9 @@ function submitData() {
                               btn.classList.add('btn-primary');
                               btn.classList.remove('btn-success');
                               btn.style.pointerEvents = 'auto';
-                        }
+                        },
+                        true,
+                        destino
                   );
             }, 1000);
       }, 1500);
@@ -213,7 +215,8 @@ function submitEdicion(destino) {
                               // por script), la página sigue viva y el timeout redirige.
                               // Si el close prospera, la descarga mata los timers.
                               setTimeout(() => { window.location.href = "/"; }, 200);
-                        }
+                        },
+                        false
                   );
             }, 1000);
       }, 1500);
@@ -322,7 +325,7 @@ function validacionYFormData(evt, es_edicion) {
             .then(async r => {
                   if (r.ok) {
                         if (es_edicion) submitEdicion(`/paciente/protocolo/${protocolo.value.trim()}`);
-                        else submitData();
+                        else submitData(`/paciente/protocolo/${protocolo.value.trim()}`);
                         return;
                   }
                   if (r.status === 401) {

@@ -897,13 +897,13 @@ opacity: 0.6;
 }
 
 .confirm-aceptar {
-      background: var(--navy);
+      background: #2e7d32;
       color: var(--white);
-      border: 1px solid var(--navy);
+      border: 1px solid #2e7d32;
 }
 
 .confirm-aceptar:hover {
-      background: var(--navy-mid);
+      background: #27692b;
 }
 
 .confirm-aceptar.confirm-aceptar-peligro {
@@ -925,15 +925,6 @@ opacity: 0.6;
    No usa el dialogo de confirmacion porque no hay nada que decidir. */
 .confirm-icon.confirm-icon-exito {
       color: #2e7d32;
-}
-
-.confirm-actions.confirm-actions-unico .confirm-aceptar {
-      background: #2e7d32;
-      border-color: #2e7d32;
-}
-
-.confirm-actions.confirm-actions-unico .confirm-aceptar:hover {
-      background: #27692b;
 }
 
 /* ===== Aviso de error dentro de la pantalla =====
