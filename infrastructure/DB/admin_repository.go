@@ -105,3 +105,8 @@ func (r *AdminRepository) SolicitudAprobada (ctx context.Context, email string) 
 func (r *AdminRepository) SolicitudRechazada (ctx context.Context, email string) (string, error) {
 	return r.queries.EliminarUsuario(ctx, email)
 }
+
+func (r *AdminRepository) GetRol (ctx context.Context, email string) (string, error) {
+	rol, err := r.queries.GetRol(ctx, email)
+	return string(rol), err
+}

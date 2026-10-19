@@ -2,41 +2,70 @@ package views
 
 import "RATAC/domain"
 
-templ Solicitudes(solicitudes []domain.Solicitud ) {
-      for _, solicitud := range solicitudes {
-            <article class="request-card">
-                  <div class="request-header">
-                        <div>
-                              <h3 class="lab-name">{solicitud.Nombre}</h3>
-                              <span class="lab-location">
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                                    {solicitud.Ciudad}
-                              </span>
+templ Solicitudes(solicitudes []domain.Solicitud) {
+      if len(solicitudes) == 0 {
+            @SinSolicitudes()
+      } else {
+            for _, solicitud := range solicitudes {
+                  <article class="request-card">
+                        <div class="request-header">
+                              <div>
+                                    <h3 class="lab-name">{solicitud.Nombre}</h3>
+                                    <span class="lab-location">
+                                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                          {solicitud.Ciudad}
+                                    </span>
+                              </div>
+                              <span class="request-date">XX-XX-XX</span>
                         </div>
-                        <span class="request-date">XX-XX-XX</span>
-                  </div>
 
-                  <div class="vet-list">
-                        <strong>Veterinarios:</strong> 
-                        for _, vet := range solicitud.Veterinarios {
-                              {vet.Nombre},
-                        }
-                  </div>
-                  <div class="request-actions">
-                        <button class="btn btn-outline"
-                              data-email_lab={ solicitud.Email }
-                              data-nombre_lab={ solicitud.Nombre }
-                              onclick="openRejectModal(this)"
-                              >Rechazar
+                        <div class="vet-list">
+                              <strong>Veterinarios:</strong> 
+                              for _, vet := range solicitud.Veterinarios {
+                                    {vet.Nombre},
+                              }
+                        </div>
+                        <div class="request-actions">
+                              <button class="btn btn-outline"
+                                    data-email_lab={ solicitud.Email }
+                                    data-nombre_lab={ solicitud.Nombre }
+                                    onclick="openRejectModal(this)"
+                                    >Rechazar
+                              </button>
+                              <button 
+                                    class="btn btn-primary"
+                                    data-email_lab={ solicitud.Email }
+                                    data-nombre_lab={ solicitud.Nombre }
+                                    onclick="openAcceptModal(this)"
+                                    >Aceptar
+                              </button>
+                        </div>
+                  </article>
+            }
+            <!-- Paginación de Solicitudes -->
+            <div class="requests-pagination">
+                  <span class="page-info" id="page-info">1-3 de 15</span>
+                  <div class="page-buttons">
+                        <button class="page-btn page-btn-text" disabled>
+                              Anterior
                         </button>
-                        <button 
-                              class="btn btn-primary"
-                              data-email_lab={ solicitud.Email }
-                              data-nombre_lab={ solicitud.Nombre }
-                              onclick="openAcceptModal(this)"
-                              >Aceptar
+                        <button class="page-btn page-btn-text active">
+                              Siguiente
                         </button>
                   </div>
-            </article>
+            </div>
       }
+}
+
+templ SinSolicitudes(){
+      <div id="no-diagnoses-notice" class="no-data-notice">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <div>
+                  <p>No hay solicitudes por el momento</p>
+            </div>
+      </div>
 }

@@ -197,18 +197,31 @@ func (h *AdminHandler) ShowAdminPanel(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	email, _ := h.authService.GetEmail(r.Context(), token.Value)
+	es_admin, err := h.adminService.EsAdmin(r.Context(), email)
+	if err != nil {
+		// renderizar templ de error
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	// SE DEBE HACER PETICION A LA BD PARA OBTENER ROL REAL CON EL TOKEN
-	solicitudes, autorizado, err := h.adminService.GetSolicitudes(r.Context(), "admin")
+	solicitudes, err := h.adminService.GetSolicitudes(r.Context(), es_admin)
 	if err != nil {
 		// renderizar templ de error
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	var lista_solicitudes templ.Component
-	if autorizado {
+	if es_admin {
 		lista_solicitudes = views.Solicitudes(solicitudes)
 	}
-	var tabla_diagnosticos templ.Component = views.TablaUltimosDiagnosticos(pacientes, 0, total, true)
+	var tabla_diagnosticos templ.Component 
+	if total == 0 {
+		tabla_diagnosticos = views.SinDiagnosticos()
+	} else {
+		tabla_diagnosticos = views.TablaUltimosDiagnosticos(pacientes, 0, total, true)
+	}
 	var paginacion templ.Component = views.ResultadosRestantes(int8(len(pacientes)), 0, total)
 	var header templ.Component = views.HeaderLinks(true, "")
 
@@ -222,9 +235,11 @@ func (h *AdminHandler) ShowAdminPanel(w http.ResponseWriter, r *http.Request) {
 
 	datos := map[string]any{
 		"TablaDiagnosticos": tabla_diagnosticos,
+		"MostrarPaginacion": total > 0,
 		"Paginacion":  paginacion,
 		"Header":      header,
 		"Solicitudes": lista_solicitudes,
+		"EsAdmin": es_admin,
 	}
 	tmp.Execute(w, datos)
 }

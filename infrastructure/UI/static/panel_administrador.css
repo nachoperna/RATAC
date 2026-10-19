@@ -165,6 +165,34 @@ tr:hover td {
       background-color: rgba(232, 228, 245, 0.2);
 }
 
+.no-data-notice {
+      background-color: #fffbeb;
+      border: 1px dashed #f59e0b;
+      border-radius: 10px;
+      padding: 32px 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      color: #b45309;
+      box-shadow: 0 4px 15px rgba(245, 158, 11, 0.05);
+}
+
+.no-data-notice svg {
+      color: #d97706;
+      flex-shrink: 0;
+}
+
+.no-data-notice p {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0;
+      color: #92400e;
+}
+
 .cell-protocol {
       font-family: 'DM Mono', monospace;
       font-weight: 600;

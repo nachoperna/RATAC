@@ -22,3 +22,6 @@ UPDATE Usuarios set rol = $2::roles WHERE email = $1;
 -- name: EliminarUsuario :one
 DELETE FROM Usuarios WHERE email = $1
 RETURNING nombre_lab;
+
+-- name: GetRol :one
+SELECT rol FROM Usuarios WHERE email = $1;

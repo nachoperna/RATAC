@@ -24,4 +24,5 @@ type AdminRepository interface{
 	GetSolicitudes(ctx context.Context) ([]Solicitud, error)
 	SolicitudAprobada (ctx context.Context, email string) (string, string, error)
 	SolicitudRechazada (ctx context.Context, email string) (string, error)
+	GetRol (ctx context.Context, email string) (string, error)
 }

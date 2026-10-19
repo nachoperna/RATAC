@@ -29,6 +29,12 @@ var (
 	ErrDiagnosticoRepetido = errors.New("el diagnostico ya esta registrado en el sistema")
 )
 
+const (
+	ROL_ADMIN       string = "admin"
+	ROL_LABORATORIO string = "laboratorio"
+	ROL_SOLICITANTE string = "solicitante"
+)
+
 type AdminService struct {
 	adminRepo domain.AdminRepository
 }
@@ -187,15 +193,15 @@ func (s *AdminService) GetUltimosDiagnosticosCargados(ctx context.Context, offse
 	return diagnosticos, total, nil
 }
 
-func (s *AdminService) GetSolicitudes(ctx context.Context, rol string) ([]domain.Solicitud, bool, error) {
-	if rol != "admin"{
-		return nil, false, nil
+func (s *AdminService) GetSolicitudes(ctx context.Context, es_admin bool) ([]domain.Solicitud, error) {
+	if !es_admin {
+		return nil, nil
 	}
 	solicitudes, err := s.adminRepo.GetSolicitudes(ctx)
 	if err != nil {
-		return nil, true, err
+		return nil, err
 	}
-	return solicitudes, true, nil
+	return solicitudes, nil
 }
 
 func (s *AdminService) SolicitudAprobada (ctx context.Context, email string) (string, string, error) {
@@ -204,4 +210,13 @@ func (s *AdminService) SolicitudAprobada (ctx context.Context, email string) (st
 
 func (s *AdminService) SolicitudRechazada (ctx context.Context, email string) (string, error) {
 	return s.adminRepo.SolicitudRechazada(ctx, email)
+}
+
+func (s *AdminService) GetRol (ctx context.Context, email string) (string, error) {
+	return s.adminRepo.GetRol(ctx, email)
+}
+
+func (s *AdminService) EsAdmin (ctx context.Context, email string) (bool, error) {
+	rol, err := s.GetRol(ctx, email)
+	return rol == ROL_ADMIN, err
 }
