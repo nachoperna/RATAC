@@ -55,9 +55,9 @@ func (r *AdminRepository) GetUltimosDiagnosticosCargados(ctx context.Context, of
 	return pacientes, total, nil
 }
 
-func (r *AdminRepository) GetSolicitudes(ctx context.Context) ([]domain.Solicitud, error) {
+func (r *AdminRepository) GetSolicitudes(ctx context.Context, offset uint8) ([]domain.Solicitud, error) {
 	var arr_solicitudes []domain.Solicitud
-	solicitudes, err := r.queries.GetSolicitudes(ctx)
+	solicitudes, err := r.queries.GetSolicitudes(ctx, int32(offset))
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +106,11 @@ func (r *AdminRepository) SolicitudRechazada (ctx context.Context, email string)
 	return r.queries.EliminarUsuario(ctx, email)
 }
 
-func (r *AdminRepository) GetRol (ctx context.Context, email string) (string, error) {
-	rol, err := r.queries.GetRol(ctx, email)
+func (r *AdminRepository) GetRol (ctx context.Context, email, token string) (string, error) {
+	if email != "" {
+		rol, err := r.queries.GetRolByEmail(ctx, email)
+		return string(rol), err
+	}
+	rol, err := r.queries.GetRolByToken(ctx, token)
 	return string(rol), err
 }

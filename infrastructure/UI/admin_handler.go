@@ -197,8 +197,7 @@ func (h *AdminHandler) ShowAdminPanel(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	email, _ := h.authService.GetEmail(r.Context(), token.Value)
-	es_admin, err := h.adminService.EsAdmin(r.Context(), email)
+	es_admin, err := h.adminService.EsAdmin(r.Context(), "", token.Value)
 	if err != nil {
 		// renderizar templ de error
 		w.WriteHeader(http.StatusInternalServerError)
@@ -206,7 +205,7 @@ func (h *AdminHandler) ShowAdminPanel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// SE DEBE HACER PETICION A LA BD PARA OBTENER ROL REAL CON EL TOKEN
-	solicitudes, err := h.adminService.GetSolicitudes(r.Context(), es_admin)
+	solicitudes, err := h.adminService.GetSolicitudes(r.Context(), es_admin, 0)
 	if err != nil {
 		// renderizar templ de error
 		w.WriteHeader(http.StatusInternalServerError)
@@ -265,6 +264,30 @@ func (h *AdminHandler) DiagnosticosByUser(w http.ResponseWriter, r *http.Request
 	}
 	w.WriteHeader(http.StatusOK)
 	views.TablaUltimosDiagnosticos(pacientes, offset, total, false).Render(r.Context(), w)
+}
+
+func (h *AdminHandler) GetSolicitudes (w http.ResponseWriter, r *http.Request)  {
+	offset, err := getOffset(r.URL.Query().Get("offset"))
+	if err != nil {
+		// renderizar templ de error
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	if !r.URL.Query().Has("desde_panel") {
+		// renderizar templ de error
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	es_admin := true
+
+	// SE DEBE HACER PETICION A LA BD PARA OBTENER ROL REAL CON EL TOKEN
+	solicitudes, err := h.adminService.GetSolicitudes(r.Context(), es_admin, uint8(offset))
+	if err != nil {
+		// renderizar templ de error
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	views.Solicitudes(solicitudes).Render(r.Context(), w)
 }
 
 func (h *AdminHandler) SolicitudAprobada (w http.ResponseWriter, r *http.Request)  {

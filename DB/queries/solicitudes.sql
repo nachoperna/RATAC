@@ -1,7 +1,9 @@
 -- name: GetSolicitudes :many
 SELECT email, nombre_lab, ciudad_origen
 FROM Usuarios
-WHERE rol = 'solicitante';
+WHERE rol = 'solicitante'
+ORDER BY fecha_creacion DESC
+LIMIT 3 OFFSET $1;
 
 -- name: GetVeterinarios :many
 SELECT matricula, nombre

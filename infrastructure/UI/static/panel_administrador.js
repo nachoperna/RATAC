@@ -3,6 +3,7 @@ let currentRequestCard = null;
 let currentRequestAction = null;
 let currentCard = null;
 offset = 0;
+let offset_solicitudes = 0;
 let email = null;
 
 // SVGs para los íconos
@@ -57,4 +58,17 @@ function confirmDelete(btn){
       const tr = btn.closest('tr');
       tr.style.transition='opacity 0.3s ease'; tr.style.opacity='0';
       setTimeout(()=>tr.remove(),300);
+}
+
+function getOffsetSolicitudes(){
+      offset_solicitudes += 3;
+      return offset_solicitudes;
+}
+
+function getOffsetRestandoSolicitudes(){
+      offset_solicitudes -= 3;
+      if (offset_solicitudes  == 0){
+            document.getElementById('btn-anterior-solicitudes').disabled = true;
+      }
+      return offset_solicitudes;
 }

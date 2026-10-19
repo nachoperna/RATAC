@@ -23,5 +23,11 @@ UPDATE Usuarios set rol = $2::roles WHERE email = $1;
 DELETE FROM Usuarios WHERE email = $1
 RETURNING nombre_lab;
 
--- name: GetRol :one
-SELECT rol FROM Usuarios WHERE email = $1;
+-- name: GetRolByToken :one
+SELECT u.rol 
+FROM Sesiones s JOIN Usuarios u ON s.id_usuario = u.id 
+WHERE s.token = $1;
+
+-- name: GetRolByEmail :one
+SELECT rol FROM Usuarios
+WHERE email = $1;

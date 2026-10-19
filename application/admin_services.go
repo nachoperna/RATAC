@@ -193,11 +193,11 @@ func (s *AdminService) GetUltimosDiagnosticosCargados(ctx context.Context, offse
 	return diagnosticos, total, nil
 }
 
-func (s *AdminService) GetSolicitudes(ctx context.Context, es_admin bool) ([]domain.Solicitud, error) {
+func (s *AdminService) GetSolicitudes(ctx context.Context, es_admin bool, offset uint8) ([]domain.Solicitud, error) {
 	if !es_admin {
 		return nil, nil
 	}
-	solicitudes, err := s.adminRepo.GetSolicitudes(ctx)
+	solicitudes, err := s.adminRepo.GetSolicitudes(ctx, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -212,11 +212,11 @@ func (s *AdminService) SolicitudRechazada (ctx context.Context, email string) (s
 	return s.adminRepo.SolicitudRechazada(ctx, email)
 }
 
-func (s *AdminService) GetRol (ctx context.Context, email string) (string, error) {
-	return s.adminRepo.GetRol(ctx, email)
+func (s *AdminService) GetRol (ctx context.Context, email string, token string) (string, error) {
+	return s.adminRepo.GetRol(ctx, email, token)
 }
 
-func (s *AdminService) EsAdmin (ctx context.Context, email string) (bool, error) {
-	rol, err := s.GetRol(ctx, email)
+func (s *AdminService) EsAdmin (ctx context.Context, email, token string) (bool, error) {
+	rol, err := s.GetRol(ctx, email, token)
 	return rol == ROL_ADMIN, err
 }

@@ -75,6 +75,7 @@ func main() {
 	http.HandleFunc("/diagnosticos/editar/{protocolo}/confirmar", authHandler.LoggerChecker(adminHandler.ConfirmarEdicion))
 	http.HandleFunc("/diagnosticos", authHandler.LoggerChecker(adminHandler.DiagnosticosByUser))
 	http.HandleFunc("/admin/panel", authHandler.LoggerChecker(adminHandler.ShowAdminPanel))
+	http.HandleFunc("/admin/solicitudes", authHandler.LoggerChecker(adminHandler.GetSolicitudes))
 	http.HandleFunc("/admin/solicitudes/aceptar", authHandler.LoggerChecker(adminHandler.SolicitudAprobada))
 	// http.HandleFunc("/admin/solicitudes/aceptar", authHandler.NoActionOk)
 	http.HandleFunc("/admin/solicitudes/rechazar", authHandler.LoggerChecker(adminHandler.SolicitudRechazada))

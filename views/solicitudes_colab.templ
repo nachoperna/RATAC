@@ -44,12 +44,25 @@ templ Solicitudes(solicitudes []domain.Solicitud) {
             }
             <!-- Paginación de Solicitudes -->
             <div class="requests-pagination">
-                  <span class="page-info" id="page-info">1-3 de 15</span>
                   <div class="page-buttons">
-                        <button class="page-btn page-btn-text" disabled>
+                        <button 
+                              class="page-btn page-btn-text"
+                              id="btn-anterior-solicitudes"
+                              hx-get="/admin/solicitudes?desde_panel=true"
+                              hx-vals='js:{offset: getOffsetRestandoSolicitudes()}'
+                              hx-target="#requests-container"
+                              hx-swap="innerHTML"
+                              disabled>
                               Anterior
                         </button>
-                        <button class="page-btn page-btn-text active">
+                        <button 
+                              class="page-btn page-btn-text active"
+                              hx-get="/admin/solicitudes?desde_panel=true"
+                              hx-vals='js:{offset: getOffsetSolicitudes()}'
+                              hx-target="#requests-container"
+                              hx-swap="innerHTML"
+                              hx-on::after-request="document.getElementById('btn-anterior-solicitudes').disabled = false;"
+                              >
                               Siguiente
                         </button>
                   </div>
