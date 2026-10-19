@@ -228,6 +228,6 @@ function solicitudErronea(evt) {
 }
 
 // Función para cerrar el modal
-function closeSuccessModal() {
-      document.getElementById('success-modal').classList.remove('active');
+function closeModals() {
+      document.querySelector('.modal-overlay.active').classList.remove('active');
 }
