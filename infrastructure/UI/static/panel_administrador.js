@@ -36,6 +36,12 @@ function processAction() {
       // Si quieres que el espacio colapse
       setTimeout(() => {
             currentCard.style.display = 'none';
+
+            const tarjetasVisibles = document.querySelectorAll('.request-card').filter(card => card.style.display !== 'none');
+
+            if (tarjetasVisibles.length === 0) {
+                  document.querySelector('.requests-pagination').style.display = 'none';
+            }
       }, 400);
 }
 
