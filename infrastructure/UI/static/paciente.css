@@ -230,6 +230,13 @@
       border-radius: 0 6px 6px 0;
 }
 
+.diagnosis-box-header {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+}
+
 .diagnosis-box .label {
       color: var(--diag-border);
       font-weight: 800;

@@ -2,6 +2,7 @@ package views
 
 import "RATAC/domain"
 import "fmt"
+import "strconv"
 
 func GetValue(campo *string) string{
       if campo != nil { return fmt.Sprint(*campo)}
@@ -111,10 +112,32 @@ templ ShowPaciente(paciente domain.Paciente, propietario bool) {
                               </div>
                               if desc_micro.Diagnostico.Descripcion != nil {
                                     <div class="diagnosis-box">
-                                          <span class="label">
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                                                Diagnóstico
-                                          </span>
+                                          <div class="diagnosis-box-header">
+                                                <span class="label">
+                                                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                                      Diagnóstico
+                                                </span>
+                                                if desc_micro.TablaGrado != nil {
+
+                                                      switch getGrado(desc_micro.TablaGrado){
+                                                            case 1:
+                                                                  <span class="grade-pill g1">
+                                                                        <span class="pill-dot"></span>
+                                                                        Grado 1
+                                                                  </span>
+                                                            case 2:
+                                                                  <span class="grade-pill g2">
+                                                                        <span class="pill-dot"></span>
+                                                                        Grado 2
+                                                                  </span>
+                                                            case 3:
+                                                                  <span class="grade-pill g3">
+                                                                        <span class="pill-dot"></span>
+                                                                        Grado 3
+                                                                  </span>
+                                                      }
+                                                }
+                                          </div>
                                           <p>{*desc_micro.Diagnostico.Descripcion}</p>
                                     </div>
  
@@ -147,4 +170,13 @@ templ ShowPaciente(paciente domain.Paciente, propietario bool) {
                   </div>
             }
       </div>
+}
+
+func getGrado(tabla []domain.Grado_oncologico) uint8 {
+      puntaje := 0
+      for _, fila := range tabla {
+            p, _ := strconv.Atoi(fila.Puntaje)
+            puntaje += p
+      }
+      return domain.GetGrado(uint8(puntaje))
 }

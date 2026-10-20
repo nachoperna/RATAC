@@ -122,13 +122,18 @@ templ resultadosMostrados(cant_pacientes int, resultados_total int32, offset int
       </div>     
 }
 
-func getMaxGradoTumoral(desc_micros []domain.Descripcion_microscopicas) int8 {
-      var aux int8 = 0
+func getMaxGradoTumoral(desc_micros []domain.Descripcion_microscopicas) uint8 {
+      var aux uint8 = 0
       for _, desc := range desc_micros {
+            puntaje := 0
             for _, tabla := range desc.TablaGrado{
-                  puntaje, _ := strconv.Atoi(tabla.Puntaje)
-                  if int8(puntaje) > aux {
-                        aux = int8(puntaje)
+                  p, _ := strconv.Atoi(tabla.Puntaje)
+                  puntaje += p
+            }
+            if puntaje > 0 {
+                  grado := domain.GetGrado(uint8(puntaje))
+                  if grado > aux {
+                        aux = grado
                   }
             }
       }

@@ -335,10 +335,18 @@ func (r *PacienteRepository) GetAllFromPaciente(ctx context.Context, protocolo, 
 			Descripcion: getValueOrNil(desc.Diagnostico),
 			Imagenes: img_rutas,
 		}
+		grado_aux, err := r.queries.GetGradoOncologico(ctx, sqlc.GetGradoOncologicoParams{
+			DescripcionesMicroscopicasPacientesProtocolo: paciente_repo.Protocolo,
+			DescripcionesMicroscopicasDescripcion: desc.Descripcion,
+		})
+		if err != nil { // Aca si hay problema se podria continuar con nil porque solo se usa para mostrar el grado (por ahora)
+			return nil, false, nil
+		}
+		grado_oncologico := setGradoOncologico(grado_aux)
 		descripcion_micro := domain.Descripcion_microscopicas{
 			Descripcion: desc.Descripcion,
 			Diagnostico: diagnostico,
-			TablaGrado: nil,
+			TablaGrado: grado_oncologico,
 		}
 		descripciones_micro_repo = append(descripciones_micro_repo, descripcion_micro)
 	}
@@ -368,6 +376,18 @@ func setDatosBasePaciente(datos sqlc.Paciente) domain.Paciente {
 		DescripcionMacroscopica: getValueOrNil(datos.DescripcionMacroscopica),
 		Descripciones_microscopicas: nil,
 	}
+}
+
+func setGradoOncologico(datos []sqlc.GradoOncologico) []domain.Grado_oncologico {
+	var grado []domain.Grado_oncologico
+	for _, aux := range datos {
+		grado = append(grado, domain.Grado_oncologico{
+			Caracteristica: aux.Caracteristica,
+			Muestra_analizada: aux.MuestraAnalizada.String,
+			Puntaje: strconv.Itoa(int(aux.Puntaje)),
+		})
+	}
+	return grado
 }
 
 func (r *PacienteRepository) DeletePaciente(ctx context.Context, protocolo string) error {

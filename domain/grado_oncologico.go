@@ -11,3 +11,14 @@ type Grado_oncologico struct {
 type Grado_oncologicoRepository interface {
 	CreateTablaGrado(ctx context.Context, tabla []Grado_oncologico) error
 }
+
+func GetGrado(puntaje uint8) uint8 {
+	switch {
+		case puntaje <= 5:
+			return 1
+		case puntaje <= 7:
+			return 2
+		default:
+			return 3
+	}
+}
