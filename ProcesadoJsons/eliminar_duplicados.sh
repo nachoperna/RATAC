@@ -8,7 +8,6 @@ cant_copias=0
 i=0
 while IFS="" read -r pdf; do
       i=$((i+1))
-      echo $i
       nombre=$(basename "$pdf" | cut -d '.' -f1)
       x=$(echo "$docs" | grep -c "$nombre")
       if [ $x -gt 0 ]; then
