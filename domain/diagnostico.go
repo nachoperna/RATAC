@@ -4,7 +4,8 @@ import "context"
 
 type Diagnostico struct {
 	Descripcion *string   `json:"Descripcion"`
-	Imagenes    []string `json:"Imagenes"`
+	Imagenes    []string  `json:"Imagenes"`
+	Grado    	*uint8    `json:"Grado"`
 }
 
 type DiagnosticoRepository interface {

@@ -74,6 +74,8 @@ func (r *PacienteRepository) ListPacientes(ctx context.Context, offset int16) ([
 	var pacientes []domain.Paciente
 	for _, p := range bd_pacientes {
 		paciente := pacienteORM(p)
+		grado, _ := r.queries.GetMaxGradoTumoral(ctx, paciente.Protocolo)
+		paciente.MaxGradoTumoral = uint8(grado)
 		pacientes = append(pacientes, paciente)
 	}
 	return pacientes, int32(bd_pacientes[0].Total), nil
@@ -163,6 +165,7 @@ func (r *PacienteRepository) GetPacienteByNombre(ctx context.Context, nombre str
 		resultados_total = int32(bd_pacientes[0].Total)
 	}
 	for _, p := range bd_pacientes {
+		grado, _ := r.queries.GetMaxGradoTumoral(ctx, p.Protocolo)
 		pacientes = append(pacientes, domain.Paciente{
 			Protocolo:      p.Protocolo,
 			Fecha:          p.Fecha.Format("02-01-2006"), // Formateo de fecha
@@ -173,6 +176,7 @@ func (r *PacienteRepository) GetPacienteByNombre(ctx context.Context, nombre str
 			Especie: getValueOrNil(p.Especie),
 			Raza: getValueOrNil(p.Raza),
 			Edad: func() *string {if p.Edad.Valid {edad := strconv.Itoa(int(p.Edad.Int16)); return &edad}; return nil} (),
+			MaxGradoTumoral: uint8(grado),
 		})
 	}
 	return pacientes, resultados_total, nil
@@ -208,6 +212,8 @@ func (r *PacienteRepository) GetPacienteByFiltro(ctx context.Context, filtros []
 			log.Printf("Error leyendo fila: %v", err)
 			continue
 		}
+		grado, _ := r.queries.GetMaxGradoTumoral(ctx, paciente.Protocolo)
+		paciente.MaxGradoTumoral = uint8(grado)
 		pacientes = append(pacientes, paciente)
 	}
 
@@ -279,9 +285,6 @@ func getQueryByFiltro(filtros []domain.Filtro, offset int16) (string, []any, err
 		return "", nil, err
 	}
 
-	fmt.Printf("\n--- QUERY PARA POSTGRESQL ---\n")
-	fmt.Printf("SQL: %s\n", sqlQuery)
-	fmt.Printf("Argumentos: %v\n-----------------------------\n", args)
 	return sqlQuery, args, nil
 }
 
@@ -333,6 +336,7 @@ func (r *PacienteRepository) GetAllFromPaciente(ctx context.Context, protocolo, 
 		}
 		diagnostico := domain.Diagnostico{
 			Descripcion: getValueOrNil(desc.Diagnostico),
+			Grado: func() *uint8 {if desc.Grado.Valid {grado := (uint8(desc.Grado.Int16)); return &grado}; return nil} (),
 			Imagenes: img_rutas,
 		}
 		grado_aux, err := r.queries.GetGradoOncologico(ctx, sqlc.GetGradoOncologicoParams{

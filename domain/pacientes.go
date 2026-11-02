@@ -17,6 +17,7 @@ type Paciente struct {
 	Antecedentes                *string                      `json:"Material remitido - Antecedentes"`
 	DescripcionMacroscopica     *string                      `json:"Descripción macroscópica"`
 	Descripciones_microscopicas []Descripcion_microscopicas `json:"Descripción microscópica"`
+	MaxGradoTumoral		    uint8
 }
 
 type Filtro struct {
@@ -41,8 +42,6 @@ const LIMIT_RESULTADOS_PACIENTE = 10
 
 type PacienteRepository interface {
 	InsertarDiagnostico(ctx context.Context, paciente Paciente) error
-	// GetPaciente(protocolo string) (Paciente, error)
-	// UpdatePaciente(paciente *Paciente) error
 	DeletePaciente(ctx context.Context, protocolo string) error
 	ListUltimosPacientes(ctx context.Context) ([]Paciente, []bool, error)
 	ListPacientes(ctx context.Context, offset int16) ([]Paciente, int32, error)

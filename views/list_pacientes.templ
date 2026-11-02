@@ -2,7 +2,6 @@ package views
 
 import "RATAC/domain"
 import "fmt"
-import "strconv"
 
 templ ShowResultados(pacientes []domain.Paciente, resultados_total int32, offset int16, filtros_avanzados bool) {
       <div class="container">
@@ -63,9 +62,9 @@ templ generateCards(pacientes []domain.Paciente) {
                               <span class="data-label">Edad</span>
                               <span class="not-specified">{GetValue(p.Edad)}</span>
                         </div>
-                        <div class="data-item grade-cell">
-                              <span class="data-label">Grado Tumoral</span>
-                              if grado_tumoral := getMaxGradoTumoral(p.Descripciones_microscopicas); grado_tumoral == 0 {
+                        <div class="data-item">
+                        <span class="data-label">Grado Tumoral (Max)</span>
+                              if grado_tumoral := p.MaxGradoTumoral; grado_tumoral == 0 {
                                     <span class="not-specified">No definido</span>
                               } else if grado_tumoral == 1 {
                                     <div class="grade-pill g1">
@@ -125,16 +124,9 @@ templ resultadosMostrados(cant_pacientes int, resultados_total int32, offset int
 func getMaxGradoTumoral(desc_micros []domain.Descripcion_microscopicas) uint8 {
       var aux uint8 = 0
       for _, desc := range desc_micros {
-            puntaje := 0
-            for _, tabla := range desc.TablaGrado{
-                  p, _ := strconv.Atoi(tabla.Puntaje)
-                  puntaje += p
-            }
-            if puntaje > 0 {
-                  grado := domain.GetGrado(uint8(puntaje))
-                  if grado > aux {
-                        aux = grado
-                  }
+            grado := desc.Diagnostico.Grado
+            if grado != nil && *grado > aux {
+                  aux = *grado
             }
       }
       return aux

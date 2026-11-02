@@ -65,6 +65,7 @@ func InsertarDescMicro(desc domain.Descripcion_microscopicas, pk string, qtx *sq
 		Descripcion: desc.Descripcion,
 		Diagnostico: SetvalueOrNull(desc.Diagnostico.Descripcion),
 		PacientesProtocolo: pk,
+		Grado: func() sql.NullInt16 {if desc.Diagnostico.Grado != nil {return sql.NullInt16{Int16: int16(*desc.Diagnostico.Grado), Valid: true}} else {return sql.NullInt16{Valid: false}}}(),
 	})
 	if err != nil {
 		return errors.New("Error al insertar descripcion microscopica")

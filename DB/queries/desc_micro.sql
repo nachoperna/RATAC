@@ -1,8 +1,8 @@
 -- name: CreateDescripcionMicroscopica :one
 INSERT INTO Descripciones_microscopicas (
-    Descripcion, Diagnostico, Pacientes_Protocolo
+    Descripcion, Diagnostico, Pacientes_Protocolo, Grado
 ) VALUES (
-    $1, $2, $3
+    $1, $2, $3, $4
 )
 RETURNING *;
 
@@ -23,3 +23,8 @@ WHERE Descripcion = $1 AND Pacientes_Protocolo = $2;
 -- name: CountDiagnosticos :one
 SELECT count(*) FROM Descripciones_microscopicas
 WHERE diagnostico IS NOT NULL;
+
+-- name: GetMaxGradoTumoral :one
+SELECT max(Grado)::int
+FROM Descripciones_microscopicas
+WHERE Pacientes_Protocolo = $1 and Grado IS NOT NULL;

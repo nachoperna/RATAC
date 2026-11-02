@@ -25,6 +25,7 @@ patronMorfologia    = re.compile(r"morfolog[ií]a", re.I)
 patronInflamacion   = re.compile(r"inflamaci[oó]n", re.I)
 patronDiagnostico   = re.compile(r"diagn[oó]stico", re.I)
 patronTablaGrado    = re.compile(r"muestra|analizada", re.I)
+patronGrado         = re.compile( r"\b(?:de\s+)?grado\s+(?P<grado>[IVXLCDM]+|\d+)\b", re.IGNORECASE)
 
 def procesarTablaGrado_docx(tabla):
     tabla_grado = []
@@ -45,6 +46,27 @@ def procesarTablaGrado_docx(tabla):
             "Puntaje": ""
         }
     return tabla_grado
+
+def extraer_grado(texto):
+    coincidencia = patronGrado.search(texto)
+
+    if not coincidencia:
+        return None
+
+    grado = coincidencia.group("grado").upper()
+
+    grados_romanos = {
+        "I": 1,
+        "II": 2,
+        "III": 3,
+        "IV": 4,
+        "V": 5
+    }
+
+    if grado in grados_romanos:
+        return grados_romanos[grado]
+
+    return int(grado)
 
 def datosPaciente_docx(tabla):
     datos = {}
@@ -130,11 +152,15 @@ def cargarDescMicro(descripciones_micro, bloque_actual):
     # no se puede hacer un simple append(bloque_actual) porque las variables son mutables entonces tener que hacer un copy de cada estructura
     if seccionVacia(bloque_actual['Diagnostico']['Descripcion']):
         bloque_actual['Diagnostico']['Descripcion'] = None
+    else:
+        bloque_actual["Diagnostico"]["Grado"] = extraer_grado(bloque_actual["Diagnostico"]["Descripcion"])
+
     descripciones_micro.append(bloque_actual.copy())
     return {   # reiniciamos la estructura
         "Descripcion": "",
         "Diagnostico": {
             "Descripcion": "",
+            "Grado": None,
             "Imagenes": []
         },
         "Tabla de Grado": []
@@ -272,7 +298,7 @@ def reordenar_datos_pdf(datos):
     return resultado
 
 def limpiar_diagnostico_pdf(desc):
-    if seccionVacia(desc):
+    if seccionVacia(desc) or desc == None:
         return None
     desc = re.sub(r"(?i)(Laura Denzoin|Médica Veterinaria|\bM\.?P\.?\b|Doctora en|Profesora Adjunta|Patología General|FCV-UNCPBA|Tandil\s*-|cov\.diagnostico|Dra\.?\s+Laura|Sof[íi]a Mart[íi]nez).*$", "", desc)
     return re.sub(r'\s+', ' ', desc).strip()
@@ -403,8 +429,12 @@ def procesar_pdf(ruta):
     descripciones_micro = []
     bloque_actual = {
         "Descripcion": "",
-        "Diagnostico": {"Descripcion": "", "Imagenes": []},
-        "Tabla de Grado": []
+        "Diagnostico": {
+            "Descripcion": "",
+            "Grado": None,
+            "Imagenes": []
+        },
+        "Tabla de Grado": [],
     }
     nombre_tabla_actual = ""
     reader = PdfReader(ruta)
@@ -495,8 +525,8 @@ def procesar_pdf(ruta):
             descripciones_micro = None
         else:
             bloque_actual["Descripcion"] = re.sub(r'\s+', ' ', bloque_actual["Descripcion"]).strip()
+            cargarDescMicro(descripciones_micro, bloque_actual)
             bloque_actual["Diagnostico"]["Descripcion"] = limpiar_diagnostico_pdf(bloque_actual["Diagnostico"]["Descripcion"])
-            descripciones_micro.append(bloque_actual.copy())
     secciones[DESCRIPCION_MICROSCOPICA] = descripciones_micro
     return resultados(datos_paciente, secciones)
 

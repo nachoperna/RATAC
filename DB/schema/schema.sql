@@ -22,6 +22,7 @@ CREATE TABLE Descripciones_microscopicas (
       Descripcion text NOT NULL,
       Diagnostico text NULL,
       Pacientes_Protocolo varchar(50) NOT NULL,
+      Grado smallint,
       CONSTRAINT Descripciones_microscopicas_pk PRIMARY KEY (Descripcion,Pacientes_Protocolo)
 );
 
@@ -74,4 +75,5 @@ CREATE TABLE Sesiones (
       fecha_creacion TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE INDEX idx_pacientes_email_lab ON pacientes(email_lab);
 CREATE INDEX idx_sesiones_token ON Sesiones(token);
