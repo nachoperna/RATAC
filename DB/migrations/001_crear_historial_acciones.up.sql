@@ -35,18 +35,18 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- 3. Enganchar los Triggers de forma individual para cada tabla
-CREATE TRIGGER trigger_historial_pacientes
-AFTER INSERT OR UPDATE OR DELETE ON Pacientes
-FOR EACH ROW EXECUTE FUNCTION registrar_historial();
-
-CREATE TRIGGER trigger_historial_descripciones
-AFTER INSERT OR UPDATE OR DELETE ON Descripciones_microscopicas
-FOR EACH ROW EXECUTE FUNCTION registrar_historial();
-
-CREATE TRIGGER trigger_historial_imagenes
-AFTER INSERT OR UPDATE OR DELETE ON Imagenes
-FOR EACH ROW EXECUTE FUNCTION registrar_historial();
-
-CREATE TRIGGER trigger_historial_grado
-AFTER INSERT OR UPDATE OR DELETE ON Grado_oncologico
-FOR EACH ROW EXECUTE FUNCTION registrar_historial();
+-- CREATE TRIGGER trigger_historial_pacientes
+-- AFTER INSERT OR UPDATE OR DELETE ON Pacientes
+-- FOR EACH ROW EXECUTE FUNCTION registrar_historial();
+--
+-- CREATE TRIGGER trigger_historial_descripciones
+-- AFTER INSERT OR UPDATE OR DELETE ON Descripciones_microscopicas
+-- FOR EACH ROW EXECUTE FUNCTION registrar_historial();
+--
+-- CREATE TRIGGER trigger_historial_imagenes
+-- AFTER INSERT OR UPDATE OR DELETE ON Imagenes
+-- FOR EACH ROW EXECUTE FUNCTION registrar_historial();
+--
+-- CREATE TRIGGER trigger_historial_grado
+-- AFTER INSERT OR UPDATE OR DELETE ON Grado_oncologico
+-- FOR EACH ROW EXECUTE FUNCTION registrar_historial();

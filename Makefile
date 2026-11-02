@@ -1,11 +1,16 @@
 # Variable para acortar los comandos de ejecución en Docker
-DB_URL = postgres://admin:password@db:5432/RATAC_DB?sslmode=disable
+DB_URL = postgres://admin:password@db:5432/RATAC_DB?sslmode=disable&search_path=public
 DB_URL_TEST = postgres://admin:password@db_test:5432/RATAC_DB_TEST?sslmode=disable
 
 MIGRATE_DOCKER = docker run --rm -v "$(PWD)/$(MIGRATIONS_DIR):/migrations:z" --network ratac_default migrate/migrate
 
 DOCKER_EXEC = docker compose exec app
 MIGRATIONS_DIR=./DB/migrations
+ATLAS_DOCKER = docker run --rm -v "$(PWD):/src:z" -w /src --network ratac_default arigaio/atlas:1.3.3-alpine
+ATLAS_DIR    = file://DB/migrations?format=golang-migrate
+ATLAS_DEV    = postgres://admin:password@db:5432/dev?sslmode=disable&search_path=public
+name ?= $(shell date +%Y%m%d%H%M%S)
+
 # Variables para herramientas de generación efímeras (con permisos corregidos)
 SQLC_DOCKER = docker run --rm -u $(shell id -u):$(shell id -g) -v "$(PWD):/src:z" -w /src sqlc/sqlc:1.28.0
 TEMPL_DOCKER = docker run --rm -u $(shell id -u):$(shell id -g) -v "$(PWD):/app:z" -w /app ghcr.io/a-h/templ:v0.3.1020
@@ -41,9 +46,30 @@ dvdocker:
 # Baja los contenedores normalmente
 ddocker:
 	docker compose down 
+	#
+# Aplica cambios de schema.sql directamente a la DB activa
+schema-apply: udocker wait
+	$(ATLAS_DOCKER) schema apply \
+		-u "$(DB_URL)&search_path=public" \
+		--env local \
+		--auto-approve
+
+# Aplica el esquema a la DB y actualiza el código generado (sqlc/templ)
+schema-sync-all: schema-apply dependencias
 
 # Crear una nueva migración
 # Uso: make migrate-create name=nombre_migracion
+migrate-hash:
+	$(ATLAS_DOCKER) migrate hash --dir "$(ATLAS_DIR)"
+
+migrate-diff: udocker wait
+	docker compose exec -T db psql -U admin -d postgres -c "DROP DATABASE IF EXISTS dev WITH (FORCE)" -c "CREATE DATABASE dev"
+	$(ATLAS_DOCKER) migrate diff $(name) --dir "$(ATLAS_DIR)" --to "file://DB/schema/schema.sql" --dev-url "$(ATLAS_DEV)"
+	docker compose exec -T db psql -U admin -d postgres -c "DROP DATABASE IF EXISTS dev WITH (FORCE)"
+
+migrate-sync: migrate-diff
+	$(MAKE) migrate-up
+
 migrate-up:
 	$(MIGRATE_DOCKER) -path=/migrations -database "$(DB_URL)" up
 
