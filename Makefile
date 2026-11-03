@@ -49,8 +49,9 @@ ddocker:
 	#
 # Aplica cambios de schema.sql directamente a la DB activa
 schema-apply: udocker wait
+	docker compose exec -T db psql -U admin -d postgres -c "DROP DATABASE IF EXISTS dev WITH (FORCE)" -c "CREATE DATABASE dev"
 	$(ATLAS_DOCKER) schema apply \
-		-u "$(DB_URL)&search_path=public" \
+		-u "$(DB_URL)" \
 		--env local \
 		--auto-approve
 
