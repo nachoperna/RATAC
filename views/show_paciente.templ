@@ -2,6 +2,7 @@ package views
 
 import "RATAC/domain"
 import "fmt"
+import "strconv"
 
 func GetValue(campo *string) string{
       if campo != nil { return fmt.Sprint(*campo)}
@@ -135,8 +136,20 @@ templ ShowPaciente(paciente domain.Paciente, propietario bool) {
                                                                   </span>
                                                       }
                                                 }
+                                                if desc_micro.TablaGrado != nil {
+                                                      <button type="button" class="btn-toggle-traits" data-traits-target="caracteristicas" onclick={toggleTable(templ.JSExpression("this"))}>
+                                                            <span>Ver características</span>
+                                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                                      </button>
+                                                      <button type="button" class="btn-toggle-traits" data-traits-target="referencias" onclick={toggleTable(templ.JSExpression("this"))}>
+                                                            <span>Ver referencias</span>
+                                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                                      </button>
+                                                }
                                           </div>
                                           <p>{*desc_micro.Diagnostico.Descripcion}</p>
+                                          @TablaCaracteristicas(desc_micro.TablaGrado)
+                                          @TablaMargenes()
                                     </div>
  
                               }else {
@@ -168,4 +181,83 @@ templ ShowPaciente(paciente domain.Paciente, propietario bool) {
                   </div>
             }
       </div>
+}
+
+templ TablaCaracteristicas(tabla []domain.Grado_oncologico){
+      <!-- Tabla de Características desplegable -->
+      <div class="traits-table-container" data-traits-table="caracteristicas">
+            <table class="traits-table">
+                  <thead>
+                        <tr>
+                              <th>Características</th>
+                              <th>Muestra analizada</th>
+                              <th class="score-header">Puntaje</th>
+                        </tr>
+                  </thead>
+                  <tbody>
+                        {{total := 0}}
+                        for _, carac := range tabla {
+                              {{p, _ := strconv.Atoi(carac.Puntaje)}}
+                              {{total += p}}
+                              <tr>
+                                    <td class="italic-val">{carac.Caracteristica}</td>
+                                    <td class="italic-val">{carac.Muestra_analizada}</td>
+                                    <td class="score-cell">{carac.Puntaje}</td>
+                              </tr>
+                        }
+                              <tr class="total-row">
+                                    <td colspan="2" class="total-label">total</td>
+                                    <td class="score-cell">{total}</td>
+                              </tr>
+                  </tbody>
+            </table>
+      </div>
+}
+
+templ TablaMargenes(){
+      <!-- Tabla de Características desplegable -->
+      <div class="traits-table-container" data-traits-table="referencias">
+            <table class="traits-table">
+                  <thead>
+                        <tr>
+                              <th colspan="2">Referencia márgenes (Stromberg y Meuten, 2017)</th>
+                        </tr>
+                  </thead>
+                  <tbody>
+                        <tr>
+                              <td class="score-cell">M1</td>
+                              <td class="italic-val">margen infiltrado focal o difuso</td>
+                        </tr>
+                        <tr>
+                              <td class="score-cell">M2</td>
+                              <td class="italic-val">margen cercano, menor a 2 mm</td>
+                        </tr>
+                        <tr>
+                              <td class="score-cell">M3</td>
+                              <td class="italic-val">margen limpio, 2 a 5 mm</td>
+                        </tr>
+                        <tr>
+                              <td class="score-cell">M4</td>
+                              <td class="italic-val">margen limpio mayor a 5 mm</td>
+                        </tr>
+                  </tbody>
+            </table>
+      </div>
+}
+
+script toggleTable(btn templ.JSExpression) {
+      const box = btn.closest('.diagnosis-box');
+      if (!box) return;
+
+      const target = btn.dataset.traitsTarget;
+      const tables = [...box.querySelectorAll('.traits-table-container')];
+      const selected = tables.find(t => t.dataset.traitsTable === target);
+      if (!selected) return;
+
+      const willOpen = !selected.classList.contains('open');
+
+      tables.forEach(t => t.classList.toggle('open', willOpen && t === selected));
+      box.querySelectorAll('.btn-toggle-traits').forEach(b => {
+            b.classList.toggle('active', willOpen && b === btn);
+      });
 }
