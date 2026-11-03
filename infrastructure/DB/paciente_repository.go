@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"time"
 
 	"github.com/Masterminds/squirrel"
 )
@@ -200,10 +201,11 @@ func (r *PacienteRepository) GetPacienteByFiltro(ctx context.Context, filtros []
 	// 6. Leer los resultados (Ejemplo genérico)
 	for rows.Next() {
 		var paciente domain.Paciente
+		var fecha time.Time
 		var err error
 		dummy := 0
 		if !set_resultado{
-			err = rows.Scan(&paciente.Protocolo, &paciente.Fecha, &paciente.NombrePaciente, &paciente.Solicitante, &paciente.Tecnica, &paciente.Edad, &paciente.Familia, &paciente.Raza, &paciente.Especie, &resultados_total);
+			err = rows.Scan(&paciente.Protocolo, &fecha, &paciente.NombrePaciente, &paciente.Solicitante, &paciente.Tecnica, &paciente.Edad, &paciente.Familia, &paciente.Raza, &paciente.Especie, &resultados_total);
 			set_resultado = true
 		}else{
 			err = rows.Scan(&paciente.Protocolo, &paciente.Fecha, &paciente.NombrePaciente, &paciente.Solicitante, &paciente.Tecnica, &paciente.Edad, &paciente.Familia, &paciente.Raza, &paciente.Especie, &dummy);
@@ -214,6 +216,7 @@ func (r *PacienteRepository) GetPacienteByFiltro(ctx context.Context, filtros []
 		}
 		grado, _ := r.queries.GetMaxGradoTumoral(ctx, paciente.Protocolo)
 		paciente.MaxGradoTumoral = uint8(grado)
+		paciente.Fecha = fecha.Format("02-01-2006")
 		pacientes = append(pacientes, paciente)
 	}
 

@@ -4,7 +4,7 @@ import "context"
 
 type Paciente struct {
 	Protocolo                   string                      `json:"Protocolo"`
-	Fecha                       string                      `json:"fecha"`
+	Fecha                       string                      `json:"Fecha"`
 	Solicitante                 string                      `json:"Solicitante"`
 	Email_Lab                   string                      `json:"Email_Lab"`
 	Tecnica                     string                      `json:"Técnica"`
