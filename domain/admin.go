@@ -25,4 +25,5 @@ type AdminRepository interface{
 	SolicitudAprobada (ctx context.Context, email string) (string, string, error)
 	SolicitudRechazada (ctx context.Context, email string) (string, error)
 	GetRol (ctx context.Context, email, token string) (string, error)
+	GetNombreLab (ctx context.Context, email, token string) (string, error)
 }

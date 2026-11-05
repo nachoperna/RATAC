@@ -30,7 +30,11 @@
       <main class="container">
             <div class="admin-header">
                   <span class="tag">Panel de Administración</span>
-                  <h1>Facultad de Ciencias Veterinarias<br>UNICEN · Argentina</h1>
+                  {{if .Nombre}}
+                  <h1>{{.Nombre}}<br></h1>
+                  {{else}}
+                  <h1>Centro de Trabajo<br></h1>
+                  {{end}}
             </div>
 
             <div class="dashboard-layout">

@@ -220,3 +220,7 @@ func (s *AdminService) EsAdmin (ctx context.Context, email, token string) (bool,
 	rol, err := s.GetRol(ctx, email, token)
 	return rol == ROL_ADMIN, err
 }
+
+func (s *AdminService) GetNombreLab (ctx context.Context, email string, token string) (string, error) {
+	return s.adminRepo.GetNombreLab(ctx, email, token)
+}

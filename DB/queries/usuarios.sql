@@ -31,3 +31,12 @@ WHERE s.token = $1;
 -- name: GetRolByEmail :one
 SELECT rol FROM Usuarios
 WHERE email = $1;
+
+-- name: GetNombreLabByToken :one
+SELECT u.nombre_lab
+FROM Sesiones s JOIN Usuarios u ON s.id_usuario = u.id 
+WHERE s.token = $1;
+
+-- name: GetNombreLabByEmail :one
+SELECT nombre_lab FROM Usuarios
+WHERE email = $1;

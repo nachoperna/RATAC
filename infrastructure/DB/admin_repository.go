@@ -114,3 +114,12 @@ func (r *AdminRepository) GetRol (ctx context.Context, email, token string) (str
 	rol, err := r.queries.GetRolByToken(ctx, token)
 	return string(rol), err
 }
+
+func (r *AdminRepository) GetNombreLab (ctx context.Context, email, token string) (string, error) {
+	if email != "" {
+		nombre, err := r.queries.GetNombreLabByEmail(ctx, email)
+		return nombre, err
+	}
+	nombre, err := r.queries.GetNombreLabByToken(ctx, token)
+	return nombre, err
+}
