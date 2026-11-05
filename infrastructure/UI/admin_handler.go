@@ -203,6 +203,12 @@ func (h *AdminHandler) ShowAdminPanel(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	nombre_lab, err := h.adminService.GetNombreLab(r.Context(), "", token.Value)
+	if err != nil {
+		// renderizar templ de error
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 	// SE DEBE HACER PETICION A LA BD PARA OBTENER ROL REAL CON EL TOKEN
 	solicitudes, err := h.adminService.GetSolicitudes(r.Context(), es_admin, 0)
@@ -239,6 +245,7 @@ func (h *AdminHandler) ShowAdminPanel(w http.ResponseWriter, r *http.Request) {
 		"Header":      header,
 		"Solicitudes": lista_solicitudes,
 		"EsAdmin": es_admin,
+		"Nombre": nombre_lab,
 	}
 	tmp.Execute(w, datos)
 }
@@ -485,4 +492,27 @@ func rutaCorrectaImagenes(imagenes []string) []string {
 		}
 	}
 	return aux
+}
+
+func (h *AdminHandler) DescargaDiagnostico (w http.ResponseWriter, r *http.Request) {
+	protocolo := r.PathValue("protocolo")
+	archivos, err := filepath.Glob(fmt.Sprintf("Histopatología/*%s*", protocolo))
+	if err != nil || archivos == nil {
+		views.ErrorTemplate("Error", "Parece que hubo un error en la descarga del diagnostico. Inténtelo nuevamente más tarde o contacte a soporte.").Render(r.Context(), w)
+		return
+	}
+	archivo := archivos[0] // deberia haber uno solo de todas formas
+	if filepath.Ext(archivo) == ".pdf" {
+		w.Header().Set("Content-type", "application/pdf")
+	} else {
+		w.Header().Set("Content-type", "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+	}
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment;filename=%s", filepath.Base(archivo)))
+	contenido, err := os.Open(archivo)
+	if err != nil {
+		views.ErrorTemplate("Error", "Parece que hubo un error en la descarga del diagnostico. Inténtelo nuevamente más tarde o contacte a soporte.").Render(r.Context(), w)
+		return
+	}
+	defer contenido.Close()
+	contenido.WriteTo(w)
 }

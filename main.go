@@ -67,6 +67,7 @@ func main() {
 	http.HandleFunc("/diagnosticos/alta", authHandler.LoggerChecker(func (w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./infrastructure/UI/static/carga_diagnostico.html")
 	}))
+	http.HandleFunc("/diagnosticos/descarga/{protocolo}", adminHandler.DescargaDiagnostico)
 	http.HandleFunc("/diagnosticos/alta/procesado", authHandler.LoggerChecker(adminHandler.ProcesarDocumento))
 	http.HandleFunc("/diagnosticos/alta/borrar_temporal", authHandler.LoggerChecker(adminHandler.BorrarTemporal))
 	http.HandleFunc("/diagnosticos/alta/carga", authHandler.LoggerChecker(adminHandler.AltaDiagnostico))
