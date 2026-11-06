@@ -191,7 +191,7 @@ func (h *AdminHandler) ShowAdminPanel(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	pacientes, total, err := h.adminService.GetUltimosDiagnosticosCargados(r.Context(), 0, token.Value)
+	pacientes, total, err := h.adminService.GetUltimosDiagnosticosCargados(r.Context(), 0, token.Value, false, false, "")
 	if err != nil {
 		// renderizar templ de error
 		w.WriteHeader(http.StatusInternalServerError)
@@ -257,13 +257,23 @@ func (h *AdminHandler) DiagnosticosByUser(w http.ResponseWriter, r *http.Request
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	var filtro_nombre, filtro_protocolo bool = false, false
+	filtro := r.URL.Query().Get("filtro_busqueda")
+	switch filtro {
+	case "nombre":
+		filtro_nombre = true
+	case "protocolo":
+		filtro_protocolo = true
+	}
+	parametro := r.URL.Query().Get("parametro")
+
 	token, err := r.Cookie(NOMBRE_TOKEN)
 	if err != nil {
 		// renderizar templ de error
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	pacientes, total, err := h.adminService.GetUltimosDiagnosticosCargados(r.Context(), offset, token.Value)
+	pacientes, total, err := h.adminService.GetUltimosDiagnosticosCargados(r.Context(), offset, token.Value, filtro_nombre, filtro_protocolo, parametro)
 	if err != nil {
 		// renderizar templ de error
 		w.WriteHeader(http.StatusInternalServerError)

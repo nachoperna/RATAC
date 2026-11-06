@@ -185,8 +185,8 @@ func (s *AdminService) BorrarJson(nombre string) (string, error) {
 	return jsons[0], os.Remove(jsons[0])
 }
 
-func (s *AdminService) GetUltimosDiagnosticosCargados(ctx context.Context, offset int16, token string) ([]domain.Paciente, int32, error) {
-	diagnosticos, total, err := s.adminRepo.GetUltimosDiagnosticosCargados(ctx, offset, token)
+func (s *AdminService) GetUltimosDiagnosticosCargados(ctx context.Context, offset int16, token string, byNombre, byProtocolo bool, parametro string) ([]domain.Paciente, int32, error) {
+	diagnosticos, total, err := s.adminRepo.GetUltimosDiagnosticosCargados(ctx, offset, token, byNombre, byProtocolo, parametro)
 	if err != nil {
 		return nil, 0, err
 	}

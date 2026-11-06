@@ -72,3 +72,39 @@ function getOffsetRestandoSolicitudes(){
       }
       return offset_solicitudes;
 }
+
+function updateSearchPlaceholder() {
+      const mode = document.querySelector('input[name="filtro_busqueda"]:checked').value;
+      const searchInput = document.getElementById('admin-search-input');
+      if (mode === 'nombre') {
+            searchInput.placeholder = 'Buscar por paciente...';
+      } else {
+            searchInput.placeholder = 'Buscar por N° protocolo...';
+      }
+}
+
+function handleSearchInput() {
+      const input = document.getElementById('admin-search-input');
+      const clearBtn = document.getElementById('clear-search-btn');
+      
+      if (input.value.trim().length === 0) {
+      clearBtn.classList.remove('visible');
+      if (!input.dataset.wasEmpty) {
+            input.dataset.wasEmpty = '1';
+            clearBtn.click();
+      }
+      return;
+      }
+
+      input.dataset.wasEmpty = '';
+      clearBtn.classList.add('visible');
+}
+
+function clearSearchInput() {
+      const input = document.getElementById('admin-search-input');
+      const clearBtn = document.getElementById('clear-search-btn');
+      
+      input.value = '';
+      clearBtn.classList.remove('visible');
+      input.focus();
+}

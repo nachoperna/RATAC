@@ -60,5 +60,23 @@ FROM Sesiones s
       JOIN Usuarios u ON s.id_usuario = u.id 
       JOIN Pacientes p ON u.email = p.email_lab
 WHERE s.token = $2
-ORDER BY Fecha DESC
+ORDER BY p.Fecha DESC
+LIMIT 10 OFFSET $1;
+
+-- name: ListPacientesByLabYNombre :many
+SELECT p.*, COUNT(p.*) OVER() AS total 
+FROM Sesiones s
+      JOIN Usuarios u ON s.id_usuario = u.id 
+      JOIN Pacientes p ON u.email = p.email_lab
+WHERE s.token = $2 AND p.paciente ilike '%'||$3||'%'
+ORDER BY p.Fecha DESC
+LIMIT 10 OFFSET $1;
+
+-- name: ListPacientesByLabYProtocolo :many
+SELECT p.*, COUNT(p.*) OVER() AS total 
+FROM Sesiones s
+      JOIN Usuarios u ON s.id_usuario = u.id 
+      JOIN Pacientes p ON u.email = p.email_lab
+WHERE s.token = $2 AND p.protocolo ilike '%'||$3||'%'
+ORDER BY p.Fecha DESC
 LIMIT 10 OFFSET $1;

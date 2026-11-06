@@ -35,20 +35,54 @@ func (r *AdminRepository) PacienteYaRegistrado(ctx context.Context, protocolo st
 	return true
 }
 
-func (r *AdminRepository) GetUltimosDiagnosticosCargados(ctx context.Context, offset int16, token string) ([]domain.Paciente, int32, error) {
-	pacientes_rows, err := r.queries.ListPacientesByLab(ctx, sqlc.ListPacientesByLabParams{
-		Offset: int32(offset),
-		Token: token,
-	})
+func (r *AdminRepository) GetUltimosDiagnosticosCargados(ctx context.Context, offset int16, token string, byNombre, byProtocolo bool, parametro string) ([]domain.Paciente, int32, error) {
+	var filas []sqlc.ListPacientesByLabRow
+	var err error
+	if byNombre {
+		pacientes_rows, err := r.queries.ListPacientesByLabYNombre(ctx, sqlc.ListPacientesByLabYNombreParams{
+			Offset: int32(offset),
+			Token: token,
+			Column3: sql.NullString{Valid: true, String: parametro},
+		})
+		if err != nil {
+			return nil, 0, err
+		}
+		filas = make([]sqlc.ListPacientesByLabRow, len(pacientes_rows))
+		for i := range pacientes_rows {
+			filas[i] = sqlc.ListPacientesByLabRow(pacientes_rows[i])
+		}
+	} else if byProtocolo {
+		pacientes_rows, err := r.queries.ListPacientesByLabYProtocolo(ctx, sqlc.ListPacientesByLabYProtocoloParams{
+			Offset: int32(offset),
+			Token: token,
+			Column3: sql.NullString{Valid: true, String: parametro},
+		})
+		if err != nil {
+			return nil, 0, err
+		}
+		filas = make([]sqlc.ListPacientesByLabRow, len(pacientes_rows))
+		for i := range pacientes_rows {
+			filas[i] = sqlc.ListPacientesByLabRow(pacientes_rows[i])
+		}
+	} else {
+		pacientes_rows, err := r.queries.ListPacientesByLab(ctx, sqlc.ListPacientesByLabParams{
+			Offset: int32(offset),
+			Token: token,
+		})
+		if err != nil {
+			return nil, 0, err
+		}
+		filas = pacientes_rows
+	}
 	if err != nil {
 		return nil, 0, err
 	}
 	var pacientes []domain.Paciente
 	var total int32 = 0
-	if len(pacientes_rows) > 0 {
-		total = int32(pacientes_rows[0].Total)
+	if len(filas) > 0 {
+		total = int32(filas[0].Total)
 	}
-	for _, p := range pacientes_rows {
+	for _, p := range filas {
 		paciente := pacienteByLabORM(p)
 		pacientes = append(pacientes, paciente)
 	}

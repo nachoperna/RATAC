@@ -42,6 +42,54 @@
                   <!-- COLUMNA IZQUIERDA: TABLA -->
                   <div class="table-section">
                         <h2 class="section-title">Últimos diagnósticos cargados</h2>
+                        <div class="search-controls-container">
+                              <div class="search-input-wrapper">
+                                    <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                          <circle cx="11" cy="11" r="8"></circle>
+                                          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                    </svg>
+                                    <input 
+                                          type="text"
+                                          id="admin-search-input" 
+                                          class="search-input-field" 
+                                          name="parametro"
+                                          placeholder="Buscar por paciente..."
+                                          hx-trigger="input[target.value.trim().length > 2] changed delay:300ms"
+                                          hx-get="/diagnosticos"
+                                          hx-include="[name='filtro_busqueda']:checked"
+                                          hx-target=".table-scroll"
+                                          hx-swap="outerHTML"
+                                          oninput="handleSearchInput()"
+                                    >
+                                    <button 
+                                          type="button" 
+                                          id="clear-search-btn" 
+                                          class="clear-search-btn" 
+                                          title="Limpiar búsqueda" 
+                                          onclick="clearSearchInput()"
+                                          hx-get="/diagnosticos"
+                                          hx-target=".table-scroll"
+                                          hx-swap="outerHTML"
+                                    >
+                                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                                          </svg>
+                                    </button>
+                              </div>
+
+                              <!-- Selector de Modo Excluyente (Nombre vs Protocolo) -->
+                              <div class="search-mode-selector">
+                                    <label class="search-mode-option" title="Buscar por nombre de paciente">
+                                          <input type="radio" name="filtro_busqueda" value="nombre" checked onchange="updateSearchPlaceholder()">
+                                          <span class="search-mode-label">Paciente</span>
+                                    </label>
+                                    <label class="search-mode-option" title="Buscar por número de protocolo">
+                                          <input type="radio" name="filtro_busqueda" value="protocolo" onchange="updateSearchPlaceholder()">
+                                          <span class="search-mode-label">Protocolo</span>
+                                    </label>
+                              </div>
+                        </div>
                         <div class="table-container">
                               {{render .TablaDiagnosticos}}
                               
@@ -56,7 +104,7 @@
                                                 hx-get="/diagnosticos"
                                                 hx-vals='js:{offset: getOffsetRestando()}'
                                                 hx-target=".table-scroll"
-                                                hx-swap="innerHTML"
+                                                hx-swap="outerHTML"
                                                 disabled>
                                                 Anterior
                                           </button>
@@ -65,7 +113,7 @@
                                                 hx-get="/diagnosticos"
                                                 hx-vals='js:{offset: getOffset()}'
                                                 hx-target=".table-scroll"
-                                                hx-swap="innerHTML"
+                                                hx-swap="outerHTML"
                                                 hx-on::after-request="habilitarAnterior()"
                                                 >Siguiente
                                           </button>

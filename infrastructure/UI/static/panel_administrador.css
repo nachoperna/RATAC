@@ -115,8 +115,130 @@ main.container {
       color: var(--navy);
       margin-bottom: 24px;
       font-weight: 600;
-      padding-bottom: 12px;
       border-bottom: 1px solid var(--border-light);
+}
+/* =========================================
+ESTILOS DEL BUSCADOR Y TOGGLE EXCLUYENTE
+========================================= */
+.search-controls-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background-color: var(--bg-card);
+      padding: 6px 12px 6px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border-light);
+      box-shadow: 0 2px 8px rgba(26, 26, 110, 0.03);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+}
+
+.search-controls-container:focus-within {
+      border-color: var(--navy);
+      box-shadow: 0 0 0 3px var(--lavender);
+}
+
+.search-input-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      min-width: 200px;
+      position: relative;
+}
+
+.search-icon {
+      color: var(--text-muted);
+      flex-shrink: 0;
+}
+
+.search-input-field {
+      border: none;
+      outline: none;
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 14px;
+      color: var(--text-main);
+      background: transparent;
+      width: 100%;
+      padding-right: 28px;
+}
+
+.search-input-field::placeholder {
+      color: var(--text-muted);
+      font-style: italic;
+}
+
+/* Botón Cruz de Borrado Rápido */
+.clear-search-btn {
+      position: absolute;
+      right: 4px;
+      top: 50%;
+      transform: translateY(-50%) scale(0.8);
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.2s ease;
+}
+
+.clear-search-btn.visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(-50%) scale(1);
+}
+
+.clear-search-btn:hover {
+      background-color: var(--lavender);
+      color: var(--navy);
+}
+
+/* Toggle de Modo de Búsqueda Excluyente */
+.search-mode-selector {
+      display: flex;
+      align-items: center;
+      background-color: var(--bg-page);
+      border-radius: 6px;
+      padding: 3px;
+      border: 1px solid var(--border-light);
+      user-select: none;
+}
+
+.search-mode-option {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      margin: 0;
+}
+
+.search-mode-option input[type="radio"] {
+      display: none; /* Ocultamos el radio native */
+}
+
+.search-mode-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 4px 10px;
+      border-radius: 4px;
+      color: var(--text-muted);
+      transition: all 0.2s ease;
+}
+
+.search-mode-option input[type="radio"]:checked + .search-mode-label {
+      background-color: var(--navy);
+      color: #ffffff;
+      box-shadow: 0 2px 4px rgba(26, 26, 110, 0.15);
 }
 
 .table-container {
