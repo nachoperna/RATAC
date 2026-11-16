@@ -208,7 +208,7 @@ func (r *PacienteRepository) GetPacienteByFiltro(ctx context.Context, filtros []
 			err = rows.Scan(&paciente.Protocolo, &fecha, &paciente.NombrePaciente, &paciente.Solicitante, &paciente.Tecnica, &paciente.Edad, &paciente.Familia, &paciente.Raza, &paciente.Especie, &resultados_total);
 			set_resultado = true
 		}else{
-			err = rows.Scan(&paciente.Protocolo, &paciente.Fecha, &paciente.NombrePaciente, &paciente.Solicitante, &paciente.Tecnica, &paciente.Edad, &paciente.Familia, &paciente.Raza, &paciente.Especie, &dummy);
+			err = rows.Scan(&paciente.Protocolo, &fecha, &paciente.NombrePaciente, &paciente.Solicitante, &paciente.Tecnica, &paciente.Edad, &paciente.Familia, &paciente.Raza, &paciente.Especie, &dummy);
 		}
 		if  err != nil {
 			log.Printf("Error leyendo fila: %v", err)
