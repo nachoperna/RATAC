@@ -60,6 +60,7 @@ services:
       - BEYLA_ROUTES_PATTERNS=/paciente/protocolo/{protocolo}
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4317
       - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - BEYLA_ROUTES_IGNORE=/grafana/*
     ports:
       - "9090:9090"
     depends_on:
@@ -83,6 +84,8 @@ services:
     environment:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_USER}
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+      - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s/grafana/
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
     volumes:
       - grafana_data:/var/lib/grafana
     depends_on:

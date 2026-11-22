@@ -7,10 +7,10 @@ import (
 	dbrepo "RATAC/infrastructure/DB"
 	ui "RATAC/infrastructure/UI"
 	"database/sql"
-	"fmt"
 	"log"
-	"net"
 	"net/http"
+	"net/http/httputil"
+	"net/url"
 	"os"
 
 	_ "github.com/lib/pq"
@@ -94,31 +94,41 @@ func main() {
 		http.ServeFile(w, r, "./infrastructure/UI/static/panel_acceso.html")
 	})
 
-	http.HandleFunc("/grafana", GrafanaRedirect)
+	http.HandleFunc("/grafana", func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("HX-Request") == "true" {
+			w.Header().Set("HX-Redirect", "/grafana/")
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		http.Redirect(w, r, "/grafana/", http.StatusFound)
+	})
+
+	http.Handle("/grafana/", grafanaProxy())
+
 	err = http.ListenAndServe(port, nil)
 	if err != nil{
 		log.Fatalf("Error al exponer puerto 8080: %v", err)
 	}
 }
 
-func GrafanaRedirect(w http.ResponseWriter, r *http.Request) {
-	host, _, err := net.SplitHostPort(r.Host)
-	if err != nil {
-		host = r.Host
+func grafanaProxy() http.Handler {
+	targetURL, _ := url.Parse("http://grafana:3000")
+	grafanaProxy := httputil.NewSingleHostReverseProxy(targetURL)
+
+	grafanaProxy.ModifyResponse = func(resp *http.Response) error {
+		if loc := resp.Header.Get("Location"); loc != "" {
+			if u, err := url.Parse(loc); err == nil && u.Path != "" {
+				u.Scheme = ""
+				u.Host = ""
+				resp.Header.Set("Location", u.String())
+			}
+		}
+		return nil
 	}
 
-	scheme := "http"
-	if r.TLS != nil || r.Header.Get("X-Forwarded-Proto") == "https" {
-		scheme = "https"
+	grafanaProxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
+		http.Error(w, "Grafana no está activo en este momento.", http.StatusServiceUnavailable)
 	}
 
-	target := fmt.Sprintf("%s://%s:3000/dashboards", scheme, host)
-
-	if r.Header.Get("HX-Request") == "true" {
-		w.Header().Set("HX-Redirect", target)
-		w.WriteHeader(http.StatusOK)
-		return
-	}
-
-	http.Redirect(w, r, target, http.StatusFound)
+	return grafanaProxy
 }
