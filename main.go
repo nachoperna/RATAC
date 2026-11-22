@@ -7,7 +7,9 @@ import (
 	dbrepo "RATAC/infrastructure/DB"
 	ui "RATAC/infrastructure/UI"
 	"database/sql"
+	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"os"
 
@@ -92,8 +94,31 @@ func main() {
 		http.ServeFile(w, r, "./infrastructure/UI/static/panel_acceso.html")
 	})
 
+	http.HandleFunc("/grafana", GrafanaRedirect)
 	err = http.ListenAndServe(port, nil)
 	if err != nil{
 		log.Fatalf("Error al exponer puerto 8080: %v", err)
 	}
+}
+
+func GrafanaRedirect(w http.ResponseWriter, r *http.Request) {
+	host, _, err := net.SplitHostPort(r.Host)
+	if err != nil {
+		host = r.Host
+	}
+
+	scheme := "http"
+	if r.TLS != nil || r.Header.Get("X-Forwarded-Proto") == "https" {
+		scheme = "https"
+	}
+
+	target := fmt.Sprintf("%s://%s:3000/dashboards", scheme, host)
+
+	if r.Header.Get("HX-Request") == "true" {
+		w.Header().Set("HX-Redirect", target)
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
+	http.Redirect(w, r, target, http.StatusFound)
 }

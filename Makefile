@@ -30,14 +30,17 @@ up-dbtest:
 down-dbtest:
 	docker compose down -v db_test
 
-up-appdocker:
+up-devApp:
 	docker compose up -d app
+
+up-prodApp:
+	docker compose --profile observability up -d
 
 down-appdocker:
 	docker compose down app
 
 restart-appdocker:
-	docker compose restart app
+	docker compose restart app beyla
 	#
 # Baja los contenedores y borra los volúmenes (limpieza total de la DB)
 dvdocker:
@@ -45,8 +48,8 @@ dvdocker:
 
 # Baja los contenedores normalmente
 ddocker:
-	docker compose down 
-	#
+	docker compose --profile "*" down
+
 # Aplica cambios de schema.sql directamente a la DB activa
 schema-apply: udocker wait
 	docker compose exec -T db psql -U admin -d postgres -c "DROP DATABASE IF EXISTS dev WITH (FORCE)" -c "CREATE DATABASE dev"
