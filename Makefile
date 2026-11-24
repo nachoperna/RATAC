@@ -5,6 +5,7 @@ DB_URL_TEST = postgres://admin:password@db_test:5432/RATAC_DB_TEST?sslmode=disab
 MIGRATE_DOCKER = docker run --rm -v "$(PWD)/$(MIGRATIONS_DIR):/migrations:z" --network ratac_default migrate/migrate
 
 DOCKER_EXEC = docker compose exec app
+DOCKER_EXEC_PROD = docker compose exec app-prod
 MIGRATIONS_DIR=./DB/migrations
 ATLAS_DOCKER = docker run --rm -v "$(PWD):/src:z" -w /src --network ratac_default arigaio/atlas:1.3.3-alpine
 ATLAS_DIR    = file://DB/migrations?format=golang-migrate
@@ -100,11 +101,17 @@ clean-images:
 	docker system prune -f
 
 # PROCESAMIENTO: Ahora corre dentro del contenedor usando las dependencias de Python instaladas
-procesarjsons: udocker wait up-appdocker wait
+procesarjsons: udocker wait up-devApp wait
 	$(DOCKER_EXEC) ./ProcesadoJsons/eliminar_duplicados.sh
 	$(DOCKER_EXEC) python3 ./ProcesadoJsons/diag_to_json.py
 	$(DOCKER_EXEC) go run ./ProcesadoJsons/json_to_bd.go 
 	$(MAKE) down-appdocker
+
+procesarjsons-prod: udocker wait up-prodApp wait
+	$(DOCKER_EXEC_PROD) ./ProcesadoJsons/eliminar_duplicados.sh
+	$(DOCKER_EXEC_PROD) python3 ./ProcesadoJsons/diag_to_json.py
+	$(DOCKER_EXEC_PROD) go run ./ProcesadoJsons/json_to_bd.go 
+	$(MAKE) ddocker
 
 # Ejecución local (por si querés probar algo fuera de Docker, requiere dependencias locales)
 run:

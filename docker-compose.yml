@@ -61,6 +61,11 @@ services:
       - .env
     restart: unless-stopped
     profiles: ["production"]
+    volumes:
+      - ./IMAGENES:/app/IMAGENES
+      - ./JSONS:/app/JSONS
+      - ./Histopatología:/app/Histopatología
+      - ./ArchivosTemporales:/app/ArchivosTemporales
 
   beyla:
     image: grafana/beyla:3.43.0
