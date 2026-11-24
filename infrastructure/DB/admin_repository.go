@@ -117,6 +117,7 @@ func solicitudORM(soli sqlc.GetSolicitudesRow, vet []sqlc.GetVeterinariosRow) do
 		Email: soli.Email,
 		Nombre: soli.NombreLab,
 		Ciudad: soli.CiudadOrigen,
+		Fecha: soli.FechaCreacion.Time.Format("02-01-2006"),
 		Veterinarios: vetes,
 	}
 }

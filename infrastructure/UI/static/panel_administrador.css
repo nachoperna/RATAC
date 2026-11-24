@@ -479,21 +479,79 @@ tr:hover td {
       border: 1px solid var(--border-light);
 }
 
-.vet-list {
-      font-size: 12.5px;
-      color: var(--text-main);
-      display: flex;
-      align-items: baseline; /* Alineación horizontal */
-      gap: 6px;
-      flex-wrap: wrap;
+.vet-section { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 8px; 
+      padding-top: 14px; 
+      border-top: 1px dashed var(--border-light); 
 }
 
-.vet-list strong {
-      font-size: 10px;
-      font-family: 'DM Mono', monospace;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      display: inline-block;
+.vet-section-label { 
+      font-size: 10px; 
+      font-family: 'DM Mono', monospace; 
+      text-transform: uppercase; 
+      letter-spacing: 0.05em; 
+      color: var(--text-muted); 
+      font-weight: 600; 
+}
+
+.vet-pills { 
+      display: flex; 
+      flex-wrap: wrap; 
+      gap: 8px; 
+}
+
+.vet-pill { 
+      font-size: 13px; 
+      color: var(--text-main); 
+      background: var(--bg-page); 
+      border: 1px solid var(--border-light); 
+      padding: 6px 10px; 
+      border-radius: 6px; 
+      display: inline-flex; 
+      align-items: center; 
+      justify-content: space-between;
+      gap: 8px; 
+      max-width: 240px; /* Ancho máximo personalizable para la píldora */
+      line-height: 1.35;
+}
+
+.vet-name {
+      white-space: nowrap; /* Mantiene el nombre en una sola línea */
+      overflow-x: auto;    /* Habilita la barra de desplazamiento horizontal */
+      flex: 1;
+      min-width: 0;
+      padding-bottom: 2px; /* Espacio sutil entre el texto y la barra de scroll */
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-light) transparent;
+}
+
+/* Estilizado discreto para la barra de desplazamiento en navegadores WebKit */
+.vet-name::-webkit-scrollbar {
+      height: 3px;
+}
+.vet-name::-webkit-scrollbar-track {
+      background: transparent;
+}
+.vet-name::-webkit-scrollbar-thumb {
+      background-color: var(--border-light);
+      border-radius: 3px;
+}
+.vet-name::-webkit-scrollbar-thumb:hover {
+      background-color: var(--text-muted);
+}
+
+.vet-mat { 
+      font-family: 'DM Mono', monospace; 
+      font-size: 11px; 
+      color: var(--navy); 
+      font-weight: 600; 
+      background: var(--lavender); 
+      padding: 2px 6px; 
+      border-radius: 4px; 
+      white-space: nowrap; /* Evita que la matrícula se parta en dos líneas */
+      flex-shrink: 0;      /* Asegura que la matrícula nunca se aplaste */
 }
 
 .request-actions {

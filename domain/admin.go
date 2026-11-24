@@ -8,7 +8,8 @@ import (
 type Solicitud struct {
 	Email string
 	Nombre string 
-	Ciudad string 
+	Ciudad string
+	Fecha string
 	Veterinarios []Veterinarios
 }
 

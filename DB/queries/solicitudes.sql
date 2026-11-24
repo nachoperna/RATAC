@@ -1,5 +1,5 @@
 -- name: GetSolicitudes :many
-SELECT email, nombre_lab, ciudad_origen
+SELECT email, nombre_lab, ciudad_origen, fecha_creacion
 FROM Usuarios
 WHERE rol = 'solicitante'
 ORDER BY fecha_creacion DESC

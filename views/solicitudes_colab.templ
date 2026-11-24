@@ -15,15 +15,24 @@ templ Solicitudes(solicitudes []domain.Solicitud) {
                                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                                           {solicitud.Ciudad}
                                     </span>
+                                    <a href="mailto:contacto@diagvetintegral.com.ar" class="lab-location">
+                                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                                          {solicitud.Email}
+                                    </a>
                               </div>
-                              <span class="request-date">XX-XX-XX</span>
+                              <span class="request-date">{solicitud.Fecha}</span>
                         </div>
 
-                        <div class="vet-list">
-                              <strong>Veterinarios:</strong> 
-                              for _, vet := range solicitud.Veterinarios {
-                                    {vet.Nombre},
-                              }
+                        <div class="vet-section">
+                              <span class="vet-section-label">Veterinarios asociados</span>
+                              <div class="vet-pills">
+                                    for _, vet := range solicitud.Veterinarios {
+                                          <span class="vet-pill">
+                                                <span class="vet-name">{vet.Nombre}</span>
+                                                <span class="vet-mat">{vet.Matricula}</span>
+                                          </span>
+                                    }
+                              </div>
                         </div>
                         <div class="request-actions">
                               <button class="btn btn-outline"
