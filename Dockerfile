@@ -24,7 +24,7 @@ RUN templ generate && sqlc generate
 RUN go build -buildvcs=false -o main .
 
 # ETAPA 2: Final (Imagen liviana para producción)
-FROM python:3.13-slim-bookworm
+FROM python:3.13-slim-bookworm AS production
 
 WORKDIR /app
 
@@ -32,8 +32,10 @@ WORKDIR /app
 COPY --from=builder /app/main .
 # Copiar scripts de python o carpetas necesarias para la ejecución (ej: templates)
 COPY --from=builder /app/ProcesadoJsons ./ProcesadoJsons
-COPY --from=builder /app/infrastructure/UI/static ./static
+COPY --from=builder /app/infrastructure/UI/static ./infrastructure/UI/static
 
+COPY requirements.txt .
+RUN pip3 install --no-cache-dir --break-system-packages -r requirements.txt
 EXPOSE 8080
 
 CMD ["./main"]

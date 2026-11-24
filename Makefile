@@ -34,7 +34,12 @@ up-devApp:
 	docker compose up -d app
 
 up-prodApp:
-	docker compose --profile observability up -d
+	docker compose --profile production --profile observability up -d \
+	app-prod db beyla prometheus grafana tempo node-exporter
+
+build-prodApp:
+	docker compose --profile production --profile observability up -d --build \
+	app-prod db beyla prometheus grafana tempo node-exporter
 
 down-appdocker:
 	docker compose down app

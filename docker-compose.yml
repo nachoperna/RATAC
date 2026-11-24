@@ -46,11 +46,26 @@ services:
       sh -c "templ generate && 
              sqlc generate && 
              go run ." 
+  app-prod:
+    build:
+      context: .
+      target: production
+    container_name: RATAC_app_prod
+    ports:
+      - "80:8080"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://admin:password@db:5432/RATAC_DB?sslmode=disable
+    env_file:
+      - .env
+    restart: unless-stopped
+    profiles: ["production"]
 
   beyla:
     image: grafana/beyla:3.43.0
     profiles: ["observability"]
-    pid: "service:app"
+    pid: "service:app-prod"
     privileged: true
     environment:
       - BEYLA_OPEN_PORT=8080
@@ -64,7 +79,7 @@ services:
     ports:
       - "9090:9090"
     depends_on:
-      - app
+      - app-prod
 
   prometheus:
     image: prom/prometheus:v3.16.0
