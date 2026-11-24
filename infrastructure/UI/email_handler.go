@@ -34,7 +34,7 @@ func enviarMailSolicitudAprobada (nombre, email, contraseña string) error {
 	m.SetBody("text/html", html.String())
 
 	port, _ := strconv.Atoi(os.Getenv("PUERTO_MAIL"))
-	d := gomail.NewDialer(os.Getenv("HOST_MAIL"), port, os.Getenv("FROM_MAIL"), os.Getenv("CLAVE_ACCESO"))
+	d := gomail.NewDialer(os.Getenv("HOST_MAIL"), port, os.Getenv("FROM_MAIL"), os.Getenv("CLAVE_ACCESO_MAIL"))
 	err = d.DialAndSend(m) 
 	return err
 }
@@ -59,7 +59,7 @@ func enviarMailSolicitudRechazada (nombre, email string) error {
 	m.SetBody("text/html", html.String())
 
 	port, _ := strconv.Atoi(os.Getenv("PUERTO_MAIL"))
-	d := gomail.NewDialer(os.Getenv("HOST_MAIL"), port, os.Getenv("FROM_MAIL"), os.Getenv("CLAVE_ACCESO"))
+	d := gomail.NewDialer(os.Getenv("HOST_MAIL"), port, os.Getenv("FROM_MAIL"), os.Getenv("CLAVE_ACCESO_MAIL"))
 	err = d.DialAndSend(m) 
 	return err
 }
@@ -92,8 +92,21 @@ func enviarMailSolicitud (nombre, email, ciudad_origen string, veterinarios, mat
 	m.SetBody("text/html", html.String())
 
 	port, _ := strconv.Atoi(os.Getenv("PUERTO_MAIL"))
-	d := gomail.NewDialer(os.Getenv("HOST_MAIL"), port, os.Getenv("FROM_MAIL"), os.Getenv("CLAVE_ACCESO"))
+	d := gomail.NewDialer(os.Getenv("HOST_MAIL"), port, os.Getenv("FROM_MAIL"), os.Getenv("CLAVE_ACCESO_MAIL"))
 	err = d.DialAndSend(m) 
+	return err
+}
+
+func enviarMailSoporte (descripcion_problema string) error {
+	m := gomail.NewMessage()
+
+	setHeader(m, os.Getenv("SOPORTE_MAIL"), os.Getenv("SOPORTE_MAIL"), "[SOPORTE] Nuevo Reclamo")
+
+	m.SetBody("text/plain", descripcion_problema)
+
+	port, _ := strconv.Atoi(os.Getenv("PUERTO_MAIL"))
+	d := gomail.NewDialer(os.Getenv("HOST_MAIL"), port, os.Getenv("SOPORTE_MAIL"), os.Getenv("CLAVE_ACCESO_SOPORTE"))
+	err := d.DialAndSend(m) 
 	return err
 }
 

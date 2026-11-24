@@ -105,6 +105,9 @@ func main() {
 
 	http.Handle("/grafana/", grafanaProxy())
 
+	http.HandleFunc("/soporte", adminHandler.RenderSoporteForm)
+	http.HandleFunc("/soporte/enviarForm", adminHandler.EnviarSoporteForm)
+
 	err = http.ListenAndServe(port, nil)
 	if err != nil{
 		log.Fatalf("Error al exponer puerto 8080: %v", err)

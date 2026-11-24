@@ -1,0 +1,58 @@
+package views
+
+templ SoporteForm (){
+    <div id="support-modal" class="modal-support-overlay">
+        <div class="modal-support-card" role="dialog" aria-labelledby="support-modal-title">
+            
+            <!-- Vista 1: Formulario de reporte -->
+            <div id="support-form-view">
+                <div class="modal-support-header">
+                    <div class="modal-support-title-group">
+                        <div class="modal-support-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="modal-support-title" id="support-modal-title">Reportar un problema</h3>
+                    </div>
+                </div>
+
+                <p class="modal-support-description">
+                    ¿Encontraste un error o tenés alguna dificultad usando la plataforma? Detallalo abajo y nuestro equipo técnico lo revisará.
+                </p>
+
+                <form id="support-form" hx-post="/soporte/enviarForm" hx-target=".modal-support-card" hx-swap="innerHTML">
+                    <div class="form-group">
+                        <label for="problem-description" class="form-label">Descripción del inconveniente</label>
+                        <textarea id="problem-description" name="descripcion" class="support-textarea" required></textarea>
+                    </div>
+
+                    <div class="modal-support-actions">
+                        <button type="button" class="btn btn-cancel" onclick="document.querySelector('.modal-support-overlay')?.remove()">Cancelar</button>
+                        <button type="submit" class="btn btn-send" id="btn-submit-support" >
+                              <span class="btn-label">Enviar</span>
+                              <span class="btn-loading">
+                                    <span class="btn-spinner"></span> Enviando...
+                              </span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+templ SoporteFormEnviado(){
+      <div id="support-success-view" class="success-state">
+            <div class="success-badge">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+            </div>
+            <h3 class="modal-support-title" style="margin-bottom: 10px;">Reporte enviado</h3>
+            <p class="modal-description" style="margin-bottom: 24px;">
+                  Gracias por avisarnos. El equipo de soporte de RATAC recibió tu mensaje y trabajará en solucionarlo.
+            </p>
+            <button type="button" class="btn btn-send" style="width: 100%;" onclick="document.querySelector('.modal-support-overlay')?.remove()">Aceptar</button>
+      </div>
+}

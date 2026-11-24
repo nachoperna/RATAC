@@ -526,3 +526,22 @@ func (h *AdminHandler) DescargaDiagnostico (w http.ResponseWriter, r *http.Reque
 	defer contenido.Close()
 	contenido.WriteTo(w)
 }
+
+func (h *AdminHandler) RenderSoporteForm (w http.ResponseWriter, r *http.Request) {
+	views.SoporteForm().Render(r.Context(), w)
+}
+
+func (h *AdminHandler) EnviarSoporteForm (w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		views.ErrorTemplate("Error al enviar", "No se pudo enviar mail a soporte en este momento. Inténtelo de nuevo en otro momneto.").Render(r.Context(), w)
+		return
+	}
+	descripcion_problema := r.FormValue("descripcion")
+	err = enviarMailSoporte(descripcion_problema)
+	if err != nil {
+		views.ErrorTemplate("Error al enviar", "No se pudo enviar mail a soporte en este momento. Inténtelo de nuevo en otro momneto.").Render(r.Context(), w)
+		return
+	}
+	views.SoporteFormEnviado().Render(r.Context(), w)
+}

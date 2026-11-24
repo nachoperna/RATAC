@@ -11,6 +11,7 @@
       --border: #ddd8ee;
       --white: #ffffff;
       --bg: #f7f6fb;
+      --bg-page: #f7f6fb;
       --gray-border: #d1d5db;
       --color-bg: #f8f9fc;
       --color-card-bg: #ffffff;
@@ -692,6 +693,268 @@ font-size: 14px;
 font-weight: 300;
 color: var(--muted);
 line-height: 1.7;
+}
+
+/* ==========================================================================
+   BOTÓN FLOTANTE DE SOPORTE (Esquina inferior izquierda)
+   ========================================================================== */
+.btn-support-floating {
+  position: fixed;
+  bottom: 28px;
+  left: 28px;
+  z-index: 900;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 6px;
+  background-color: var(--bg-card, #ffffff);
+  color: var(--navy);
+  border: 1px solid var(--border, #ddd8ee);
+  box-shadow: 0 4px 12px rgba(26, 26, 110, 0.08);
+font-family: 'DM Mono', monospace;
+font-size: 12px;
+font-weight: 600;
+text-transform: uppercase;
+letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-support-floating:hover {
+  background-color: #383896;
+  color: var(--lavender, #e8e4f5);
+  border-color: var(--lavender-mid, #c9bfea);
+  box-shadow: 0 6px 16px rgba(26, 26, 110, 0.12);
+}
+
+.btn-support-floating svg {
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .btn-support-floating {
+    bottom: 20px;
+    left: 20px;
+    padding: 12px;
+  }
+  .btn-support-floating span {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   MODAL DE SOPORTE (Renderizado activo por defecto para Templ / HTMX)
+   ========================================================================== */
+@keyframes modalOverlayFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalCardSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-support-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background-color: rgba(26, 26, 110, 0.45);
+  backdrop-filter: blur(3px);
+  animation: modalOverlayFadeIn 0.2s ease-out forwards;
+}
+
+.modal-support-card {
+  width: 100%;
+  max-width: 460px;
+  background-color: var(--bg-card, #ffffff);
+  border: 1px solid var(--border, #ddd8ee);
+  border-radius: 14px;
+  padding: 24px 28px;
+  box-shadow: 0 20px 40px rgba(26, 26, 110, 0.16);
+  animation: modalCardSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Cabecera del Modal */
+.modal-support-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.modal-support-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.modal-support-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background-color: var(--lavender, #e8e4f5);
+  color: var(--navy, #1a1a6e);
+  flex-shrink: 0;
+}
+
+.modal-support-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--navy, #1a1a6e);
+  line-height: 1.25;
+}
+
+/* Textos descriptivos */
+.modal-support-description,
+.modal-description {
+  margin: 0 0 20px 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-muted, #6b6b8a);
+}
+
+/* Formulario */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 22px;
+}
+
+.form-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--navy, #1a1a6e);
+  margin-bottom: 8px;
+}
+
+.support-textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 12px 14px;
+  border: 1px solid var(--border, #ddd8ee);
+  border-radius: 8px;
+  background-color: var(--bg-page, #f7f6fb);
+  color: #1e1e3f;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  resize: vertical;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.support-textarea::placeholder {
+  color: #9696b3;
+}
+
+.support-textarea:focus {
+  outline: none;
+  background-color: #ffffff;
+  border-color: var(--navy, #1a1a6e);
+  box-shadow: 0 0 0 3px rgba(26, 26, 110, 0.1);
+}
+
+/* Botonera de acciones */
+.modal-support-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.modal-support-card .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 18px;
+  border-radius: 8px;
+font-family: 'DM Mono', monospace;
+font-size: 12px;
+font-weight: 600;
+text-transform: uppercase;
+letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.modal-support-card .btn-cancel {
+  background-color: #ffffff;
+  color: var(--text-muted, #6b6b8a);
+  border: 1px solid var(--border, #ddd8ee);
+}
+
+.modal-support-card .btn-cancel:hover {
+  background-color: var(--lavender, #e8e4f5);
+  color: var(--navy, #1a1a6e);
+  border-color: var(--lavender-mid, #c9bfea);
+}
+
+.modal-support-card .btn-send {
+  background-color: var(--navy, #1a1a6e);
+  color: #ffffff;
+  border: 1px solid var(--navy, #1a1a6e);
+}
+
+.modal-support-card .btn-send:hover {
+  background-color: #27278f;
+  border-color: #27278f;
+}
+
+.modal-support-card .btn-send:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+#support-form.htmx-request { pointer-events: none; opacity: .85; }
+#support-form.htmx-request .btn-label { display: none; }
+#support-form.htmx-request .btn-loading { display: inline-flex; align-items: center; gap: 8px; }
+.btn-loading { display: none; }
+.btn-spinner { width:14px; height:14px; border:2px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+/* ==========================================================================
+   VISTA DE CONFIRMACIÓN (SoporteFormEnviado)
+   ========================================================================== */
+.success-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 12px 4px 4px;
+  animation: modalOverlayFadeIn 0.25s ease-out forwards;
+}
+
+.success-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+  margin-bottom: 16px;
 }
 
 #scroll-up {
