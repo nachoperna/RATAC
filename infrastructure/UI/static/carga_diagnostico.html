@@ -8,8 +8,8 @@
       <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
       <link rel="stylesheet" href="/static/index.css?v=1">
       <link rel="stylesheet" href="/static/carga_diagnostico.css?v=1">
-      <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-      <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>   
+      <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+      <script src="https://unpkg.com/htmx-ext-json-enc@2.0.1/json-enc.js"></script>
  
 </head>
 <body>
@@ -59,6 +59,8 @@
                                           hx-post="/diagnosticos/alta/procesado"
                                           hx-encoding="multipart/form-data"
                                           hx-trigger="change"
+                                          hx-on:change="if(this.files[0]) document.getElementById('processing-filename').textContent = this.files[0].name"
+                                          hx-indicator=".processing-overlay"
                                           >
                                     <div class="loader" id="loader"></div>
                               </div>
@@ -211,7 +213,27 @@
       </button>
       <!-- Overlay de Error HTML -->
       <div id="error" class="error-overlay"> </div>
-
+      <div id="processing-overlay" class="processing-overlay" aria-live="polite" aria-busy="true">
+            <div class="processing-card">
+                  <div class="doc-scanner-wrapper">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                              <polyline points="14 2 14 8 20 8"></polyline>
+                              <line x1="16" y1="13" x2="8" y2="13"></line>
+                              <line x1="16" y1="17" x2="8" y2="17"></line>
+                              <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                  </div>
+                  
+                  <h3 class="processing-title">Procesando documento</h3>
+                  <div class="processing-file-badge" id="processing-filename">Documento seleccionado</div>
+                  <p class="processing-step-text" id="processing-step-text">Procesando diagnóstico...</p>
+                  
+                  <div class="progress-track">
+                        <div class="progress-bar-indeterminate"></div>
+                  </div>
+            </div>
+      </div>
       <script src="/static/confirmacion.js?v=1"></script>
       <script src="/static/carga_diagnostico.js?v=1"></script>
 </body>
